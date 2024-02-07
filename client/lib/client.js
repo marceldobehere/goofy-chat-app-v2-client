@@ -20,7 +20,7 @@ function initUserStuff()
 function initServerListStuff()
 {
     serverList = loadObjectOrCreateDefault("serverList", []);
-    serverList = ["http://localhost:80"];
+    serverList = ["https://goofy2.marceldobehere.com"];
     saveObject("serverList", serverList);
     logTxt("Server List:", serverList);
 }
