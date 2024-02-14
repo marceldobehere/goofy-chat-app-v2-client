@@ -19,15 +19,15 @@ function initUserStuff()
 
 function initServerListStuff()
 {
-    serverList = loadObjectOrCreateDefault("serverList", []);
-    serverList = ["https://goofy2.marceldobehere.com"];
+    serverList = loadObjectOrCreateDefault("serverList", ["https://goofy2.marceldobehere.com"]);
+    //serverList = ["https://goofy2.marceldobehere.com"];
     saveObject("serverList", serverList);
     logTxt("Server List:", serverList);
 }
 
 async function checkUserStuff()
 {
-    let pubKey = await getUserPubKey(currentUser["mainAccount"]["userId"]);
+    let pubKey = await getPublicKeyFromUser(currentUser["mainAccount"]["userId"]);
     if (pubKey === undefined)
     {
         logError("User not found on server");

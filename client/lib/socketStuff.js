@@ -126,13 +126,9 @@ async function login(socket, account)
     logInfo(`Logged in as ${account["userId"]}!`);
 }
 
-let userIdPubKeyCache = {};
 
-async function getUserPubKey(userId)
+async function _getUserPubKey(userId)
 {
-    if (userIdPubKeyCache[userId])
-        return userIdPubKeyCache[userId];
-
     for (let socket of serverSocketList)
     {
         let reply = await msgSendAndGetReply(socket, "get-pub-key", userId);
@@ -151,7 +147,6 @@ async function getUserPubKey(userId)
                 continue;
             }
 
-            userIdPubKeyCache[userId] = pubKey;
             return pubKey;
         }
     }
