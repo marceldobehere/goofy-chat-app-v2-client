@@ -37,10 +37,28 @@ async function accSendRawMessageSock(accountFrom, socketTo, userIdTo, data)
     return true;
 }
 
+class AsyncLock {
+    constructor () {
+        this.disable = () => {}
+        this.promise = Promise.resolve()
+    }
+
+    enable () {
+        this.promise = new Promise(resolve => this.disable = resolve)
+    }
+}
+const lock = new AsyncLock();
+
 async function _handleMessageSock(socketFrom, data)
 {
+    await lock.promise
+    lock.enable();
+
     if (data === undefined)
+    {
+        lock.disable()
         return logWarn(`Invalid message from ${socketFrom}:`, data);
+    }
 
     let userIdFrom = data["from"];
     let userIdTo = data["to"];
@@ -49,14 +67,22 @@ async function _handleMessageSock(socketFrom, data)
         date = new Date(data["date"]);
     }
     catch (e) {
+        lock.disable();
         return logWarn(`Invalid date from ${socketFrom}:`, data);
     }
     let msg = data["data"];
 
     if (userIdFrom === undefined || userIdTo === undefined || date === undefined || msg === undefined)
+    {
+        lock.disable();
         return logWarn(`Invalid message from ${socketFrom}:`, data);
+    }
+
+
 
     await handleMessageSock(socketFrom, userIdFrom, userIdTo, date, msg);
+
+    lock.disable();
 }
 
 async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)
@@ -92,9 +118,11 @@ async function sendRsaMessageToUser(accountFrom, userIdTo, data)
     }
 
     let rsaStrList = await StringIntoRsaStringListAsync(JSON.stringify(data), pubKey);
+    let sig = createSignature(data, accountFrom["private-key"]);
     let msgObj = {
         type: "rsa",
-        data: rsaStrList
+        data: rsaStrList,
+        signature: sig
     }
 
     return await accSendRawMessage(accountFrom, userIdTo, msgObj);
@@ -133,6 +161,20 @@ async function handleMessageSock(socketFrom, userIdFrom, userIdTo, date, data)
             return logWarn(`No private key for user ${currentUser["mainAccount"]["userId"]}`);
         let dataStr = await rsaStringListIntoStringAsync(data["data"], privKey);
         let dataObj = JSON.parse(dataStr);
+
+        let sig = data["signature"];
+        let pubKey = await getPublicKeyFromUser(userIdFrom);
+        if (pubKey === undefined)
+        {
+            logError(`User not found on server`);
+            return;
+        }
+        if (!verifySignature(dataObj, sig, pubKey))
+        {
+            logError(`Invalid signature from ${userIdFrom} to ${userIdTo}:`, data);
+            return;
+        }
+
         await addMessageToUser(currentUser["mainAccount"], userIdFrom, dataObj, date);
     }
     else

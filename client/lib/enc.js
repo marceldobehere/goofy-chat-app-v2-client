@@ -180,15 +180,15 @@ function accDecRsa(str, account)
     return decryptStr(str, account["private-key"]);
 }
 
-function accSign(obj, account)
-{
-    return createSignature(obj, account["private-key"]);
-}
-
-function accVerify(obj, account)
-{
-    return verifySignature(obj, account["signature"], account["public-key"]);
-}
+// function accSign(obj, account)
+// {
+//     return createSignature(obj, account["private-key"]);
+// }
+//
+// function accVerify(obj, account)
+// {
+//     return verifySignature(obj, account["signature"], account["public-key"]);
+// }
 
 function encAes(str, key)
 {
