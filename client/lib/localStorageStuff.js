@@ -87,7 +87,7 @@ function loadObject(key)
     if (!isPasswordSecured)
         return _loadObject(key);
 
-    let temp = localStorage.getItem(key);
+    let temp = _loadObject(key);
     if (temp == null)
         return null;
     let res = aesDecrypt(temp, securedPasswordKey);
@@ -101,7 +101,7 @@ function saveObject(key, obj)
 
     let temp = JSON.stringify(obj);
     temp = aesEncrypt(temp, securedPasswordKey);
-    localStorage.setItem(key, temp);
+    _saveObject(key, temp);
 }
 
 function loadObjectOrCreateDefault(key, defaultObj)
@@ -146,20 +146,20 @@ function aesDecrypt(enc, key)
     return CryptoJS.AES.decrypt(enc, key).toString(CryptoJS.enc.Utf8);
 }
 
-function loadAesEncryptedObject(key, _key)
-{
-    let temp = localStorage.getItem(key);
-    if (temp == null)
-        return null;
-
-    temp = aesDecrypt(temp, _key);
-    return JSON.parse(temp);
-}
-
-function saveAesEncryptedObject(key, obj, _key)
-{
-    let temp = JSON.stringify(obj);
-    temp = aesEncrypt(temp, _key);
-
-    localStorage.setItem(key, temp);
-}
+// function loadAesEncryptedObject(key, _key)
+// {
+//     let temp = loadObject(key);
+//     if (temp == null)
+//         return null;
+//
+//     temp = aesDecrypt(temp, _key);
+//     return JSON.parse(temp);
+// }
+//
+// function saveAesEncryptedObject(key, obj, _key)
+// {
+//     let temp = JSON.stringify(obj);
+//     temp = aesEncrypt(temp, _key);
+//
+//     saveObject(key, temp);
+// }
