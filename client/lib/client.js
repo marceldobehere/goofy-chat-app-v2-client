@@ -43,6 +43,17 @@ async function checkUserStuff()
 
 async function initClientLib()
 {
+    await initLocalStorageStuff(
+        () => {
+            return prompt("Enter password:");
+        },
+        () => {
+            alert("Invalid password");
+        },
+        () => {
+            return confirm("Do you want to secure your data with a password?");
+        });
+
     initUserStuff();
     initServerListStuff();
 
