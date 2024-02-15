@@ -61,7 +61,11 @@ async function _handleMessageSock(socketFrom, data)
 
 async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)
 {
-    let data = {symmKey: symmKey};
+    let data = {
+        type: "symm-key",
+        symmKey: symmKey
+    };
+
     return await sendRsaMessageToUser(accountFrom, userIdTo, data);
 }
 
@@ -96,11 +100,12 @@ async function sendRsaMessageToUser(accountFrom, userIdTo, data)
     return await accSendRawMessage(accountFrom, userIdTo, msgObj);
 }
 
-async function sendSecureMessageToUser(accountFrom, userIdTo, data)
+async function sendSecureMessageToUser(accountFrom, userIdTo, data, type)
 {
     let msg = {
         messageId: getRandomIntInclusive(0, 99999999999),
-        data: data
+        data: data,
+        type: type
     };
 
     await sendAesMessageToUser(accountFrom, userIdTo, msg);
@@ -119,7 +124,7 @@ async function handleMessageSock(socketFrom, userIdFrom, userIdTo, date, data)
             return logWarn(`No last symm key for user ${userIdFrom}`);
         let dataStr = await aesDecrypt(data["data"], symmKey);
         let dataObj = JSON.parse(dataStr);
-        await addMessageToUser(currentUser["mainAccount"], userIdFrom, dataObj);
+        await addMessageToUser(currentUser["mainAccount"], userIdFrom, dataObj, date);
     }
     else if (data["type"] === "rsa")
     {
@@ -128,7 +133,7 @@ async function handleMessageSock(socketFrom, userIdFrom, userIdTo, date, data)
             return logWarn(`No private key for user ${currentUser["mainAccount"]["userId"]}`);
         let dataStr = await rsaStringListIntoStringAsync(data["data"], privKey);
         let dataObj = JSON.parse(dataStr);
-        await addMessageToUser(currentUser["mainAccount"], userIdFrom, dataObj);
+        await addMessageToUser(currentUser["mainAccount"], userIdFrom, dataObj, date);
     }
     else
         return logWarn(`Invalid message type from ${userIdFrom} to ${userIdTo}:`, data);
