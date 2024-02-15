@@ -67,3 +67,28 @@ async function initClientLib()
 
     //console.log(await accSendRawMessage(currentUser["mainAccount"], currentUser["mainAccount"]["userId"], {text: "yooo"}));
 }
+
+function currUserExportMainAccount()
+{
+    return exportMainAccount(currentUser);
+}
+
+function currUserImportUserMainAccountAndCreateCustomListener(importedUser)
+{
+    importUserMainAccountAndCreateCustomListener(currentUser, importedUser);
+    saveObject("currentUser", currentUser);
+}
+
+function currUserAddRedirect(listener)
+{
+    addRedirectToUser(currentUser, listener);
+    saveObject("currentUser", currentUser);
+}
+
+function currUserImportUserMainAccountAndRedirectAndCreateCustomListener(importedUser)
+{
+    importUserMainAccountAndCreateCustomListener(currentUser, importedUser);
+    clearRedirects(currentUser);
+    currUserAddRedirect(importedUser["listenerAccount"]["userId"]);
+    saveObject("currentUser", currentUser);
+}

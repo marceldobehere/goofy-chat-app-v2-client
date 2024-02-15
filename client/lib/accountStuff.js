@@ -35,3 +35,25 @@ function testUser(user)
 
     return work;
 }
+
+function exportMainAccount(user)
+{
+    return user;
+}
+
+function importUserMainAccountAndCreateCustomListener(user, importedUser)
+{
+    user["mainAccount"] = importedUser["mainAccount"];
+    user["listenerAccount"] = createAccount();
+    user["useListener"] = true;
+}
+
+function addRedirectToUser(user, listener)
+{
+    user["redirectAccounts"].push(listener);
+}
+
+function clearRedirects(user)
+{
+    user["redirectAccounts"] = [];
+}
