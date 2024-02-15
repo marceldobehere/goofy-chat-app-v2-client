@@ -5,6 +5,11 @@ function generateKeys ()
     return {"public": crypt.getPublicKey(), "private": crypt.getPrivateKey()};
 };
 
+function generateSymmKey()
+{
+    return CryptoJS.lib.WordArray.random(128/8).toString();
+}
+
 function testRsa(pubKey, privKey)
 {
     let testStr1 = 'Hello, world!';
@@ -125,7 +130,6 @@ async function StringIntoRsaStringListAsync(str, pubKey)
     {
         let chunk = rawStrList[i];
         let rsaChunk = encryptStr(chunk, pubKey);
-        await delay(10);
         rsaStrList.push(rsaChunk);
     }
 
@@ -145,8 +149,6 @@ async function rsaStringListIntoStringAsync(rsaStrList, privKey)
     {
         let rsaChunk = rsaStrList[i];
         let chunk = decryptStr(rsaChunk, privKey);
-
-        await delay(10);
         str += chunk;
     }
     return str;

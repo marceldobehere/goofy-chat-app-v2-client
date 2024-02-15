@@ -60,6 +60,8 @@ async function initClientLib()
     await createSockets(serverList, currentUser);
     await checkUserStuff();
 
+    await initUserMsgSystem();
+
     await initMsgSystem();
 
 
