@@ -3,8 +3,17 @@ async function initUserMsgSystem()
 
 }
 
+function privateSymmKey(account)
+{
+    return hashString(account["private-key"])+"";
+
+}
+
 async function getUserMySymmKey(account, userId)
 {
+    if (userId == account["userId"])
+        return privateSymmKey(account);
+
     let symmKey = loadAccountObject(account, `USER_MY_SYMM_KEY_${userId}`);
     if (symmKey == undefined)
     {
@@ -23,6 +32,9 @@ async function setUserMySymmKey(account, userId, key)
 
 async function getUserLastSymmKey(account, userId)
 {
+    if (userId == account["userId"])
+        return privateSymmKey(account);
+
     return loadAccountObject(account, `USER_SYMM_KEY_${userId}`);
 }
 
@@ -42,7 +54,7 @@ async function messageIdInUser(account, userId, messageId)
 async function addMessageIdToUser(account, userId, messageId)
 {
     let messageIds = loadAccountObject(account, `USER_MSG_IDS_${userId}`);
-    if (messageIds === undefined)
+    if (messageIds == undefined)
         messageIds = [];
     messageIds.push(messageId);
     saveAccountObject(account, `USER_MSG_IDS_${userId}`, messageIds);
@@ -109,8 +121,45 @@ async function internalRemoveUserMessage(account, userId, messageId)
 
 async function addMessageToUser(account, userIdTo, message, date)
 {
+    message["date"] = date;
+    message["from"] = userIdTo;
     logInfo(`Adding message to user ${userIdTo}:`, message);
     let type = message["type"];
+    let messageId = message["messageId"];
+    if (messageId == undefined)
+    {
+        logWarn(`Message without messageId:`, message);
+        return;
+    }
+
+    if (!await messageIdInUser(account, userIdTo, messageId) && type != "redirect")
+    {
+        await addMessageIdToUser(account, userIdTo, messageId);
+
+        if (currentUser["redirectAccounts"].length > 0)
+        {
+            let msg = {
+                messageId: getRandomIntInclusive(0, 99999999999),
+                data: message,
+                type: "redirect"
+            };
+
+
+            for (let i = 0; i < currentUser["redirectAccounts"].length; i++)
+            {
+                let redirect = currentUser["redirectAccounts"][i];
+
+                logInfo(`Redirecting message to ${redirect}:`, message);
+                await _sendAesMessageToUser(account, redirect, msg, privateSymmKey(account));
+            }
+        }
+    }
+    else if (type != "redirect")
+    {
+        logWarn(`Message already in user:`, message);
+        return;
+    }
+
 
     if (type == "symm-key")
     {
@@ -122,22 +171,20 @@ async function addMessageToUser(account, userIdTo, message, date)
     {
         await addNormalMessageToUser(account, userIdTo, message, date);
     }
+    else if (type == "redirect")
+    {
+        logInfo("Redirect message", message);
+        //logError("NO REDIRECT IMPLEMENTED!");
+        await addMessageToUser(account, message["data"]["from"], message["data"], message["data"]["date"]);
+    }
     else
     {
         logWarn(`Unknown message type: ${type}`);
     }
 }
 
-async function addNormalMessageToUser(account, userIdTo, message, date)
+async function addNormalMessageToUser(account, userIdTo, message)
 {
-    message["date"] = date;
-    message["from"] = userIdTo;
-    let messageId = message["messageId"];
-    if (messageId == undefined || await messageIdInUser(account, userIdTo, messageId))
-    {
-        logWarn(`Message already in user ${userIdTo}:`, message);
-        return;
-    }
     logInfo(`New message from user ${userIdTo}:`, message);
     await internalAddUserMessageSorted(account, userIdTo, message);
 }

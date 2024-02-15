@@ -89,7 +89,8 @@ async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)
 {
     let data = {
         type: "symm-key",
-        symmKey: symmKey
+        symmKey: symmKey,
+        messageId: getRandomIntInclusive(0, 99999999999)
     };
 
     return await sendRsaMessageToUser(accountFrom, userIdTo, data);
@@ -98,6 +99,18 @@ async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)
 async function sendAesMessageToUser(accountFrom, userIdTo, data)
 {
     let symmKey = await getUserMySymmKey(accountFrom, userIdTo);
+    let dataEnc = aesEncrypt(JSON.stringify(data), symmKey);
+
+    let msgObj = {
+        type: "aes",
+        data: dataEnc
+    }
+
+    return await accSendRawMessage(accountFrom, userIdTo, msgObj);
+}
+
+async function _sendAesMessageToUser(accountFrom, userIdTo, data, symmKey)
+{
     let dataEnc = aesEncrypt(JSON.stringify(data), symmKey);
 
     let msgObj = {

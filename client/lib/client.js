@@ -85,6 +85,12 @@ function currUserAddRedirect(listener)
     saveObject("currentUser", currentUser);
 }
 
+function currUserClearRedirects()
+{
+    clearRedirects(currentUser);
+    saveObject("currentUser", currentUser);
+}
+
 function currUserImportUserMainAccountAndRedirectAndCreateCustomListener(importedUser)
 {
     importUserMainAccountAndCreateCustomListener(currentUser, importedUser);
