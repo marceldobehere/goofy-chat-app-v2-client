@@ -13,7 +13,7 @@ function resetWithPassword(password)
 
 function resetWithoutPassword(password)
 {
-clearAllLocalStorage();
+    clearAllLocalStorage();
     _saveObject("isPasswordSecured", false);
 }
 
@@ -86,6 +86,9 @@ function loadObject(key)
 {
     if (!isPasswordSecured)
         return _loadObject(key);
+    // console.log(`> LOAD OBJECT: ${key} (1/2)`);
+    // key = aesEncrypt(key, securedPasswordKey);
+    // console.log(`> LOAD OBJECT: ${key} (2/2)`);
 
     let temp = _loadObject(key);
     if (temp == null)
@@ -98,6 +101,9 @@ function saveObject(key, obj)
 {
     if (!isPasswordSecured)
         return _saveObject(key, obj);
+    // console.log(`> SAVING OBJECT: ${key} (1/2)`);
+    // key = aesEncrypt(key, securedPasswordKey);
+    // console.log(`> SAVING OBJECT: ${key} (2/2)`);
 
     let temp = JSON.stringify(obj);
     temp = aesEncrypt(temp, securedPasswordKey);
