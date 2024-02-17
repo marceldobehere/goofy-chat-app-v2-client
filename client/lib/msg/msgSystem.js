@@ -47,16 +47,17 @@ class AsyncLock {
         this.promise = new Promise(resolve => this.disable = resolve)
     }
 }
-const lock = new AsyncLock();
+const lockIncoming = new AsyncLock();
+const lockOutgoing = new AsyncLock();
 
 async function _handleMessageSock(socketFrom, data)
 {
-    await lock.promise
-    lock.enable();
+    await lockIncoming.promise
+    lockIncoming.enable();
 
     if (data === undefined)
     {
-        lock.disable()
+        lockIncoming.disable()
         return logWarn(`Invalid message from ${socketFrom}:`, data);
     }
 
@@ -67,14 +68,14 @@ async function _handleMessageSock(socketFrom, data)
         date = new Date(data["date"]);
     }
     catch (e) {
-        lock.disable();
+        lockIncoming.disable();
         return logWarn(`Invalid date from ${socketFrom}:`, data);
     }
     let msg = data["data"];
 
     if (userIdFrom === undefined || userIdTo === undefined || date === undefined || msg === undefined)
     {
-        lock.disable();
+        lockIncoming.disable();
         return logWarn(`Invalid message from ${socketFrom}:`, data);
     }
 
@@ -82,7 +83,7 @@ async function _handleMessageSock(socketFrom, data)
 
     await handleMessageSock(socketFrom, userIdFrom, userIdTo, date, msg);
 
-    lock.disable();
+    lockIncoming.disable();
 }
 
 async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)
@@ -143,13 +144,22 @@ async function sendRsaMessageToUser(accountFrom, userIdTo, data)
 
 async function sendSecureMessageToUser(accountFrom, userIdTo, data, type)
 {
-    let msg = {
-        messageId: getRandomIntInclusive(0, 99999999999),
-        data: data,
-        type: type
-    };
+    await lockOutgoing.promise;
+    lockOutgoing.enable();
 
-    await sendAesMessageToUser(accountFrom, userIdTo, msg);
+    try {
+        let msg = {
+            messageId: getRandomIntInclusive(0, 99999999999),
+            data: data,
+            type: type
+        };
+
+        await sendAesMessageToUser(accountFrom, userIdTo, msg);
+    }
+    catch (e) {
+        logError(e);
+    }
+    lockOutgoing.disable();
 }
 
 async function handleMessageSock(socketFrom, userIdFrom, userIdTo, date, data)

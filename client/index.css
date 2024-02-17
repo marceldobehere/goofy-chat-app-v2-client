@@ -1,0 +1,55 @@
+* {
+    color: #e0e0ff;
+    background-color: #101020;
+}
+
+.video-test {
+    width: 100%;
+    border: 1px solid orange;
+}
+
+.video-test-feed {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+    margin-top: 20px;
+    border: 1px solid red;
+}
+
+.video-test-feed > span {
+    border: 1px solid blue;
+    text-align: center;
+    width: 100%;
+}
+
+.video-test-feed > span > video{
+    width: 100%;
+    height: auto;
+    border: 1px solid green;
+}
+
+
+.video-test-menu {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+
+.video-test-menu > button {
+    width: 30%;
+    margin: auto;
+    padding: 10px;
+    border: 1px solid blue;
+    align-self: center;
+}
+
+
+h2{
+    text-align: center;
+    margin-top: 20px;
+}

@@ -9,6 +9,32 @@
     <h1>Hello</h1>
     <p>Hoi</p>
 
+    <br><br>
+    <div>
+        <h2>VC Test</h2>
+        <div class="video-test">
+            <div class="video-test-feed">
+            <span>
+                <h3>Local Video</h3>
+                <video id="vctest-local-video"></video>
+            </span>
+
+                <span>
+                <h3>Remote Video</h3>
+                <video id="vctest-remote-video"></video>
+            </span>
+            </div>
+            <div class="video-test-menu">
+                <button id="vctest-webcam-enable-btn">Toggle Webcam</button>
+                <button id="vctest-audio-enable-btn">Toggle Audio</button>
+            </div>
+            <div class="video-test-menu">
+                <button id="vctest-call-btn">Call</button>
+                <button id="vctest-hang-up-btn">Hang up</button>
+            </div>
+        </div>
+        <br>
+    </div>
 </body>
 <script src="./ext/jsencrypt.min.js"></script>
 <script src="./ext/crypto_js/crypto-js.js"></script>
@@ -24,6 +50,7 @@
 <script src="./lib/msg/msgInterface.js"></script>
 <script src="./lib/user/userMsgSystem.js"></script>
 <script src="./lib/msg/msgSystem.js"></script>
+<script src="./lib/vc/vctest.js"></script>
 <script src="./lib/client.js"></script>
 <script src="./clientJs/extra.js"></script>
 <script src="./clientJs/profileStuff.js"></script>

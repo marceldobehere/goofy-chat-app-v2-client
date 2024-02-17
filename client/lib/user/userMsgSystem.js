@@ -177,6 +177,22 @@ async function addMessageToUser(account, userIdTo, message, date)
         //logError("NO REDIRECT IMPLEMENTED!");
         await addMessageToUser(account, message["data"]["from"], message["data"], message["data"]["date"]);
     }
+    else if (type == "call-start")
+    {
+        await VCTEST_onReceiveCallOffer(account, userIdTo, message["data"]);
+    }
+    else if (type == "call-stop")
+    {
+        await VCTEST_onReceiveHangup(account, userIdTo, message["data"]);
+    }
+    else if (type == "call-reply")
+    {
+        await VCTEST_onReceiveCallReply(account, userIdTo, message["data"]);
+    }
+    else if (type == "ice-candidate")
+    {
+        await VCTEST_onReceiveIceCandidate(account, userIdTo, message["data"]);
+    }
     else
     {
         logWarn(`Unknown message type: ${type}`);

@@ -57,12 +57,21 @@ async function initClientLib()
     initUserStuff();
     initServerListStuff();
 
+    await initUserMsgSystem();
+    await initMsgSystem();
+
     await createSockets(serverList, currentUser);
     await checkUserStuff();
 
-    await initUserMsgSystem();
 
-    await initMsgSystem();
+    try {
+        await initVcTest();
+    }
+    catch (e)
+    {
+        logWarn("No VC moment");
+        console.log(e);
+    }
 
 
     //console.log(await accSendRawMessage(currentUser["mainAccount"], currentUser["mainAccount"]["userId"], {text: "yooo"}));
