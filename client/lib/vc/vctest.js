@@ -258,7 +258,7 @@ async function toggleWebcamPressed()
             return;
 
         // Get video stream from selected device
-        let tempLocalVideoStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: videoDevices[videoIndex].deviceId }, audio: true });
+        let tempLocalVideoStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: videoDevices[videoIndex].deviceId } });
         localVideoTrack = tempLocalVideoStream.getVideoTracks()[0];
     }
     else
