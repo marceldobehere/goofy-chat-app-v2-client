@@ -229,6 +229,7 @@ async function replaceTrack(kind, track)
 
 async function toggleWebcamPressed()
 {
+    await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
     if (localVideoTrack == emptyVideoTrack)
     {
         // Get all video devices
@@ -270,6 +271,7 @@ async function toggleWebcamPressed()
 
 async function toggleAudioPressed()
 {
+    await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
     if (localAudioTrack == emptyAudioTrack)
     {
         // Get all audio devices
