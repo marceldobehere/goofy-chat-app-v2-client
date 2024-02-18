@@ -91,6 +91,7 @@ async function initVcTest()
         localVideo.play();
     }
     localVideo.controls = true;
+    localVideo.muted = true;
 
     // Pull tracks from remote stream, add to video stream
     pc.ontrack = event => {
