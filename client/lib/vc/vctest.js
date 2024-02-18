@@ -189,8 +189,7 @@ async function VCTEST_onReceiveHangup(account, userIdTo, message)
     pc.onicecandidate = null;
     pc.ontrack = null;
 
-
-
+    alert(`Call with ${userIdTo} ended`);
 }
 
 
@@ -286,11 +285,15 @@ async function toggleWebcamPressed()
         // Get video stream from selected device
         let tempLocalVideoStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: videoDevices[videoIndex].deviceId } });
         localVideoTrack = tempLocalVideoStream.getVideoTracks()[0];
+
+        toggleWebcamButton.textContent = "Disable Webcam";
     }
     else
     {
         localVideoTrack.stop();
         localVideoTrack = emptyVideoTrack;
+
+        toggleWebcamButton.textContent = "Enable Webcam";
     }
 
     // Replace tracks in peer connection
@@ -334,11 +337,15 @@ async function toggleAudioPressed()
         // Get audio stream from selected device
         let tempLocalAudioStream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: audioDevices[audioIndex].deviceId } });
         localAudioTrack = tempLocalAudioStream.getAudioTracks()[0];
+
+        toggleAudioButton.textContent = "Disable Audio";
     }
     else
     {
         localAudioTrack.stop();
         localAudioTrack = emptyAudioTrack;
+
+        toggleAudioButton.textContent = "Enable Audio";
     }
 
     // Replace tracks in peer connection

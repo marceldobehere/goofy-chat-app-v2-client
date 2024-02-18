@@ -179,19 +179,39 @@ async function addMessageToUser(account, userIdTo, message, date)
     }
     else if (type == "call-start")
     {
-        await VCTEST_onReceiveCallOffer(account, userIdTo, message["data"]);
+        try {
+            await VCTEST_onReceiveCallOffer(account, userIdTo, message["data"]);
+        }
+        catch (e) {
+            logError(e);
+        }
     }
     else if (type == "call-stop")
     {
-        await VCTEST_onReceiveHangup(account, userIdTo, message["data"]);
+        try {
+            await VCTEST_onReceiveHangup(account, userIdTo, message["data"]);
+        }
+        catch (e) {
+            logError(e);
+        }
     }
     else if (type == "call-reply")
     {
-        await VCTEST_onReceiveCallReply(account, userIdTo, message["data"]);
+        try {
+            await VCTEST_onReceiveCallReply(account, userIdTo, message["data"]);
+        }
+        catch (e) {
+            logError(e);
+        }
     }
     else if (type == "ice-candidate")
     {
-        await VCTEST_onReceiveIceCandidate(account, userIdTo, message["data"]);
+        try {
+            await VCTEST_onReceiveIceCandidate(account, userIdTo, message["data"]);
+        }
+        catch (e) {
+            logError(e);
+        }
     }
     else
     {
