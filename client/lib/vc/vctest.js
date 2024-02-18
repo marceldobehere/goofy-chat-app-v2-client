@@ -106,6 +106,9 @@ async function initVcTest()
     // Push empty tracks to peer connection
     pc.addTrack(emptyAudioTrack, emptyStream);
     pc.addTrack(emptyVideoTrack, emptyStream);
+
+    let userIdSpan = document.getElementById('test-user-id');
+    userIdSpan.innerText = currentUser["mainAccount"]["userId"];
 }
 
 
