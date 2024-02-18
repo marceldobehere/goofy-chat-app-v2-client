@@ -67,7 +67,7 @@ async function initVcTest()
 
     // Create empty local tracks
     emptyAudioTrack = silence();
-    emptyVideoTrack = black({width: 640, height: 480});
+    emptyVideoTrack = black({width: 200, height: 100});
     emptyStream = new MediaStream([emptyAudioTrack, emptyVideoTrack]);
 
     // Set local tracks to empty tracks
@@ -95,12 +95,19 @@ async function initVcTest()
 
     // Pull tracks from remote stream, add to video stream
     pc.ontrack = event => {
+        console.log(event.streams);
         event.streams[0].getTracks().forEach(track => {
             //remoteStream.addTrack(track);
             if (track.kind === "video")
+            {
                 remoteVideoTrack = track;
+                logInfo("Remote video track updated")
+            }
             if (track.kind === "audio")
+            {
                 remoteAudioTrack = track;
+                logInfo("Remote audio track updated")
+            }
         });
 
         remoteStream = new MediaStream([remoteVideoTrack, remoteAudioTrack]);
@@ -150,6 +157,11 @@ async function VCTEST_onReceiveCallOffer(account, userIdTo, message)
     };
 
     await sendSecureMessageToUser(account, userIdTo, {answer: answer}, "call-reply");
+
+    setTimeout(async () => {
+        if (localVideoTrack == emptyVideoTrack)
+            await replaceTrack("video", black({width: 200, height: 100}));
+    }, 100);
 }
 
 async function VCTEST_onReceiveCallReply(account, userIdTo, message)
@@ -161,10 +173,14 @@ async function VCTEST_onReceiveCallReply(account, userIdTo, message)
     if (answer === null)
     {
         logInfo("Call declined");
+        alert(`Call with ${userIdTo} declined`)
         return;
     }
 
     await pc.setRemoteDescription(new RTCSessionDescription(answer));
+
+    if (localVideoTrack == emptyVideoTrack)
+        await replaceTrack("video", black({width: 200, height: 100}));
 
     logInfo("Call accepted");
 }
