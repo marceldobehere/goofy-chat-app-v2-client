@@ -65,8 +65,20 @@ async function initVcTest()
     toggleWebcamButton.addEventListener('click', toggleWebcamPressed);
     toggleAudioButton.addEventListener('click', toggleAudioPressed);
 
+    // Create empty local tracks
+    emptyAudioTrack = silence();
+    emptyVideoTrack = black({width: 640, height: 480});
+    emptyStream = new MediaStream([emptyAudioTrack, emptyVideoTrack]);
 
-    remoteStream = blackSilence({width: 640, height: 480});
+    // Set local tracks to empty tracks
+    localAudioTrack = emptyAudioTrack;
+    localVideoTrack = emptyVideoTrack;
+
+    // Create empty remote tracks
+    remoteAudioTrack = silence();
+    remoteVideoTrack = black({width: 640, height: 480});
+    remoteStream = new MediaStream([remoteAudioTrack, remoteVideoTrack]);
+
     remoteVideo.srcObject = remoteStream;
     remoteVideo.onloadedmetadata = (e) => {
         remoteVideo.play();
@@ -94,14 +106,7 @@ async function initVcTest()
         remoteVideo.srcObject = remoteStream;
     };
 
-    // Create empty tracks
-    emptyAudioTrack = silence();
-    emptyVideoTrack = black({width: 640, height: 480});
-    emptyStream = new MediaStream([emptyAudioTrack, emptyVideoTrack]);
 
-    // Set local tracks to empty tracks
-    localAudioTrack = emptyAudioTrack;
-    localVideoTrack = emptyVideoTrack;
 
     // Push empty tracks to peer connection
     pc.addTrack(emptyAudioTrack, emptyStream);
