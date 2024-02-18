@@ -63,12 +63,14 @@ async function initVcTest()
     remoteVideo.onloadedmetadata = (e) => {
         remoteVideo.play();
     }
+    remoteVideo.controls = true;
 
     localStream = blackSilence({width: 640, height: 480});
     localVideo.srcObject = localStream;
     localVideo.onloadedmetadata = (e) => {
         localVideo.play();
     }
+    localVideo.controls = true;
 
     // Pull tracks from remote stream, add to video stream
     pc.ontrack = event => {
