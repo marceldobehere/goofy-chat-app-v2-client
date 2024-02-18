@@ -19,8 +19,16 @@ const servers = {
     iceCandidatePoolSize: 10
 };
 
+let silenceCtx = [];
+async function resumeSilence() {
+    for (let ctx of silenceCtx) {
+        await ctx.resume();
+    }
+}
+
 let silence = () => {
     let ctx = new AudioContext(), oscillator = ctx.createOscillator();
+    silenceCtx.push(ctx);
     let dst = oscillator.connect(ctx.createMediaStreamDestination());
     oscillator.start();
     return Object.assign(dst.stream.getAudioTracks()[0], {enabled: false});
@@ -180,6 +188,12 @@ async function VCTEST_onReceiveHangup(account, userIdTo, message)
 
 async function callPressed()
 {
+    try {
+        await resumeSilence();
+    }
+    catch (e) {
+
+    }
     remoteUserId = prompt("Enter remote user ID:");
     if (remoteUserId === null)
         return;
@@ -233,6 +247,7 @@ async function toggleWebcamPressed()
 {
     try {
         await navigator.mediaDevices.getUserMedia({ video: true });
+        await resumeSilence();
     }
     catch (e) {
 
@@ -280,6 +295,7 @@ async function toggleAudioPressed()
 {
     try {
         await navigator.mediaDevices.getUserMedia({ audio: true });
+        await resumeSilence();
     }
     catch (e) {
 
