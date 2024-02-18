@@ -6,7 +6,6 @@ async function initUserMsgSystem()
 function privateSymmKey(account)
 {
     return hashString(account["private-key"])+"";
-
 }
 
 async function getUserMySymmKey(account, userId)
@@ -119,6 +118,8 @@ async function internalRemoveUserMessage(account, userId, messageId)
     saveAccountObject(account, `USER_MSGS_${userId}`, newMessages);
 }
 
+const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "ice-candidate"];
+
 async function addMessageToUser(account, userIdTo, message, date)
 {
     message["date"] = date;
@@ -132,7 +133,7 @@ async function addMessageToUser(account, userIdTo, message, date)
         return;
     }
 
-    if (!await messageIdInUser(account, userIdTo, messageId) && type != "redirect")
+    if (!await messageIdInUser(account, userIdTo, messageId) && !dontRedirectTypes.includes(type))
     {
         await addMessageIdToUser(account, userIdTo, messageId);
 
