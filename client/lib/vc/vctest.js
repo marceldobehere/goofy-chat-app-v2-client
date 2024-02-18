@@ -37,7 +37,7 @@ let black = ({width = 640, height = 480} = {}) => {
     let canvas = Object.assign(document.createElement("canvas"), {width, height});
     canvas.getContext('2d').fillRect(0, 0, width, height);
     let stream = canvas.captureStream();
-    return Object.assign(stream.getVideoTracks()[0], {enabled: false});
+    return Object.assign(stream.getVideoTracks()[0], {enabled: true});
 }
 let blackSilence = (...args) => new MediaStream([black(...args), silence()]);
 
@@ -75,8 +75,8 @@ async function initVcTest()
     localVideoTrack = emptyVideoTrack;
 
     // Create empty remote tracks
-    remoteAudioTrack = silence();
-    remoteVideoTrack = black({width: 640, height: 480});
+    remoteAudioTrack = emptyAudioTrack;
+    remoteVideoTrack = emptyVideoTrack;
     remoteStream = new MediaStream([remoteAudioTrack, remoteVideoTrack]);
 
     remoteVideo.srcObject = remoteStream;
@@ -85,7 +85,7 @@ async function initVcTest()
     }
     remoteVideo.controls = true;
 
-    localStream = blackSilence({width: 640, height: 480});
+    localStream = new MediaStream([localVideoTrack, localAudioTrack]);
     localVideo.srcObject = localStream;
     localVideo.onloadedmetadata = (e) => {
         localVideo.play();
