@@ -98,7 +98,7 @@ async function initVcTest()
         event.streams[0].getTracks().forEach(track => {
             //remoteStream.addTrack(track);
             if (track.kind === "video")
-                remoteVideo.srcObject = event.streams[0];
+                remoteVideoTrack = track;
             if (track.kind === "audio")
                 remoteAudioTrack = track;
         });
