@@ -44,33 +44,36 @@ async function _handleMessageSock(socketFrom, data)
     await lockIncoming.promise
     lockIncoming.enable();
 
-    if (data === undefined)
-    {
-        lockIncoming.disable()
-        return logWarn(`Invalid message from ${socketFrom}:`, data);
-    }
-
-    let userIdFrom = data["from"];
-    let userIdTo = data["to"];
-    let date;
     try {
-        date = new Date(data["date"]);
+        if (data === undefined)
+        {
+            lockIncoming.disable()
+            return logWarn(`Invalid message from ${socketFrom}:`, data);
+        }
+
+        let userIdFrom = data["from"];
+        let userIdTo = data["to"];
+        let date;
+        try {
+            date = new Date(data["date"]);
+        }
+        catch (e) {
+            lockIncoming.disable();
+            return logWarn(`Invalid date from ${socketFrom}:`, data);
+        }
+        let msg = data["data"];
+
+        if (userIdFrom === undefined || userIdTo === undefined || date === undefined || msg === undefined)
+        {
+            lockIncoming.disable();
+            return logWarn(`Invalid message from ${socketFrom}:`, data);
+        }
+
+        await handleMessageSock(socketFrom, userIdFrom, userIdTo, date, msg);
     }
     catch (e) {
-        lockIncoming.disable();
-        return logWarn(`Invalid date from ${socketFrom}:`, data);
+        logError(e);
     }
-    let msg = data["data"];
-
-    if (userIdFrom === undefined || userIdTo === undefined || date === undefined || msg === undefined)
-    {
-        lockIncoming.disable();
-        return logWarn(`Invalid message from ${socketFrom}:`, data);
-    }
-
-
-
-    await handleMessageSock(socketFrom, userIdFrom, userIdTo, date, msg);
 
     lockIncoming.disable();
 }
