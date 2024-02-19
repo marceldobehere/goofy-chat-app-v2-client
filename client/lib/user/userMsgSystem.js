@@ -17,8 +17,12 @@ async function getUserMySymmKey(account, userId)
     if (symmKey == undefined)
     {
         symmKey = generateSymmKey();
+        if (!await sendUserNewSymmKey(account, userId, symmKey))
+        {
+            logError(`Failed to send new symm key to ${userId}`);
+            return undefined;
+        }
         await setUserMySymmKey(account, userId, symmKey);
-        await sendUserNewSymmKey(account, userId, symmKey);
     }
 
     return symmKey;
@@ -118,7 +122,7 @@ async function internalRemoveUserMessage(account, userId, messageId)
     saveAccountObject(account, `USER_MSGS_${userId}`, newMessages);
 }
 
-const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "ice-candidate"];
+const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "call-join", "ice-candidate"];
 
 async function addMessageToUser(account, userIdTo, message, date)
 {
@@ -155,7 +159,7 @@ async function addMessageToUser(account, userIdTo, message, date)
             }
         }
     }
-    else if (type != "redirect")
+    else if (!dontRedirectTypes.includes(type))
     {
         logWarn(`Message already in user:`, message);
         return;
@@ -200,6 +204,15 @@ async function addMessageToUser(account, userIdTo, message, date)
     {
         try {
             await VCTEST_onReceiveCallReply(account, userIdTo, message["data"]);
+        }
+        catch (e) {
+            logError(e);
+        }
+    }
+    else if (type == "call-join")
+    {
+        try {
+            await VCTEST_onMemberJoined(account, userIdTo, message["data"]);
         }
         catch (e) {
             logError(e);

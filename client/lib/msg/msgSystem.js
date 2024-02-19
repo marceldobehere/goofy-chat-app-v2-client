@@ -100,6 +100,12 @@ async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)
 async function sendAesMessageToUser(accountFrom, userIdTo, data)
 {
     let symmKey = await getUserMySymmKey(accountFrom, userIdTo);
+    if (symmKey == undefined)
+    {
+        logError(`No symm key for user ${userIdTo}`);
+        return false;
+    }
+
     let dataEnc = aesEncrypt(JSON.stringify(data), symmKey);
 
     let msgObj = {
@@ -146,6 +152,7 @@ async function sendSecureMessageToUser(accountFrom, userIdTo, data, type)
 {
     await lockOutgoing.promise;
     lockOutgoing.enable();
+    let status = true;
 
     try {
         let msg = {
@@ -154,12 +161,15 @@ async function sendSecureMessageToUser(accountFrom, userIdTo, data, type)
             type: type
         };
 
-        await sendAesMessageToUser(accountFrom, userIdTo, msg);
+        status = await sendAesMessageToUser(accountFrom, userIdTo, msg);
     }
     catch (e) {
         logError(e);
+        status = false;
     }
     lockOutgoing.disable();
+
+    return status;
 }
 
 async function handleMessageSock(socketFrom, userIdFrom, userIdTo, date, data)

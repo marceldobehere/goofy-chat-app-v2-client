@@ -12,7 +12,13 @@ const servers = {
 let silenceCtx = [];
 async function resumeSilence() {
     for (let ctx of silenceCtx) {
-        await ctx.resume();
+        try {
+            await ctx.resume();
+        }
+        catch (e)
+        {
+
+        }
     }
 }
 
@@ -30,9 +36,16 @@ let black = ({width = 640, height = 480} = {}) => {
     return Object.assign(stream.getVideoTracks()[0], {enabled: true});
 }
 
-const defaultSilence = silence();
-const defaultBlack = black({width: 20, height: 10});
-const defaultBlackSilence = new MediaStream([defaultBlack, defaultSilence]);
+const defaultVideoBlackSilence = new MediaStream([black({width: 20, height: 10}), silence()]);
+
+const defaultCameraSilence = silence();
+const defaultCameraBlack = black({width: 20, height: 10});
+const defaultCameraBlackSilence = new MediaStream([defaultCameraBlack, defaultCameraSilence]);
+
+const defaultStreamSilence = silence();
+const defaultStreamBlack = black({width: 20, height: 10});
+const defaultStreamBlackSilence = new MediaStream([defaultStreamBlack, defaultStreamSilence]);
+
 
 const videoContainer = document.getElementById('vctest-video-container');
 const callButton = document.getElementById('vctest-call-btn');
@@ -41,14 +54,16 @@ const toggleAudioButton = document.getElementById('vctest-audio-enable-btn');
 const toggleWebcamButton = document.getElementById('vctest-webcam-enable-btn');
 const toggleStreamButton = document.getElementById('vctest-stream-enable-btn');
 
+
 let otherMembers = {};
 let localCameraVideo = undefined;
 let localStreamVideo = undefined;
 
-let mediaLocalCameraTrack = defaultBlack;
-let mediaLocalMicrophoneTrack = defaultSilence;
-let mediaLocalStreamVideoTrack = defaultBlack;
-let mediaLocalStreamAudioTrack = defaultSilence;
+
+let mediaLocalCameraTrack = defaultCameraBlack;
+let mediaLocalMicrophoneTrack = defaultCameraSilence;
+let mediaLocalStreamVideoTrack = defaultStreamBlack;
+let mediaLocalStreamAudioTrack = defaultStreamSilence;
 
 function createVideoElement(title, shouldUnmute, alwaysVisible)
 {
@@ -60,11 +75,11 @@ function createVideoElement(title, shouldUnmute, alwaysVisible)
     localVideo.autoplay = true;
     localVideo.controls = true;
     localVideo.muted = true;
-    localVideo.srcObject = defaultBlackSilence;
+    localVideo.srcObject = defaultVideoBlackSilence;
     localVideoDiv.style.display = alwaysVisible ? "" : "none";
     {
         let firstUnmute = true;
-        localVideo.onloadedmetadata = async (e) => {
+        localVideo.onloadedmetadata = async () => {
             if (!alwaysVisible)
                 localVideoDiv.style.display =  (localVideo.srcObject === null || localVideo.videoWidth <= 50 || localVideo.videoHeight <= 50) ? "none" : "";
 
@@ -85,11 +100,6 @@ function createVideoElement(title, shouldUnmute, alwaysVisible)
 
 function addLocalVideos()
 {
-    mediaLocalCameraTrack = defaultBlack;
-    mediaLocalMicrophoneTrack = defaultSilence;
-    mediaLocalStreamVideoTrack = defaultBlack;
-    mediaLocalStreamAudioTrack = defaultSilence;
-
     localCameraVideo = createVideoElement("Local Camera", false, true);
     localStreamVideo = createVideoElement("Local Stream", false, false);
 
@@ -134,9 +144,28 @@ async function tryGetPerms(audio, video)
     }
 }
 
-const localCameraVideoTrackIndex = 0, localCameraAudioTrackIndex = 1, localStreamVideoTrackIndex = 2, localStreamAudioTrackIndex = 3;
-async function updateAllRemoteTracks(trackIndex, track)
+async function updateAllRemoteTracks(trackType, trackIndex, track)
 {
+    for (let userId in otherMembers)
+    {
+        let pc = otherMembers[userId]["pc"];
+        if (pc === undefined)
+            continue;
+
+        // Replace track in peer connection
+        const sender = pc.getSenders().filter((s) => {
+            return s.track.kind === trackType;
+        })[trackIndex];
+
+        if (sender)
+        {
+            await sender.replaceTrack(track);
+            console.log(`Replaced ${trackType} track ${trackIndex} for ${userId} with`, track)
+        }
+        else
+            logError(`No sender found for track kind ${track.kind}`);
+    }
+
     //     // Replace track in peer connection
     //     const sender = pc.getSenders().find((s) => {
     //         return s.track.kind === kind;
@@ -152,7 +181,7 @@ async function toggleAudio()
 {
     await tryGetPerms(true, false);
 
-    if (mediaLocalMicrophoneTrack === defaultSilence)
+    if (mediaLocalMicrophoneTrack === defaultCameraSilence)
     {
         // Get all audio devices
         let devices = await navigator.mediaDevices.enumerateDevices();
@@ -189,20 +218,20 @@ async function toggleAudio()
     else
     {
         mediaLocalMicrophoneTrack.stop();
-        mediaLocalMicrophoneTrack = defaultSilence;
+        mediaLocalMicrophoneTrack = defaultCameraSilence;
 
         toggleAudioButton.textContent = "Enable Audio";
     }
 
     localCameraVideo.srcObject = new MediaStream([mediaLocalCameraTrack, mediaLocalMicrophoneTrack]);
-    await updateAllRemoteTracks(localCameraAudioTrackIndex, mediaLocalMicrophoneTrack);
+    await updateAllRemoteTracks("audio", 0, mediaLocalMicrophoneTrack);
 }
 
 async function toggleWebcam()
 {
     await tryGetPerms(false, true);
 
-    if (mediaLocalCameraTrack === defaultBlack)
+    if (mediaLocalCameraTrack === defaultCameraBlack)
     {
         // Get all video devices
         let devices = await navigator.mediaDevices.enumerateDevices();
@@ -239,36 +268,36 @@ async function toggleWebcam()
     else
     {
         mediaLocalCameraTrack.stop();
-        mediaLocalCameraTrack = defaultBlack;
+        mediaLocalCameraTrack = defaultCameraBlack;
 
         toggleWebcamButton.textContent = "Enable Webcam";
     }
 
     localCameraVideo.srcObject = new MediaStream([mediaLocalCameraTrack, mediaLocalMicrophoneTrack]);
-    await updateAllRemoteTracks(localCameraVideoTrackIndex, mediaLocalCameraTrack);
+    await updateAllRemoteTracks("video", 0, mediaLocalCameraTrack);
 }
 
 async function toggleStream()
 {
-    if (mediaLocalStreamAudioTrack == defaultSilence && mediaLocalStreamVideoTrack == defaultBlack)
+    if (mediaLocalStreamAudioTrack === defaultStreamSilence && mediaLocalStreamVideoTrack === defaultStreamBlack)
     {
         try {
             let stream = await navigator.mediaDevices.getDisplayMedia({audio: true, video: true});
 
             mediaLocalStreamAudioTrack = stream.getAudioTracks()[0];
             if (mediaLocalStreamAudioTrack === undefined)
-                mediaLocalStreamAudioTrack = defaultSilence;
+                mediaLocalStreamAudioTrack = defaultStreamSilence;
 
             mediaLocalStreamVideoTrack = stream.getVideoTracks()[0];
             if (mediaLocalStreamVideoTrack === undefined)
-                mediaLocalStreamVideoTrack = defaultBlack;
+                mediaLocalStreamVideoTrack = defaultStreamBlack;
         }
         catch (e) {
             alert(e);
             return;
         }
 
-        if (mediaLocalStreamAudioTrack == defaultSilence && mediaLocalStreamVideoTrack == defaultBlack)
+        if (mediaLocalStreamAudioTrack === defaultStreamSilence && mediaLocalStreamVideoTrack === defaultStreamBlack)
         {
             alert("No audio or video stream found");
             return;
@@ -279,51 +308,322 @@ async function toggleStream()
     else
     {
         mediaLocalStreamAudioTrack.stop();
-        mediaLocalStreamAudioTrack = defaultSilence;
+        mediaLocalStreamAudioTrack = defaultStreamSilence;
         mediaLocalStreamVideoTrack.stop();
-        mediaLocalStreamVideoTrack = defaultBlack;
+        mediaLocalStreamVideoTrack = defaultStreamBlack;
 
         toggleStreamButton.textContent = "Enable Stream";
     }
 
     localStreamVideo.srcObject = new MediaStream([mediaLocalStreamVideoTrack, mediaLocalStreamAudioTrack]);
-    await updateAllRemoteTracks(localStreamAudioTrackIndex, mediaLocalStreamAudioTrack);
-    await updateAllRemoteTracks(localStreamVideoTrackIndex, mediaLocalStreamVideoTrack);
+    await updateAllRemoteTracks("audio", 1, mediaLocalStreamAudioTrack);
+    await updateAllRemoteTracks("video", 1, mediaLocalStreamVideoTrack);
 }
 
 
+async function newPeerConnection(userId)
+{
+    if (otherMembers[userId] !== undefined)
+    {
+        logError("Peer connection already exists");
+        return;
+    }
+
+    otherMembers[userId] = {};
+
+    let pc = new RTCPeerConnection(servers);
+    otherMembers[userId]["pc"] = pc;
+
+    pc.onicecandidate = event => {
+        event.candidate && sendSecureMessageToUser(currentUser["mainAccount"], userId, {candidate: event.candidate}, "ice-candidate")
+    }
+
+    otherMembers[userId]["remoteStream"] = new MediaStream();
+    pc.ontrack = event => {
+        console.log("> EVENT", event);
+        for (let stream of event.streams)
+            console.log(stream.getTracks());
+
+        if (event.streams.length != 1)
+            return;
+
+        // otherMembers[userId]["remoteStream"].getTracks().forEach(track => {
+        //     track.stop();
+        // });
+
+        let remoteStream = new MediaStream();
+        let remoteCameraVideoTrack = event.streams[0].getVideoTracks()[0];
+        let remoteCameraAudioTrack = event.streams[0].getAudioTracks()[0];
+        let remoteStreamVideoTrack = event.streams[0].getVideoTracks()[1];
+        let remoteStreamAudioTrack = event.streams[0].getAudioTracks()[1];
+
+        remoteStream.addTrack(remoteCameraVideoTrack);
+        remoteStream.addTrack(remoteCameraAudioTrack);
+        remoteStream.addTrack(remoteStreamVideoTrack);
+        remoteStream.addTrack(remoteStreamAudioTrack);
+
+        otherMembers[userId]["remoteStream"] = remoteStream;
+
+        let tracks = remoteStream.getTracks();
+        console.log("TRACKS");
+        console.log(tracks);
+
+        otherMembers[userId]["remoteCameraVideo"].srcObject = new MediaStream([remoteCameraVideoTrack, remoteCameraAudioTrack]);
+        otherMembers[userId]["remoteStreamVideo"].srcObject = new MediaStream([remoteStreamVideoTrack, remoteStreamAudioTrack]);
+    }
+
+    let localCameraStream = new MediaStream();
+    pc.addTrack(mediaLocalCameraTrack, localCameraStream);
+    pc.addTrack(mediaLocalMicrophoneTrack, localCameraStream);
+    let localStreamStream = new MediaStream();
+    pc.addTrack(mediaLocalStreamVideoTrack, localCameraStream);
+    pc.addTrack(mediaLocalStreamAudioTrack, localCameraStream);
+
+    let remoteCameraVideo = createVideoElement(`${userId}'s Camera`, true, true);
+    otherMembers[userId]["remoteCameraVideo"] = remoteCameraVideo;
+
+    let remoteStreamVideo = createVideoElement(`${userId}'s Stream`, true, false);
+    otherMembers[userId]["remoteStreamVideo"] = remoteStreamVideo;
+
+    return pc;
+}
+
+async function removeUser(userId)
+{
+    if (otherMembers[userId] === undefined)
+    {
+        logError("Peer connection does not exist");
+        return;
+    }
+
+    otherMembers[userId]["pc"].close();
+    otherMembers[userId]["remoteStream"].getTracks().forEach(track => {
+        track.stop();
+    });
+    otherMembers[userId]["remoteCameraVideo"].srcObject = defaultVideoBlackSilence;
+    otherMembers[userId]["remoteStreamVideo"].srcObject = defaultVideoBlackSilence;
+
+    videoContainer.removeChild(otherMembers[userId]["remoteCameraVideo"].parentElement);
+
+    delete otherMembers[userId];
+}
 
 async function callPressed()
 {
+    await resumeSilence();
 
+    let remoteUserId = prompt("Enter remote user ID:");
+    if (remoteUserId === null)
+        return;
+
+    let pc = await newPeerConnection(remoteUserId);
+    if (pc === undefined)
+        return;
+
+    let offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    let offerObj = {
+        sdp: offer.sdp,
+        type: offer.type
+    };
+
+    let res = await sendSecureMessageToUser(currentUser["mainAccount"], remoteUserId, offerObj, "call-start");
+    if (!res)
+    {
+        await removeUser(remoteUserId);
+        alert("Failed to send call start message");
+    }
 }
 
 async function hangupPressed()
 {
-
+    for (let userId in otherMembers)
+    {
+        await sendSecureMessageToUser(currentUser["mainAccount"], userId, {}, "call-stop");
+        await removeUser(userId);
+    }
 }
-
 
 
 async function VCTEST_onReceiveCallOffer(account, userIdTo, message)
 {
+    let accept = confirm(`Accept call from ${userIdTo}?`);
+    if (!accept)
+    {
+        await sendSecureMessageToUser(account, userIdTo, {answer: null}, "call-reply");
+        return;
+    }
 
+    let pc = await newPeerConnection(userIdTo);
+    if (pc === undefined)
+        return;
+
+    await pc.setRemoteDescription(new RTCSessionDescription(message));
+
+    let answerDescription = await pc.createAnswer();
+    await pc.setLocalDescription(answerDescription);
+
+    let answer = {
+        type: answerDescription.type,
+        sdp: answerDescription.sdp,
+    };
+
+    let res = await sendSecureMessageToUser(account, userIdTo, {answer: answer}, "call-reply");
+    if (!res)
+    {
+        await removeUser(userIdTo);
+        alert("Failed to send call reply message");
+    }
 }
 
 async function VCTEST_onReceiveCallReply(account, userIdTo, message)
+{
+    if (message["answer"] === null)
+    {
+        await removeUser(userIdTo);
+        alert(`Call with ${userIdTo} declined`);
+        return;
+    }
+
+    let pc = otherMembers[userIdTo]["pc"];
+    await pc.setRemoteDescription(new RTCSessionDescription(message["answer"]));
+}
+
+async function VCTEST_onMemberJoined(account, userIdTo, message)
 {
 
 }
 
 async function VCTEST_onReceiveIceCandidate(account, userIdTo, message)
 {
-
+    let candidate = new RTCIceCandidate(message["candidate"]);
+    await otherMembers[userIdTo]["pc"].addIceCandidate(candidate);
 }
 
 async function VCTEST_onReceiveHangup(account, userIdTo, message)
 {
-
+    await removeUser(userIdTo);
+    alert(`Call with ${userIdTo} ended`);
 }
+
+// async function callPressed()
+// {
+//     try {
+//         await resumeSilence();
+//     }
+//     catch (e) {
+//
+//     }
+//     remoteUserId = prompt("Enter remote user ID:");
+//     if (remoteUserId === null)
+//         return;
+//
+//     // Get candidates for caller, save to db
+//     pc.onicecandidate = event => {
+//         event.candidate && sendSecureMessageToUser(currentUser["mainAccount"], remoteUserId, {candidate: event.candidate}, "ice-candidate");
+//     };
+//
+//     let offer = await pc.createOffer();
+//     await pc.setLocalDescription(offer);
+//
+//
+//     const offerObj = {
+//         sdp: offer.sdp,
+//         type: offer.type
+//     }
+//
+//     let callSent = await sendSecureMessageToUser(currentUser["mainAccount"], remoteUserId, offerObj, "call-start");
+//     console.log(callSent);
+// }
+//
+// async function hangupPressed()
+// {
+//     await sendSecureMessageToUser(currentUser["mainAccount"], remoteUserId, null, "call-stop");
+//
+//     remoteUserId = null;
+//     pc.close();
+//     pc.onicecandidate = null;
+//     pc.ontrack = null;
+//
+//     remoteStream = new MediaStream();
+//     remoteCameraVideo.srcObject = remoteStream;
+// }
+
+
+// async function VCTEST_onReceiveCallOffer(account, userIdTo, message)
+// {
+//     logInfo("Received call offer");
+//
+//     let accept = confirm(`Accept call from ${userIdTo}?`);
+//     if (!accept)
+//     {
+//         logInfo("Call declined");
+//         await sendSecureMessageToUser(account, userIdTo, {answer: null}, "call-reply");
+//         return;
+//     }
+//
+//     remoteUserId = userIdTo;
+//
+//     pc.onicecandidate = event => {
+//         event.candidate && sendSecureMessageToUser(account, userIdTo, {candidate: event.candidate}, "ice-candidate");
+//     };
+//     console.log(message);
+//
+//     let offer = message;
+//     await pc.setRemoteDescription(new RTCSessionDescription(offer));
+//
+//     const answerDescription = await pc.createAnswer();
+//     await pc.setLocalDescription(answerDescription);
+//
+//     const answer = {
+//         type: answerDescription.type,
+//         sdp: answerDescription.sdp,
+//     };
+//
+//     await sendSecureMessageToUser(account, userIdTo, {answer: answer}, "call-reply");
+// }
+//
+// async function VCTEST_onReceiveCallReply(account, userIdTo, message)
+// {
+//     logInfo("Received call reply");
+//
+//     let answer = message["answer"];
+//
+//     if (answer === null)
+//     {
+//         logInfo("Call declined");
+//         alert(`Call with ${userIdTo} declined`)
+//         return;
+//     }
+//
+//     await pc.setRemoteDescription(new RTCSessionDescription(answer));
+//
+//     logInfo("Call accepted");
+// }
+//
+// async function VCTEST_onReceiveIceCandidate(account, userIdTo, message)
+// {
+//     logInfo("Received ice candidate");
+//
+//     let candidate = new RTCIceCandidate(message["candidate"]);
+//     await pc.addIceCandidate(candidate);
+// }
+//
+// async function VCTEST_onReceiveHangup(account, userIdTo, message)
+// {
+//     logInfo("Received hangup");
+//
+//     remoteStream = new MediaStream([emptyAudioTrack, emptyVideoTrack]);
+//     remoteCameraVideo.srcObject = remoteStream;
+//
+//     remoteUserId = null;
+//     pc.close();
+//     pc.onicecandidate = null;
+//     pc.ontrack = null;
+//
+//     alert(`Call with ${userIdTo} ended`);
+// }
 
 
 // const localCameraVideo = document.getElementById('vctest-local-video');
@@ -460,124 +760,11 @@ async function VCTEST_onReceiveHangup(account, userIdTo, message)
 //
 //
 //
-// async function VCTEST_onReceiveCallOffer(account, userIdTo, message)
-// {
-//     logInfo("Received call offer");
-//
-//     let accept = confirm(`Accept call from ${userIdTo}?`);
-//     if (!accept)
-//     {
-//         logInfo("Call declined");
-//         await sendSecureMessageToUser(account, userIdTo, {answer: null}, "call-reply");
-//         return;
-//     }
-//
-//     remoteUserId = userIdTo;
-//
-//     pc.onicecandidate = event => {
-//         event.candidate && sendSecureMessageToUser(account, userIdTo, {candidate: event.candidate}, "ice-candidate");
-//     };
-//     console.log(message);
-//
-//     let offer = message;
-//     await pc.setRemoteDescription(new RTCSessionDescription(offer));
-//
-//     const answerDescription = await pc.createAnswer();
-//     await pc.setLocalDescription(answerDescription);
-//
-//     const answer = {
-//         type: answerDescription.type,
-//         sdp: answerDescription.sdp,
-//     };
-//
-//     await sendSecureMessageToUser(account, userIdTo, {answer: answer}, "call-reply");
-// }
-//
-// async function VCTEST_onReceiveCallReply(account, userIdTo, message)
-// {
-//     logInfo("Received call reply");
-//
-//     let answer = message["answer"];
-//
-//     if (answer === null)
-//     {
-//         logInfo("Call declined");
-//         alert(`Call with ${userIdTo} declined`)
-//         return;
-//     }
-//
-//     await pc.setRemoteDescription(new RTCSessionDescription(answer));
-//
-//     logInfo("Call accepted");
-// }
-//
-// async function VCTEST_onReceiveIceCandidate(account, userIdTo, message)
-// {
-//     logInfo("Received ice candidate");
-//
-//     let candidate = new RTCIceCandidate(message["candidate"]);
-//     await pc.addIceCandidate(candidate);
-// }
-//
-// async function VCTEST_onReceiveHangup(account, userIdTo, message)
-// {
-//     logInfo("Received hangup");
-//
-//     remoteStream = new MediaStream([emptyAudioTrack, emptyVideoTrack]);
-//     remoteCameraVideo.srcObject = remoteStream;
-//
-//     remoteUserId = null;
-//     pc.close();
-//     pc.onicecandidate = null;
-//     pc.ontrack = null;
-//
-//     alert(`Call with ${userIdTo} ended`);
-// }
+
 //
 //
 //
-// async function callPressed()
-// {
-//     try {
-//         await resumeSilence();
-//     }
-//     catch (e) {
-//
-//     }
-//     remoteUserId = prompt("Enter remote user ID:");
-//     if (remoteUserId === null)
-//         return;
-//
-//     // Get candidates for caller, save to db
-//     pc.onicecandidate = event => {
-//         event.candidate && sendSecureMessageToUser(currentUser["mainAccount"], remoteUserId, {candidate: event.candidate}, "ice-candidate");
-//     };
-//
-//     let offer = await pc.createOffer();
-//     await pc.setLocalDescription(offer);
-//
-//
-//     const offerObj = {
-//         sdp: offer.sdp,
-//         type: offer.type
-//     }
-//
-//     let callSent = await sendSecureMessageToUser(currentUser["mainAccount"], remoteUserId, offerObj, "call-start");
-//     console.log(callSent);
-// }
-//
-// async function hangupPressed()
-// {
-//     await sendSecureMessageToUser(currentUser["mainAccount"], remoteUserId, null, "call-stop");
-//
-//     remoteUserId = null;
-//     pc.close();
-//     pc.onicecandidate = null;
-//     pc.ontrack = null;
-//
-//     remoteStream = new MediaStream();
-//     remoteCameraVideo.srcObject = remoteStream;
-// }
+
 //
 //
 // async function replaceTrack(kind, track)
