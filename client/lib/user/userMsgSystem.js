@@ -122,7 +122,7 @@ async function internalRemoveUserMessage(account, userId, messageId)
     saveAccountObject(account, `USER_MSGS_${userId}`, newMessages);
 }
 
-const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "call-join", "ice-candidate"];
+const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "call-join", "call-join-fail", "ice-candidate"];
 
 async function addMessageToUser(account, userIdTo, message, date)
 {
@@ -212,7 +212,16 @@ async function addMessageToUser(account, userIdTo, message, date)
     else if (type == "call-join")
     {
         try {
-            await VCTEST_onMemberJoined(account, userIdTo, message["data"]);
+            await VCTEST_onMemberJoin(account, userIdTo, message["data"]);
+        }
+        catch (e) {
+            logError(e);
+        }
+    }
+    else if (type == "call-join-fail")
+    {
+        try {
+            await VCTEST_onMemberJoinFailed(account, userIdTo, message["data"]);
         }
         catch (e) {
             logError(e);
