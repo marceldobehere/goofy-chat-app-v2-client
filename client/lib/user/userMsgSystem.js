@@ -14,6 +14,7 @@ async function getUserMySymmKey(account, userId)
         return privateSymmKey(account);
 
     let symmKey = loadAccountObject(account, `USER_MY_SYMM_KEY_${userId}`);
+    console.log(`Symm key for ${userId}:`, symmKey);
     if (symmKey == undefined)
     {
         symmKey = generateSymmKey();
@@ -22,6 +23,7 @@ async function getUserMySymmKey(account, userId)
             logError(`Failed to send new symm key to ${userId}`);
             return undefined;
         }
+        console.log(`Setting symm key for ${userId}:`, symmKey);
         await setUserMySymmKey(account, userId, symmKey);
     }
 
