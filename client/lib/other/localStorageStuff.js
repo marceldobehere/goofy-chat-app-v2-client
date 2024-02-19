@@ -158,6 +158,7 @@ function aesEncrypt(dec, key)
 {
     console.log(`> AES ENCRYPT:`);
     console.log(dec)
+    console.log(key)
     //return CryptoJS.AES.encrypt(JSON.stringify(dec), key).toString();
     return _encryptTheValue(dec, key);
 }
@@ -166,6 +167,7 @@ function aesDecrypt(enc, key)
 {
     console.log(`> AES DECRYPT:`);
     console.log(enc);
+    console.log(key);
     //return JSON.parse(CryptoJS.AES.decrypt(enc, key).toString(CryptoJS.enc.Utf8));
     return _decryptTheValue(enc, key);
 }
