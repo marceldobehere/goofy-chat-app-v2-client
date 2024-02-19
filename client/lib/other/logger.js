@@ -65,7 +65,10 @@ function logWarn(...arr)
 function logError(...arr)
 {
     if (logErrorEnabled)
+    {
         _logExtra("ERROR", arr);
+        console.log("ERROR ", arr);
+    }
 }
 
 function logFatalErrorAndCrash(...arr)

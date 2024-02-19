@@ -8,26 +8,39 @@ function privateSymmKey(account)
     return hashString(account["private-key"])+"";
 }
 
+
 async function getUserMySymmKey(account, userId)
 {
     if (userId == account["userId"])
         return privateSymmKey(account);
 
-    let symmKey = loadAccountObject(account, `USER_MY_SYMM_KEY_${userId}`);
-    console.log(`Symm key for ${userId}:`, symmKey);
-    if (symmKey == undefined)
-    {
-        symmKey = generateSymmKey();
-        if (!await sendUserNewSymmKey(account, userId, symmKey))
+    await lockSymmKey.promise;
+    lockSymmKey.enable();
+    try {
+        let symmKey = loadAccountObject(account, `USER_MY_SYMM_KEY_${userId}`);
+        console.log(`Symm key for ${userId}:`, symmKey);
+        if (symmKey == undefined)
         {
-            logError(`Failed to send new symm key to ${userId}`);
-            return undefined;
+            symmKey = generateSymmKey();
+            if (!await sendUserNewSymmKey(account, userId, symmKey))
+            {
+                logError(`Failed to send new symm key to ${userId}`);
+                lockSymmKey.disable();
+                return undefined;
+            }
+            console.log(`Setting symm key for ${userId}:`, symmKey);
+            await setUserMySymmKey(account, userId, symmKey);
         }
-        console.log(`Setting symm key for ${userId}:`, symmKey);
-        await setUserMySymmKey(account, userId, symmKey);
-    }
 
-    return symmKey;
+        lockSymmKey.disable();
+        return symmKey;
+    }
+    catch (e) {
+        lockSymmKey.disable();
+        logError(e);
+        return undefined;
+    }
+    lockSymmKey.disable();
 }
 
 async function setUserMySymmKey(account, userId, key)

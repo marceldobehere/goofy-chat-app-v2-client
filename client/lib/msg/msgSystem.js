@@ -37,18 +37,7 @@ async function accSendRawMessageSock(accountFrom, socketTo, userIdTo, data)
     return true;
 }
 
-class AsyncLock {
-    constructor () {
-        this.disable = () => {}
-        this.promise = Promise.resolve()
-    }
 
-    enable () {
-        this.promise = new Promise(resolve => this.disable = resolve)
-    }
-}
-const lockIncoming = new AsyncLock();
-const lockOutgoing = new AsyncLock();
 
 async function _handleMessageSock(socketFrom, data)
 {
@@ -99,21 +88,34 @@ async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)
 
 async function sendAesMessageToUser(accountFrom, userIdTo, data)
 {
-    let symmKey = await getUserMySymmKey(accountFrom, userIdTo);
-    if (symmKey == undefined)
-    {
-        logError(`No symm key for user ${userIdTo}`);
+    await lockOutgoingAes.promise;
+    lockOutgoingAes.enable();
+    try {
+        let symmKey = await getUserMySymmKey(accountFrom, userIdTo);
+        if (symmKey == undefined)
+        {
+            logError(`No symm key for user ${userIdTo}`);
+            lockOutgoingAes.disable();
+            return false;
+        }
+
+        let dataEnc = aesEncrypt(JSON.stringify(data), symmKey);
+
+        let msgObj = {
+            type: "aes",
+            data: dataEnc
+        }
+
+        let res = await accSendRawMessage(accountFrom, userIdTo, msgObj);
+        lockOutgoingAes.disable();
+        return res;
+    }
+    catch (e) {
+        logError(e);
+        lockOutgoingAes.disable();
         return false;
     }
-
-    let dataEnc = aesEncrypt(JSON.stringify(data), symmKey);
-
-    let msgObj = {
-        type: "aes",
-        data: dataEnc
-    }
-
-    return await accSendRawMessage(accountFrom, userIdTo, msgObj);
+    lockOutgoingAes.disable();
 }
 
 async function _sendAesMessageToUser(accountFrom, userIdTo, data, symmKey)
@@ -130,22 +132,36 @@ async function _sendAesMessageToUser(accountFrom, userIdTo, data, symmKey)
 
 async function sendRsaMessageToUser(accountFrom, userIdTo, data)
 {
-    let pubKey = await getPublicKeyFromUser(userIdTo);
-    if (pubKey === undefined)
-    {
-        logError(`User not found on server`);
+    await lockOutgoingRsa.promise;
+    lockOutgoingRsa.enable();
+
+    try {
+        let pubKey = await getPublicKeyFromUser(userIdTo);
+        if (pubKey === undefined)
+        {
+            logError(`User not found on server`);
+            lockOutgoingRsa.disable();
+            return false;
+        }
+
+        let rsaStrList = await StringIntoRsaStringListAsync(JSON.stringify(data), pubKey);
+        let sig = createSignature(data, accountFrom["private-key"]);
+        let msgObj = {
+            type: "rsa",
+            data: rsaStrList,
+            signature: sig
+        }
+
+        let res = await accSendRawMessage(accountFrom, userIdTo, msgObj);
+        lockOutgoingRsa.disable();
+        return res;
+    }
+    catch (e) {
+        logError(e);
+        lockOutgoingRsa.disable();
         return false;
     }
-
-    let rsaStrList = await StringIntoRsaStringListAsync(JSON.stringify(data), pubKey);
-    let sig = createSignature(data, accountFrom["private-key"]);
-    let msgObj = {
-        type: "rsa",
-        data: rsaStrList,
-        signature: sig
-    }
-
-    return await accSendRawMessage(accountFrom, userIdTo, msgObj);
+    lockOutgoingRsa.disable();
 }
 
 async function sendSecureMessageToUser(accountFrom, userIdTo, data, type)
