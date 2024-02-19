@@ -1,3 +1,11 @@
+const videoContainer = document.getElementById('vctest-video-container');
+const canvasContainer = document.getElementById('canvasContainer');
+const callButton = document.getElementById('vctest-call-btn');
+const hangupButton = document.getElementById('vctest-hang-up-btn');
+const toggleAudioButton = document.getElementById('vctest-audio-enable-btn');
+const toggleWebcamButton = document.getElementById('vctest-webcam-enable-btn');
+const toggleStreamButton = document.getElementById('vctest-stream-enable-btn');
+
 const servers = {
     iceServers: [
         {
@@ -32,6 +40,7 @@ let silence = () => {
 let black = ({width = 640, height = 480} = {}) => {
     let canvas = Object.assign(document.createElement("canvas"), {width, height});
     canvas.getContext('2d').fillRect(0, 0, width, height);
+    canvasContainer.appendChild(canvas);
     let stream = canvas.captureStream();
     return Object.assign(stream.getVideoTracks()[0], {enabled: true});
 }
@@ -47,12 +56,6 @@ const defaultStreamBlack = black({width: 20, height: 10});
 const defaultStreamBlackSilence = new MediaStream([defaultStreamBlack, defaultStreamSilence]);
 
 
-const videoContainer = document.getElementById('vctest-video-container');
-const callButton = document.getElementById('vctest-call-btn');
-const hangupButton = document.getElementById('vctest-hang-up-btn');
-const toggleAudioButton = document.getElementById('vctest-audio-enable-btn');
-const toggleWebcamButton = document.getElementById('vctest-webcam-enable-btn');
-const toggleStreamButton = document.getElementById('vctest-stream-enable-btn');
 
 
 let otherMembers = {};
@@ -91,6 +94,15 @@ function createVideoElement(title, shouldUnmute, alwaysVisible)
                 firstUnmute = false;
             }
         };
+        if (!alwaysVisible)
+        {
+            let id = setInterval(() => {
+                localVideoDiv.style.display =  (localVideo.srcObject === null || localVideo.videoWidth <= 50 || localVideo.videoHeight <= 50) ? "none" : "";
+            }, 500);
+            localVideo.onclose = () => {
+                clearInterval(id);
+            };
+        }
     }
     localVideoDiv.appendChild(localVideoTitle);
     localVideoDiv.appendChild(localVideo);
@@ -146,6 +158,15 @@ async function tryGetPerms(audio, video)
 
 async function updateAllRemoteTracks(trackType, trackIndex, track)
 {
+    if (track == defaultCameraBlack)
+        track = black({width: 20, height: 10});
+    if (track == defaultCameraSilence)
+        track = silence();
+    if (track == defaultStreamBlack)
+        track = black({width: 20, height: 10});
+    if (track == defaultStreamSilence)
+        track = silence();
+
     for (let userId in otherMembers)
     {
         let pc = otherMembers[userId]["pc"];
@@ -445,6 +466,19 @@ async function hangupPressed()
     }
 }
 
+function doStreamRefresh()
+{
+    setTimeout(async () => {
+        if (mediaLocalCameraTrack === defaultCameraBlack)
+            await updateAllRemoteTracks("video", 0, defaultCameraBlack);
+        if (mediaLocalMicrophoneTrack === defaultCameraSilence)
+            await updateAllRemoteTracks("audio", 0, defaultCameraSilence);
+        if (mediaLocalStreamVideoTrack === defaultStreamBlack)
+            await updateAllRemoteTracks("video", 1, defaultStreamBlack);
+        if (mediaLocalStreamAudioTrack === defaultStreamSilence)
+            await updateAllRemoteTracks("audio", 1, defaultStreamSilence);
+    }, 500);
+}
 
 async function VCTEST_onReceiveCallOffer(account, userIdTo, message)
 {
@@ -475,6 +509,8 @@ async function VCTEST_onReceiveCallOffer(account, userIdTo, message)
         await removeUser(userIdTo);
         alert("Failed to send call reply message");
     }
+
+    doStreamRefresh();
 }
 
 async function VCTEST_onReceiveCallReply(account, userIdTo, message)
@@ -488,6 +524,8 @@ async function VCTEST_onReceiveCallReply(account, userIdTo, message)
 
     let pc = otherMembers[userIdTo]["pc"];
     await pc.setRemoteDescription(new RTCSessionDescription(message["answer"]));
+
+    doStreamRefresh();
 }
 
 async function VCTEST_onMemberJoined(account, userIdTo, message)
