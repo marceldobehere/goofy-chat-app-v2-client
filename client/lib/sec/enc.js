@@ -190,12 +190,12 @@ function accDecRsa(str, account)
 //     return verifySignature(obj, account["signature"], account["public-key"]);
 // }
 
-function encAes(str, key)
-{
-    return CryptoJS.AES.encrypt(str, key).toString();
-}
-
-function decAes(str, key)
-{
-    return CryptoJS.AES.decrypt(str, key).toString(CryptoJS.enc.Utf8);
-}
+// function encAes(str, key)
+// {
+//     return CryptoJS.AES.encrypt(str, key).toString();
+// }
+//
+// function decAes(str, key)
+// {
+//     return CryptoJS.AES.decrypt(str, key).toString(CryptoJS.enc.Utf8);
+// }

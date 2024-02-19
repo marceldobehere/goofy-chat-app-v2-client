@@ -139,21 +139,35 @@ function saveAccountObject(account, key, obj)
 
 
 
+function _encryptTheValue(word, key) {
+    const encJson = CryptoJS.AES.encrypt(JSON.stringify(word), key).toString();
+    const encData = CryptoJS.enc.Base64.stringify(
+        CryptoJS.enc.Utf8.parse(encJson)
+    );
+    return encData;
+}
 
+function _decryptTheValue(word, key) {
+    const decData = CryptoJS.enc.Base64.parse(word).toString(CryptoJS.enc.Utf8);
+    const bytes = CryptoJS.AES.decrypt(decData, key).toString(CryptoJS.enc.Utf8);
+    return JSON.parse(bytes);
+}
 
 
 function aesEncrypt(dec, key)
 {
     console.log(`> AES ENCRYPT:`);
     console.log(dec)
-    return CryptoJS.AES.encrypt(JSON.stringify(dec), key).toString();
+    //return CryptoJS.AES.encrypt(JSON.stringify(dec), key).toString();
+    return _encryptTheValue(dec, key);
 }
 
 function aesDecrypt(enc, key)
 {
     console.log(`> AES DECRYPT:`);
     console.log(enc);
-    return JSON.parse(CryptoJS.AES.decrypt(enc, key).toString(CryptoJS.enc.Utf8));
+    //return JSON.parse(CryptoJS.AES.decrypt(enc, key).toString(CryptoJS.enc.Utf8));
+    return _decryptTheValue(enc, key);
 }
 
 // function loadAesEncryptedObject(key, _key)
