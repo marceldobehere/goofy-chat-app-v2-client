@@ -144,11 +144,15 @@ function saveAccountObject(account, key, obj)
 
 function aesEncrypt(dec, key)
 {
+    console.log(`> AES ENCRYPT:`);
+    console.log(dec)
     return CryptoJS.AES.encrypt(JSON.stringify(dec), key).toString();
 }
 
 function aesDecrypt(enc, key)
 {
+    console.log(`> AES DECRYPT:`);
+    console.log(enc);
     return JSON.parse(CryptoJS.AES.decrypt(enc, key).toString(CryptoJS.enc.Utf8));
 }
 
