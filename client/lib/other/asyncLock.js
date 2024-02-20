@@ -10,9 +10,11 @@ class AsyncLock {
         {
             console.log("Disabling lock");
 
-            this.resolveArr.shift()();
             this.promiseArr.shift();
+            this.resolveArr.shift()();
         }
+        else
+            alert("Invalid lock disable")
     }
 
     async enable ()
