@@ -1,11 +1,35 @@
 class AsyncLock {
     constructor () {
-        this.disable = () => {}
-        this.promise = Promise.resolve()
+        this.promiseArr = [];
+        this.resolveArr = [];
     }
 
-    enable () {
-        this.promise = new Promise(resolve => this.disable = resolve)
+    disable ()
+    {
+        if (this.resolveArr.length > 0)
+        {
+            console.log("Disabling lock");
+
+            this.resolveArr.shift()();
+            this.promiseArr.shift();
+        }
+    }
+
+    async enable ()
+    {
+        console.log("Enabling lock");
+
+        let tempPromises = [];
+        for (let prom of this.promiseArr)
+            tempPromises.push(prom);
+        let bigPromise = Promise.all(tempPromises);
+
+        let resolve;
+        let promise = new Promise(r => resolve = r);
+        this.promiseArr.push(promise);
+        this.resolveArr.push(resolve);
+
+        await bigPromise;
     }
 }
 const lockIncoming = new AsyncLock();

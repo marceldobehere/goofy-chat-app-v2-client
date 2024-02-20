@@ -14,8 +14,7 @@ async function getUserMySymmKey(account, userId)
     if (userId == account["userId"])
         return privateSymmKey(account);
 
-    await lockSymmKey.promise;
-    lockSymmKey.enable();
+    await lockSymmKey.enable();
     try {
         let symmKey = loadAccountObject(account, `USER_MY_SYMM_KEY_${userId}`);
         logInfo(`Symm key for ${userId}:`, symmKey);

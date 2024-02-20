@@ -41,8 +41,7 @@ async function accSendRawMessageSock(accountFrom, socketTo, userIdTo, data)
 
 async function _handleMessageSock(socketFrom, data)
 {
-    await lockIncoming.promise
-    lockIncoming.enable();
+    await lockIncoming.enable();
 
     try {
         if (data === undefined)
@@ -91,8 +90,7 @@ async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)
 
 async function sendAesMessageToUser(accountFrom, userIdTo, data)
 {
-    await lockOutgoingAes.promise;
-    lockOutgoingAes.enable();
+    await lockOutgoingAes.enable();
     try {
         let symmKey = await getUserMySymmKey(accountFrom, userIdTo);
         if (symmKey == undefined)
@@ -135,8 +133,7 @@ async function _sendAesMessageToUser(accountFrom, userIdTo, data, symmKey)
 
 async function sendRsaMessageToUser(accountFrom, userIdTo, data)
 {
-    await lockOutgoingRsa.promise;
-    lockOutgoingRsa.enable();
+    await lockOutgoingRsa.enable();
 
     try {
         let pubKey = await getPublicKeyFromUser(userIdTo);
@@ -169,8 +166,7 @@ async function sendRsaMessageToUser(accountFrom, userIdTo, data)
 
 async function sendSecureMessageToUser(accountFrom, userIdTo, data, type)
 {
-    await lockOutgoing.promise;
-    lockOutgoing.enable();
+    await lockOutgoing.enable();
     let status = true;
 
     try {
