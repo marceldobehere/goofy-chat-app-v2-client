@@ -138,10 +138,10 @@ async function internalRemoveUserMessage(account, userId, messageId)
 
 const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "call-join", "call-join-fail", "ice-candidate"];
 
-async function addMessageToUser(account, userIdTo, message, date)
+async function addMessageToUser(account, userIdFrom, userIdTo, message, date)
 {
     message["date"] = date;
-    message["from"] = userIdTo;
+    message["from"] = userIdFrom;
     logInfo(`Adding message to user ${userIdTo}:`, message);
     let type = message["type"];
     let messageId = message["messageId"];
@@ -193,8 +193,16 @@ async function addMessageToUser(account, userIdTo, message, date)
     else if (type == "redirect")
     {
         logInfo("Redirect message", message);
+
+        if (message["to"] == undefined)
+            await addMessageToUser(account, message["data"]["from"], message["data"]["from"], message["data"], message["data"]["date"]);
+        else
+        {
+            await addMessageToUser(account, account['userId'], message["to"], message["data"], message["data"]["date"]);
+        }
+
         //logError("NO REDIRECT IMPLEMENTED!");
-        await addMessageToUser(account, message["data"]["from"], message["data"], message["data"]["date"]);
+
     }
     else if (type == "call-start")
     {
@@ -254,6 +262,49 @@ async function addMessageToUser(account, userIdTo, message, date)
     {
         logWarn(`Unknown message type: ${type}`);
     }
+}
+
+async function addSentMessage(account, userIdTo, message)
+{
+    let type = message["type"];
+    let messageId = message["messageId"];
+
+    if (dontRedirectTypes.includes(type))
+    {
+        logInfo(`Not saving sent message to ${userIdTo}:`, message);
+        return;
+    }
+
+    if (!await messageIdInUser(account, userIdTo, messageId))
+    {
+        await addMessageIdToUser(account, userIdTo, messageId);
+
+        if (currentUser["redirectAccounts"].length > 0)
+        {
+            let msg = {
+                messageId: getRandomIntInclusive(0, 99999999999),
+                data: message,
+                type: "redirect",
+                to: userIdTo
+            };
+
+            for (let i = 0; i < currentUser["redirectAccounts"].length; i++)
+            {
+                let redirect = currentUser["redirectAccounts"][i];
+
+                logInfo(`Redirecting message to ${redirect}:`, msg);
+                await _sendAesMessageToUser(account, redirect, msg, privateSymmKey(account));
+            }
+        }
+    }
+    else if (!dontRedirectTypes.includes(type))
+    {
+        logWarn(`Message already in user:`, message);
+        return;
+    }
+
+    logInfo(`New sent message to user ${userIdTo}:`, message);
+    await internalAddUserMessageSorted(account, userIdTo, message);
 }
 
 async function addNormalMessageToUser(account, userIdTo, message)

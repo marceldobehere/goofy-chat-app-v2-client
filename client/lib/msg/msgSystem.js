@@ -177,6 +177,11 @@ async function sendSecureMessageToUser(accountFrom, userIdTo, data, type)
         };
 
         status = await sendAesMessageToUser(accountFrom, userIdTo, msg);
+
+        msg["date"] = new Date();
+        msg["from"] = accountFrom["userId"];
+
+        await addSentMessage(accountFrom, userIdTo, msg);
     }
     catch (e) {
         logError(e);
@@ -200,7 +205,7 @@ async function handleMessageSock(socketFrom, userIdFrom, userIdTo, date, data)
             return logWarn(`No last symm key for user ${userIdFrom}`);
         let dataStr = await aesDecrypt(data["data"], symmKey);
         let dataObj = JSON.parse(dataStr);
-        await addMessageToUser(currentUser["mainAccount"], userIdFrom, dataObj, date);
+        await addMessageToUser(currentUser["mainAccount"], userIdFrom, userIdFrom, dataObj, date);
     }
     else if (data["type"] === "rsa")
     {
@@ -223,7 +228,7 @@ async function handleMessageSock(socketFrom, userIdFrom, userIdTo, date, data)
             return;
         }
 
-        await addMessageToUser(currentUser["mainAccount"], userIdFrom, dataObj, date);
+        await addMessageToUser(currentUser["mainAccount"], userIdFrom, userIdFrom, dataObj, date);
     }
     else
         return logWarn(`Invalid message type from ${userIdFrom} to ${userIdTo}:`, data);
