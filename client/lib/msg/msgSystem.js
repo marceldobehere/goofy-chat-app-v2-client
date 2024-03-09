@@ -107,7 +107,7 @@ async function sendAesMessageToUser(accountFrom, userIdTo, data, onlyTrySend)
             data: dataEnc
         }
 
-        let res = await accSendRawMessage(accountFrom, userIdTo, msgObj);
+        let res = await accSendRawMessage(accountFrom, userIdTo, msgObj, onlyTrySend);
         lockOutgoingAes.disable();
         return res;
     }
