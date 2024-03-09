@@ -50,10 +50,16 @@ function importUserMainAccountAndCreateCustomListener(user, importedUser)
 
 function addRedirectToUser(user, listener)
 {
-    user["redirectAccounts"].push(listener);
+    if (user["redirectAccounts"].indexOf(listener) == -1 && user["listenerAccount"]["userId"] != listener)
+        user["redirectAccounts"].push(listener);
 }
 
 function clearRedirects(user)
 {
     user["redirectAccounts"] = [];
+}
+
+function addRedirects(user, redirectAccounts)
+{
+    user["redirectAccounts"] = redirectAccounts;
 }

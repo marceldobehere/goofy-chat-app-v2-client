@@ -8,11 +8,11 @@ async function sockReqMessages(socket)
     socket.emit('get-messages', {});
 }
 
-async function accSendRawMessage(account, userIdTo, data)
+async function accSendRawMessage(account, userIdTo, data, onlyTrySend)
 {
     let promises = [];
     for (let socket of serverSocketList)
-        promises.push(accSendRawMessageSock(account, socket, userIdTo, data));
+        promises.push(accSendRawMessageSock(account, socket, userIdTo, data, onlyTrySend));
     await Promise.all(promises);
 
     let work = false;
@@ -23,9 +23,9 @@ async function accSendRawMessage(account, userIdTo, data)
     return work;
 }
 
-async function accSendRawMessageSock(accountFrom, socketTo, userIdTo, data)
+async function accSendRawMessageSock(accountFrom, socketTo, userIdTo, data, onlyTrySend)
 {
-    let message = {from: accountFrom["userId"], to: userIdTo, data: data};
+    let message = {from: accountFrom["userId"], to: userIdTo, data: data, store: !onlyTrySend};
     let reply = await msgSendAndGetReply(socketTo, 'send-message', message);
     if (reply["error"] != undefined)
     {
@@ -88,7 +88,7 @@ async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)
     return await sendRsaMessageToUser(accountFrom, userIdTo, data);
 }
 
-async function sendAesMessageToUser(accountFrom, userIdTo, data)
+async function sendAesMessageToUser(accountFrom, userIdTo, data, onlyTrySend)
 {
     await lockOutgoingAes.enable();
     try {
@@ -164,7 +164,7 @@ async function sendRsaMessageToUser(accountFrom, userIdTo, data)
     lockOutgoingRsa.disable();
 }
 
-async function sendSecureMessageToUser(accountFrom, userIdTo, data, type)
+async function sendSecureMessageToUser(accountFrom, userIdTo, data, type, onlyTrySend)
 {
     await lockOutgoing.enable();
     let status = true;
@@ -176,7 +176,7 @@ async function sendSecureMessageToUser(accountFrom, userIdTo, data, type)
             type: type
         };
 
-        status = await sendAesMessageToUser(accountFrom, userIdTo, msg);
+        status = await sendAesMessageToUser(accountFrom, userIdTo, msg, onlyTrySend);
 
         msg["date"] = new Date();
         msg["from"] = accountFrom["userId"];

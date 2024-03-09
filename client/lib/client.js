@@ -63,16 +63,7 @@ async function initClientLib()
     await createSockets(serverList, currentUser);
     await checkUserStuff();
 
-
-    try {
-        await initVcTest();
-    }
-    catch (e)
-    {
-        logWarn("No VC moment");
-        console.log(e);
-    }
-
+    tryExtFn(extFnVcInit);
 
     //console.log(await accSendRawMessage(currentUser["mainAccount"], currentUser["mainAccount"]["userId"], {text: "yooo"}));
 }
@@ -103,7 +94,27 @@ function currUserClearRedirects()
 function currUserImportUserMainAccountAndRedirectAndCreateCustomListener(importedUser)
 {
     importUserMainAccountAndCreateCustomListener(currentUser, importedUser);
-    clearRedirects(currentUser);
+    addRedirects(currentUser, importedUser["redirectAccounts"]);
     currUserAddRedirect(importedUser["listenerAccount"]["userId"]);
     saveObject("currentUser", currentUser);
+}
+
+async function currUserFullImport(importedUser, As2ndAccount)
+{
+    if (!As2ndAccount)
+    {
+        // This essentially is like restoring a backup
+        currentUser = importedUser;
+        saveObject("currentUser", currentUser);
+        return;
+    }
+
+    // This is like creating an additional account for this user
+    importUserMainAccountAndCreateCustomListener(currentUser, importedUser);
+    addRedirects(currentUser, importedUser["redirectAccounts"]);
+    currUserAddRedirect(importedUser["listenerAccount"]["userId"]);
+    saveObject("currentUser", currentUser);
+
+    await sendSecureMessageToUser(importedUser["mainAccount"], importedUser["mainAccount"]["userId"],
+        {userId:currentUser["listenerAccount"]["userId"]}, "add-redirect");
 }

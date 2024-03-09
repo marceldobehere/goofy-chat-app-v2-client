@@ -202,61 +202,40 @@ async function addMessageToUser(account, userIdFrom, userIdTo, message, date)
         }
 
         //logError("NO REDIRECT IMPLEMENTED!");
+    }
+    else if (type == "add-redirect")
+    {
+        if (message["from"] != account["userId"])
+            return logWarn("Invalid add-redirect message:", message);
 
+        let newUserId = message["data"]["userId"];
+        currUserAddRedirect(newUserId);
+
+        logInfo(`Adding User ${newUserId} to redirect list`);
     }
     else if (type == "call-start")
     {
-        try {
-            await VCTEST_onReceiveCallOffer(account, userIdTo, message["data"]);
-        }
-        catch (e) {
-            logError(e);
-        }
+        tryExtFn(extFnVcOnReceiveCallOffer, account, userIdTo, message["data"]);
     }
     else if (type == "call-stop")
     {
-        try {
-            await VCTEST_onReceiveHangup(account, userIdTo, message["data"]);
-        }
-        catch (e) {
-            logError(e);
-        }
+        tryExtFn(extFnVcOnReceiveHangup, account, userIdTo, message["data"]);
     }
     else if (type == "call-reply")
     {
-        try {
-            await VCTEST_onReceiveCallReply(account, userIdTo, message["data"]);
-        }
-        catch (e) {
-            logError(e);
-        }
+        tryExtFn(extFnVcOnReceiveCallReply, account, userIdTo, message["data"]);
     }
     else if (type == "call-join")
     {
-        try {
-            await VCTEST_onMemberJoin(account, userIdTo, message["data"]);
-        }
-        catch (e) {
-            logError(e);
-        }
+        tryExtFn(extFnVcOnMemberJoin, account, userIdTo, message["data"]);
     }
     else if (type == "call-join-fail")
     {
-        try {
-            await VCTEST_onMemberJoinFailed(account, userIdTo, message["data"]);
-        }
-        catch (e) {
-            logError(e);
-        }
+        tryExtFn(extFnVcOnMemberJoinFailed, account, userIdTo, message["data"]);
     }
     else if (type == "ice-candidate")
     {
-        try {
-            await VCTEST_onReceiveIceCandidate(account, userIdTo, message["data"]);
-        }
-        catch (e) {
-            logError(e);
-        }
+        tryExtFn(extFnVcOnReceiveIceCandidate, account, userIdTo, message["data"]);
     }
     else
     {
@@ -311,4 +290,15 @@ async function addNormalMessageToUser(account, userIdTo, message)
 {
     logInfo(`New message from user ${userIdTo}:`, message);
     await internalAddUserMessageSorted(account, userIdTo, message);
+    tryExtFn(extMsgNormalMessage, account, userIdTo, message);
 }
+
+let extFnVcInit = undefined;
+let extFnVcOnReceiveCallOffer = undefined;
+let extFnVcOnReceiveHangup = undefined;
+let extFnVcOnReceiveCallReply = undefined;
+let extFnVcOnMemberJoin = undefined;
+let extFnVcOnMemberJoinFailed = undefined;
+let extFnVcOnReceiveIceCandidate = undefined;
+
+let extMsgNormalMessage = undefined;

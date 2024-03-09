@@ -122,6 +122,14 @@ function addLocalVideos()
 
 async function initVcTest()
 {
+    // Attach Hooks
+    extFnVcOnReceiveCallOffer = VCTEST_onReceiveCallOffer;
+    extFnVcOnReceiveCallReply = VCTEST_onReceiveCallReply;
+    extFnVcOnReceiveIceCandidate = VCTEST_onReceiveIceCandidate;
+    extFnVcOnReceiveHangup = VCTEST_onReceiveHangup;
+    extFnVcOnMemberJoin = VCTEST_onMemberJoin;
+    extFnVcOnMemberJoinFailed = VCTEST_onMemberJoinFailed;
+
     // Clear other members
     otherMembers = {};
     joiningMembers = [];
@@ -348,7 +356,7 @@ async function newPeerConnection(userId)
     otherMembers[userId]["pc"] = pc;
 
     pc.onicecandidate = event => {
-        event.candidate && sendSecureMessageToUser(currentUser["mainAccount"], userId, {candidate: event.candidate}, "ice-candidate")
+        event.candidate && sendSecureMessageToUser(currentUser["mainAccount"], userId, {candidate: event.candidate}, "ice-candidate", true)
     }
 
     otherMembers[userId]["remoteStream"] = new MediaStream();
@@ -424,14 +432,14 @@ async function removeUser(userId)
 async function notifyUserJoin(joinUserId)
 {
     for (let userId in otherMembers)
-        await sendSecureMessageToUser(currentUser["mainAccount"], userId, {userId: joinUserId}, "call-join");
+        await sendSecureMessageToUser(currentUser["mainAccount"], userId, {userId: joinUserId}, "call-join", true);
     logInfo(`Notified all users of ${joinUserId}'s join`);
 }
 
 async function notifyUserJoinFailed(joinUserId)
 {
     for (let userId in otherMembers)
-        await sendSecureMessageToUser(currentUser["mainAccount"], userId, {userId: joinUserId}, "call-join-fail");
+        await sendSecureMessageToUser(currentUser["mainAccount"], userId, {userId: joinUserId}, "call-join-fail", true);
     logInfo(`Notified all users of ${joinUserId}'s join failure`);
 }
 
@@ -460,7 +468,7 @@ async function startCall(remoteUserId, userInteraction)
         users: users
     };
 
-    let res = await sendSecureMessageToUser(currentUser["mainAccount"], remoteUserId, offerObj, "call-start");
+    let res = await sendSecureMessageToUser(currentUser["mainAccount"], remoteUserId, offerObj, "call-start", true);
     if (!res)
     {
         await removeUser(remoteUserId);
@@ -492,7 +500,7 @@ async function hangupPressed()
 {
     for (let userId in otherMembers)
     {
-        await sendSecureMessageToUser(currentUser["mainAccount"], userId, {}, "call-stop");
+        await sendSecureMessageToUser(currentUser["mainAccount"], userId, {}, "call-stop", true);
         await removeUser(userId);
     }
 }
@@ -539,7 +547,7 @@ async function VCTEST_onReceiveCallOffer(account, userIdTo, message)
 
     if (!accept)
     {
-        await sendSecureMessageToUser(account, userIdTo, {answer: null}, "call-reply");
+        await sendSecureMessageToUser(account, userIdTo, {answer: null}, "call-reply", true);
         return;
     }
 
@@ -564,7 +572,7 @@ async function VCTEST_onReceiveCallOffer(account, userIdTo, message)
         sdp: answerDescription.sdp,
     };
 
-    let res = await sendSecureMessageToUser(account, userIdTo, {answer: answer}, "call-reply");
+    let res = await sendSecureMessageToUser(account, userIdTo, {answer: answer}, "call-reply", true);
     if (!res)
     {
         await removeUser(userIdTo);

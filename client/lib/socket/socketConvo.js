@@ -1,4 +1,4 @@
-let socketReplyDict = {};
+let socketReplyDict = new Map();
 
 
 function msgSend(socket, channel, message)
@@ -8,9 +8,9 @@ function msgSend(socket, channel, message)
 
 function msgHook(socket, channel, callback)
 {
-    if (socketReplyDict[socket] == undefined)
-        socketReplyDict[socket] = {};
-    let replyDict = socketReplyDict[socket];
+    if (socketReplyDict.get(socket) == undefined)
+        socketReplyDict.set(socket, {});
+    let replyDict = socketReplyDict.get(socket);
 
     if (replyDict[channel] == undefined)
     {
@@ -48,9 +48,9 @@ function handleReply(replyDict, channel, obj)
 
 function msgSendAndGetReply(socket, channel, message)
 {
-    if (socketReplyDict[socket] == undefined)
-        socketReplyDict[socket] = {};
-    let replyDict = socketReplyDict[socket];
+    if (socketReplyDict.get(socket) == undefined)
+        socketReplyDict.set(socket, {});
+    let replyDict = socketReplyDict.get(socket);
 
     let replyPromise = new Promise(resolve =>
     {

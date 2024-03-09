@@ -1,8 +1,19 @@
 let serverSocketList = [];
 let serverStatusList = [];
+
+function disconnectSockets()
+{
+    for (let socket of serverSocketList)
+        socket.disconnect();
+
+    serverSocketList = [];
+    serverStatusList = [];
+}
+
 async function createSockets(serverList, user)
 {
-    serverSocketList = [];
+    disconnectSockets();
+
     let listIndex = 0;
     for (let addr of serverList)
     {
