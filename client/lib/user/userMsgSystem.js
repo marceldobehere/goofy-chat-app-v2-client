@@ -42,9 +42,31 @@ async function getUserMySymmKey(account, userId)
     lockSymmKey.disable();
 }
 
-async function setUserMySymmKey(account, userId, key)
+async function setUserMySymmKey(account, userId, key, dontRedirect)
 {
+    let lastKey = loadAccountObject(account, `USER_MY_SYMM_KEY_${userId}`);
+    if (lastKey == key)
+        return;
+
     saveAccountObject(account, `USER_MY_SYMM_KEY_${userId}`, key);
+
+    if (dontRedirect)
+        return;
+
+    // send read-message to redirects
+    logInfo(`Sending remote-symm-key of ${userId} to redirects:`, key);
+    let msg = {
+        messageId: getRandomIntInclusive(0, 99999999999),
+        data: {userId: userId, symmKey: key},
+        type: "remote-my-symm-key"
+    };
+
+    let accountFrom = currentUser["mainAccount"];
+
+    msg["date"] = new Date();
+    msg["from"] = accountFrom["userId"];
+
+    await addSentMessage(accountFrom, userId, msg, true);
 }
 
 async function getUserLastSymmKey(account, userId)
@@ -55,9 +77,31 @@ async function getUserLastSymmKey(account, userId)
     return loadAccountObject(account, `USER_SYMM_KEY_${userId}`);
 }
 
-async function setUserLastSymmKey(account, userId, key)
+async function setUserLastSymmKey(account, userId, key, dontRedirect)
 {
+    let lastKey = await getUserLastSymmKey(account, userId);
+    if (lastKey == key)
+        return;
+
     saveAccountObject(account, `USER_SYMM_KEY_${userId}`, key);
+
+    if (dontRedirect)
+        return;
+
+    // send read-message to redirects
+    logInfo(`Sending remote-symm-key of ${userId} to redirects:`, key);
+    let msg = {
+        messageId: getRandomIntInclusive(0, 99999999999),
+        data: {userId: userId, symmKey: key},
+        type: "remote-symm-key"
+    };
+
+    let accountFrom = currentUser["mainAccount"];
+
+    msg["date"] = new Date();
+    msg["from"] = accountFrom["userId"];
+
+    await addSentMessage(accountFrom, userId, msg, true);
 }
 
 async function messageIdInUser(account, userId, messageId)
@@ -75,6 +119,29 @@ async function addMessageIdToUser(account, userId, messageId)
         messageIds = [];
     messageIds.push(messageId);
     saveAccountObject(account, `USER_MSG_IDS_${userId}`, messageIds);
+}
+
+async function addMessageToUnread(account, userId, message)
+{
+    let messageId = message["messageId"];
+    let fromId = message["from"];
+    if (fromId == account["userId"])
+        return logInfo(`Not adding message to unread for self:`, message);
+
+    let messageIds = loadAccountObjectOrCreateDefault(account, `USER_UNREAD_MSG_IDS_${userId}`, []);
+    if (!messageIds.includes(messageId))
+        messageIds.push(messageId);
+    saveAccountObject(account, `USER_UNREAD_MSG_IDS_${userId}`, messageIds);
+}
+
+async function readMessages(account, userId)
+{
+    saveAccountObject(account, `USER_UNREAD_MSG_IDS_${userId}`, []);
+}
+
+async function getUnreadMessages(account, userId)
+{
+    return loadAccountObjectOrCreateDefault(account, `USER_UNREAD_MSG_IDS_${userId}`, []);
 }
 
 async function internalGetUserMessages(account, userId)
@@ -120,6 +187,12 @@ async function internalAddUserMessageSorted(account, userId, message)
 
     messages.splice(index, 0, message);
     saveAccountObject(account, `USER_MSGS_${userId}`, messages);
+
+    if (message["from"] == account["userId"])
+    {
+        logInfo(`Message sent so marking messages as read: `, message)
+        await readMessages(account, userId);
+    }
 }
 
 async function internalRemoveUserMessage(account, userId, messageId)
@@ -197,11 +270,38 @@ async function addMessageToUser(account, userIdFrom, userIdTo, message, date)
         if (message["to"] == undefined)
             await addMessageToUser(account, message["data"]["from"], message["data"]["from"], message["data"], message["data"]["date"]);
         else
-        {
             await addMessageToUser(account, account['userId'], message["to"], message["data"], message["data"]["date"]);
-        }
+    }
+    else if (type == "remote-symm-key")
+    {
+        if (message["from"] != account["userId"])
+            return logWarn("Invalid remote-symm-key message:", message);
 
-        //logError("NO REDIRECT IMPLEMENTED!");
+        let newSymmKey = message["data"]["symmKey"];
+        let remoteUserId = message["data"]["userId"];
+
+        logInfo(`Setting remote symm key for ${remoteUserId}:`, newSymmKey);
+        await setUserLastSymmKey(account, remoteUserId, newSymmKey, true);
+    }
+    else if (type == "remote-my-symm-key")
+    {
+        if (message["from"] != account["userId"])
+            return logWarn("Invalid remote-my-symm-key message:", message);
+
+        let newSymmKey = message["data"]["symmKey"];
+        let remoteUserId = message["data"]["userId"];
+
+        logInfo(`Setting remote my symm key for ${remoteUserId}:`, newSymmKey);
+        await setUserMySymmKey(account, remoteUserId, newSymmKey, true);
+    }
+    else if (type == "read-message")
+    {
+        if (message["from"] != account["userId"])
+            return logWarn("Invalid add-redirect message:", message);
+
+        let readUserId = message["data"]["userId"];
+
+        await readMessages(account, readUserId);
     }
     else if (type == "add-redirect")
     {
@@ -243,10 +343,12 @@ async function addMessageToUser(account, userIdFrom, userIdTo, message, date)
     }
 }
 
-async function addSentMessage(account, userIdTo, message)
+async function addSentMessage(account, userIdTo, message, dontActuallyAdd)
 {
     let type = message["type"];
     let messageId = message["messageId"];
+
+    await readMessages(account, userIdTo);
 
     if (dontRedirectTypes.includes(type))
     {
@@ -283,13 +385,15 @@ async function addSentMessage(account, userIdTo, message)
     }
 
     logInfo(`New sent message to user ${userIdTo}:`, message);
-    await internalAddUserMessageSorted(account, userIdTo, message);
+    if (!dontActuallyAdd)
+        await internalAddUserMessageSorted(account, userIdTo, message);
 }
 
 async function addNormalMessageToUser(account, userIdTo, message)
 {
     logInfo(`New message from user ${userIdTo}:`, message);
     await internalAddUserMessageSorted(account, userIdTo, message);
+    await addMessageToUnread(account, userIdTo, message);
     tryExtFn(extMsgNormalMessage, account, userIdTo, message);
 }
 
