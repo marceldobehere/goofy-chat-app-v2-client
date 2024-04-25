@@ -1,24 +1,13 @@
-async function userGetAllUsers()
+async function userSendDirectMessage(userId, data, type)
 {
-    let userIds = [];
-    for (let userId in userPubKeyDict)
-        userIds.push(parseInt(userId));
-
-    // remove listener account user id
-    userIds = userIds.filter((userId) => userId != currentUser["listenerAccount"]["userId"]);
-
-    // remove main account user id
-    userIds = userIds.filter((userId) => userId != currentUser["mainAccount"]["userId"]);
-
-    // remove redirect accounts
-    userIds = userIds.filter((userId) => !currentUser["redirectAccounts"].includes(userId));
-
-    return userIds;
+    addUserIdIfNotExists(userId);
+    return sendSecureMessageToUser(currentUser["mainAccount"], userId, data, type, false);
 }
 
-async function userSendMessage(userId, data, type)
+async function userSendGroupMessage(groupId, data, type)
 {
-    return sendSecureMessageToUser(currentUser["mainAccount"], userId, data, type, false);
+    addGroupIdIfNotExists(groupId);
+    logWarn("Group messages are not implemented yet.");
 }
 
 async function userGetMessages(userId)

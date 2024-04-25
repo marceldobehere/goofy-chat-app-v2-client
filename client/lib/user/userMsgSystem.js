@@ -211,11 +211,11 @@ async function internalRemoveUserMessage(account, userId, messageId)
 
 const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "call-join", "call-join-fail", "ice-candidate"];
 
-async function addMessageToUser(account, userIdFrom, userIdTo, message, date)
+async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
 {
     message["date"] = date;
     message["from"] = userIdFrom;
-    logInfo(`Adding message to user ${userIdTo}:`, message);
+    logInfo(`Adding message to user ${chatUserId}:`, message);
     let type = message["type"];
     let messageId = message["messageId"];
     if (messageId == undefined)
@@ -224,9 +224,9 @@ async function addMessageToUser(account, userIdFrom, userIdTo, message, date)
         return;
     }
 
-    if (!await messageIdInUser(account, userIdTo, messageId) && !dontRedirectTypes.includes(type))
+    if (!await messageIdInUser(account, chatUserId, messageId) && !dontRedirectTypes.includes(type))
     {
-        await addMessageIdToUser(account, userIdTo, messageId);
+        await addMessageIdToUser(account, chatUserId, messageId);
 
         if (currentUser["redirectAccounts"].length > 0)
         {
@@ -257,11 +257,11 @@ async function addMessageToUser(account, userIdFrom, userIdTo, message, date)
     {
         logInfo("Setting symm key");
         let symmKey = message["symmKey"];
-        await setUserLastSymmKey(account, userIdTo, symmKey);
+        await setUserLastSymmKey(account, chatUserId, symmKey);
     }
     else if (type == "text")
     {
-        await addNormalMessageToUser(account, userIdTo, message, date);
+        await addNormalMessageToUser(account, chatUserId, message, false);
     }
     else if (type == "redirect")
     {
@@ -315,27 +315,27 @@ async function addMessageToUser(account, userIdFrom, userIdTo, message, date)
     }
     else if (type == "call-start")
     {
-        tryExtFn(extFnVcOnReceiveCallOffer, account, userIdTo, message["data"]);
+        tryExtFn(extFnVcOnReceiveCallOffer, account, chatUserId, message["data"]);
     }
     else if (type == "call-stop")
     {
-        tryExtFn(extFnVcOnReceiveHangup, account, userIdTo, message["data"]);
+        tryExtFn(extFnVcOnReceiveHangup, account, chatUserId, message["data"]);
     }
     else if (type == "call-reply")
     {
-        tryExtFn(extFnVcOnReceiveCallReply, account, userIdTo, message["data"]);
+        tryExtFn(extFnVcOnReceiveCallReply, account, chatUserId, message["data"]);
     }
     else if (type == "call-join")
     {
-        tryExtFn(extFnVcOnMemberJoin, account, userIdTo, message["data"]);
+        tryExtFn(extFnVcOnMemberJoin, account, chatUserId, message["data"]);
     }
     else if (type == "call-join-fail")
     {
-        tryExtFn(extFnVcOnMemberJoinFailed, account, userIdTo, message["data"]);
+        tryExtFn(extFnVcOnMemberJoinFailed, account, chatUserId, message["data"]);
     }
     else if (type == "ice-candidate")
     {
-        tryExtFn(extFnVcOnReceiveIceCandidate, account, userIdTo, message["data"]);
+        tryExtFn(extFnVcOnReceiveIceCandidate, account, chatUserId, message["data"]);
     }
     else
     {
@@ -389,12 +389,18 @@ async function addSentMessage(account, userIdTo, message, dontActuallyAdd)
         await internalAddUserMessageSorted(account, userIdTo, message);
 }
 
-async function addNormalMessageToUser(account, userIdTo, message)
+async function addNormalMessageToUser(account, chatUserId, message, isGroup)
 {
-    logInfo(`New message from user ${userIdTo}:`, message);
-    await internalAddUserMessageSorted(account, userIdTo, message);
-    await addMessageToUnread(account, userIdTo, message);
-    tryExtFn(extMsgNormalMessage, account, userIdTo, message);
+    logInfo(`New message from user ${chatUserId}:`, message);
+    if (isGroup)
+        logWarn("Group messages not implemented yet");
+    else
+        addUserIdIfNotExists(chatUserId);
+
+
+    await internalAddUserMessageSorted(account, chatUserId, message);
+    await addMessageToUnread(account, chatUserId, message);
+    tryExtFn(extMsgNormalMessage, account, chatUserId, message);
 }
 
 let extFnVcInit = undefined;
