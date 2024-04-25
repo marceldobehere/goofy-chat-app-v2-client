@@ -1,0 +1,58 @@
+* {
+    font-size: 20px;
+}
+
+:root {
+    --main-sidebar-size: 100px;
+    --main-chat-selector-size: 250px;
+    --main-chat-size: 1fr;
+    --main-chat-info-size: 300px;
+
+    --main-chat-show-selector: 1;
+    --main-chat-show-info: 1;
+}
+
+#main-app-container {
+    grid-template-columns:
+            var(--main-sidebar-size)
+            calc(var(--main-chat-selector-size) * var(--main-chat-show-selector))
+            var(--main-chat-size)
+            calc(var(--main-chat-info-size) * var(--main-chat-show-info));
+}
+
+
+@media (max-width: 1200px) {
+    * {
+        font-size: 16px;
+    }
+
+    #main-app-container {
+        --main-sidebar-size: 80px;
+        --main-chat-selector-size: 180px;
+        --main-chat-info-size: 200px;
+    }
+}
+
+@media (max-width: 900px) {
+    * {
+        font-size: 16px;
+    }
+
+    #main-app-container {
+        --main-sidebar-size: 80px;
+        --main-chat-selector-size: 180px;
+        --main-chat-info-size: 180px;
+    }
+}
+
+@media (max-width: 650px) {
+    * {
+        font-size: 10px;
+    }
+
+    #main-app-container {
+        --main-sidebar-size: 50px;
+        --main-chat-selector-size: 100px;
+        --main-chat-info-size: 120px;
+    }
+}

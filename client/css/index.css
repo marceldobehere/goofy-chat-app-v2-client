@@ -1,0 +1,44 @@
+* {
+    color: var(--main-text-color);
+    background-color: var(--main-app-bg-color);
+    font-family: Arial, sans-serif;
+}
+
+
+body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0px;
+    padding: 0px;
+}
+
+#main-app-container {
+    width: calc(100vw - 5px);
+    height: calc(100vh - 5px);
+    display: grid;
+    border: 1px solid blue;
+    margin: 0px;
+    padding: 0px;
+    background-color: var(--main-app-bg-color);
+}
+
+#main-sidebar {
+    border: 1px solid red;
+    background-color: var(--main-sidebar-bg);
+}
+
+#main-chat-selector {
+    border: 1px solid green;
+    background-color: var(--main-chat-selector-bg);
+}
+
+#main-chat-content {
+    border: 1px solid orange;
+    background-color: var(--main-chat-bg);
+}
+
+#main-chat-info {
+    border: 1px solid yellow;
+    background-color: var(--main-chat-info-bg);
+    overflow: hidden;
+}
