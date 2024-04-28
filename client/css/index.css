@@ -32,7 +32,7 @@ body {
     background-color: var(--main-app-bg-color);
 
     /*Shouldn't occur*/
-    overflow: auto;
+    overflow: hidden;
 }
 
 #main-sidebar {
@@ -81,6 +81,23 @@ body {
 #main-chat-content {
     border: 1px solid orange;
     background-color: var(--main-chat-bg);
+    overflow-y: scroll;
+}
+
+/*Change the scrollbar*/
+#main-chat-content::-webkit-scrollbar {
+    width: var(--main-chat-selector-scroll-size);
+}
+
+/*Change the scrollbar track*/
+#main-chat-content::-webkit-scrollbar-track {
+    background-color: var(--main-chat-selector-scroll-bg);
+}
+
+/*Change the scrollbar thumb*/
+#main-chat-content::-webkit-scrollbar-thumb {
+    background-color: var(--main-chat-selector-scroll-color);
+    border-radius: var(--main-chat-selector-scroll-size);
 }
 
 #main-chat-info {
@@ -113,23 +130,34 @@ body {
 
 .chat-selector-entry {
     width: 90%;
-    padding: 0px;
-    margin: var(--main-sidebar-margin-vert) auto var(--main-sidebar-margin-vert) auto;
+    padding: var(--main-sidebar-margin-vert) 0px var(--main-sidebar-margin-vert) 0px;
+    margin: 0px auto 0px auto;
     display: block;
 }
 
+
+/*Only Hover*/
 .sidebar-entry:hover {
     filter: opacity(0.5) drop-shadow(0 0 0 var(--main-sidebar-hover-color));
 }
 .chat-selector-entry:hover {
     color: var(--main-chat-selector-hover-color);
+    background-color: var(--main-chat-selector-selected-bg);
 }
 
+/*Only active*/
 .sidebar-entry-active {
     filter: opacity(0.5) drop-shadow(0 0 0 var(--main-sidebar-selected-color));
 }
 .chat-selector-entry-active {
     color: var(--main-chat-selector-selected-color);
-    background-color: var(--main-chat-selector-selected-bg);
+}
+
+/*Hover and active*/
+.sidebar-entry-active:hover {
+    filter: opacity(0.5) drop-shadow(0 0 0 var(--main-sidebar-hover-selected-color));
+}
+.chat-selector-entry-active:hover {
+    color: var(--main-chat-selector-selected-color);
 }
 
