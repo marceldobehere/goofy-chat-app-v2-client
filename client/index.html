@@ -10,50 +10,29 @@
 </head>
 <body>
     <div id="main-app-container">
-        <div id="goofy-server-popup">
-            BLUB
-        </div>
-        <div id="main-sidebar">
-            <ul class="hidden-ul" id="main-sidebar-list">
-<!--                <li><img src="./assets/imgs/dm.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'A')" onmouseleave="serverHoverEnd()"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'B')" onmouseleave="serverHoverEnd()"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry sidebar-entry-active" onmouseover="serverHoverStart(this, 'C')" onmouseleave="serverHoverEnd()"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'D')" onmouseleave="serverHoverEnd()"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'E')" onmouseleave="serverHoverEnd()"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'F')" onmouseleave="serverHoverEnd()"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'G')" onmouseleave="serverHoverEnd()"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'H')" onmouseleave="serverHoverEnd()"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'I')" onmouseleave="serverHoverEnd()"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'J')" onmouseleave="serverHoverEnd()"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry"></li>-->
-<!--                <li><img src="./assets/imgs/uh.png" class="sidebar-entry"></li>-->
-            </ul>
-        </div>
-        <div id="main-chat-selector">
-            <ul class="hidden-ul" id="main-chat-selector-list">
-<!--                <li><span class="chat-selector-entry">CHAT 1</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 2</span></li>-->
-<!--                <li><span class="chat-selector-entry chat-selector-entry-active">CHAT 3</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 4</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 5</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 6</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 7</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 8</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 9</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 10</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 11</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 12</span></li>-->
-<!--                <li><span class="chat-selector-entry">CHAT 13</span></li>-->
-            </ul>
-        </div>
-        <div id="main-chat-content">
-            <ul class="hidden-ul" id="main-chat-content-list">
-                <li><div class="chat-entry"><span class="chat-entry-username">Username</span> at <span>TIME</span><br><p class="chat-entry-message">Message yes es</p></div></li>
-            </ul>
-        </div>
-        <div id="main-chat-info">
-            CHAT INFO
+
+
+
+        <div id="main-app-container-chat">
+            <div id="goofy-server-popup">
+                ???
+            </div>
+            <div id="main-sidebar">
+                <div id="main-sidebar-uldiv"><ul class="hidden-ul" id="main-sidebar-list"></ul></div>
+                <div id="main-sidebar-settings">SERVER SETTINGS</div>
+            </div>
+            <div id="main-chat-selector">
+                <div id="main-chat-selector-uldiv"><ul class="hidden-ul" id="main-chat-selector-list"></ul></div>
+                <div id="main-chat-selector-settings">CHAT SETTINGS</div>
+            </div>
+            <div id="main-chat-content">
+                <div id="main-chat-content-header">CHAT NAME & SETTINGS <a style="float:right;" href="#" onclick="toggleChatInfoVis()">HIDE CHAT INFO</a></div>
+                <div id="main-chat-content-uldiv"><ul class="hidden-ul" id="main-chat-content-list"></ul></div>
+                <div id="main-chat-content-input">CHAT INPUT</div>
+            </div>
+            <div id="main-chat-info">
+                CHAT INFO
+            </div>
         </div>
     </div>
 </body>

@@ -16,7 +16,7 @@
     --main-chat-show-info: 1;
 }
 
-#main-app-container {
+#main-app-container-chat {
     grid-template-columns:
             var(--main-sidebar-size)
             calc(var(--main-chat-selector-size) * var(--main-chat-show-selector))
@@ -30,7 +30,7 @@
         font-size: 16px;
     }
 
-    #main-app-container {
+    #main-app-container-chat {
         --main-sidebar-size: 60px;
         --main-chat-selector-size: 180px;
         --main-chat-info-size: 200px;
@@ -45,7 +45,7 @@
         font-size: 16px;
     }
 
-    #main-app-container {
+    #main-app-container-chat {
         --main-sidebar-size: 55px;
         --main-chat-selector-size: 180px;
         --main-chat-info-size: 180px;
@@ -60,7 +60,7 @@
         font-size: 10px;
     }
 
-    #main-app-container {
+    #main-app-container-chat {
         --main-sidebar-size: 40px;
         --main-chat-selector-size: 100px;
         --main-chat-info-size: 120px;

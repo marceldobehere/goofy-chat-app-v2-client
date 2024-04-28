@@ -104,7 +104,7 @@ function createChatList(channelId) {
     docChatList.innerHTML = "";
 
     for (let i = 0; i < 30; i++)
-        createChatEntry(`User ${i}`, "2024-04-27T17:43:03.164Z", `Message ${i}`);
+        createChatEntry(`User ${i}`, "2024-04-27T17:43:03.164Z", `Message ${i} for chat ${channelId}`);
 }
 
 function serverClicked(element, serverId) {
@@ -130,9 +130,9 @@ function channelClicked(element, channelId) {
 async function doConnInit() {
     createServerList();
 
-    createChannelList();
+    createChannelList(0);
 
-    createChatList();
+    createChatList(0);
 }
 
 doConnInit().then();
@@ -141,4 +141,10 @@ doConnInit().then();
 function setChatInfoVisibility(visible)
 {
     document.documentElement.style.setProperty("--main-chat-show-info", visible ? "1" : "0");
+}
+
+function toggleChatInfoVis()
+{
+    let visible = document.documentElement.style.getPropertyValue("--main-chat-show-info");
+    setChatInfoVisibility(visible === "0");
 }
