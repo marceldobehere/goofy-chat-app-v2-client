@@ -3,8 +3,12 @@
 }
 
 :root {
-    --main-sidebar-size: 100px;
+    --main-sidebar-size: 70px;
+    --main-sidebar-margin-vert: 12px;
+
     --main-chat-selector-size: 250px;
+    --main-chat-selector-scroll-size: 10px;
+
     --main-chat-size: 1fr;
     --main-chat-info-size: 300px;
 
@@ -27,9 +31,12 @@
     }
 
     #main-app-container {
-        --main-sidebar-size: 80px;
+        --main-sidebar-size: 60px;
         --main-chat-selector-size: 180px;
         --main-chat-info-size: 200px;
+
+        --main-sidebar-margin-vert: 10px;
+        --main-chat-selector-scroll-size: 8px;
     }
 }
 
@@ -39,9 +46,12 @@
     }
 
     #main-app-container {
-        --main-sidebar-size: 80px;
+        --main-sidebar-size: 55px;
         --main-chat-selector-size: 180px;
         --main-chat-info-size: 180px;
+
+        --main-sidebar-margin-vert: 10px;
+        --main-chat-selector-scroll-size: 8px;
     }
 }
 
@@ -51,8 +61,11 @@
     }
 
     #main-app-container {
-        --main-sidebar-size: 50px;
+        --main-sidebar-size: 40px;
         --main-chat-selector-size: 100px;
         --main-chat-info-size: 120px;
+
+        --main-sidebar-margin-vert: 6px;
+        --main-chat-selector-scroll-size: 4px;
     }
 }

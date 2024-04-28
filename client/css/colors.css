@@ -6,4 +6,16 @@
     --main-chat-selector-bg: #141428;
     --main-chat-bg: #202035;
     --main-chat-info-bg: #151530;
+
+    --main-sidebar-hover-color: #ffffff;
+    --main-sidebar-selected-color: #ff0000;
+
+    --main-chat-selector-default-color: #e0e0ff;
+    --main-chat-selector-hover-color: #ffffff;
+    --main-chat-selector-selected-color: #ff0000;
+    --main-chat-selector-selected-bg: #303045;
+
+    --main-chat-selector-scroll-bg: #202035;
+    --main-chat-selector-scroll-color: #e0e0ff;
+    --main-chat-selector-scroll-color-hover: #ff0000;
 }
