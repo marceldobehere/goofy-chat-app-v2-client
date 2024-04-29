@@ -1,21 +1,3 @@
-* {
-    font-size: 20px;
-}
-
-:root {
-    --main-sidebar-size: 70px;
-    --main-sidebar-margin-vert: 12px;
-
-    --main-chat-selector-size: 250px;
-    --main-chat-selector-scroll-size: 10px;
-
-    --main-chat-size: 1fr;
-    --main-chat-info-size: 300px;
-
-    --main-chat-show-selector: 1;
-    --main-chat-show-info: 1;
-}
-
 #main-app-container-chat {
     grid-template-columns:
             var(--main-sidebar-size)
@@ -24,10 +6,77 @@
             calc(var(--main-chat-info-size) * var(--main-chat-show-info));
 }
 
+#main-chat-info-header-toggle-chat-info {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    #main-app-container-chat {
+        grid-template-columns:
+            var(--main-sidebar-size)
+            calc(var(--main-chat-selector-size) * var(--main-chat-show-selector))
+            calc((100% - var(--main-sidebar-size) - (var(--main-chat-selector-size) * var(--main-chat-show-selector))) * (1 - var(--main-chat-show-info)))
+            calc((100% - var(--main-sidebar-size) - (var(--main-chat-selector-size) * var(--main-chat-show-selector))) * var(--main-chat-show-info));
+    }
+
+    #main-chat-info-header-toggle-chat-info {
+        display: block;
+    }
+}
+
+
+/*--------------------------------------------------------*/
+
+* {
+    font-size: 26px;
+}
+
+:root {
+    --main-sidebar-size: 70px;
+    --main-sidebar-margin-vert: 12px;
+
+    --main-chat-selector-size: 250px;
+    --main-chat-selector-scroll-size: 10px;
+    --main-chat-selector-margin-vert: 5px;
+    --main-chat-selector-padding: 10px;
+
+
+    --main-chat-size: 1fr;
+    --main-chat-info-size: 400px;
+    --main-chat-margin-vert: 15px;
+    --main-chat-padding: 5px;
+
+    --main-chat-show-selector: 1;
+    --main-chat-show-info: 0;
+
+    --main-chat-media-query-minus: calc(var(--main-chat-info-size));
+}
+
+
+@media (max-width: 1800px) {
+    * {
+        font-size: 22px;
+    }
+
+    #main-app-container-chat {
+        --main-chat-info-size: 350px;
+    }
+}
+
+@media (max-width: 1600px) {
+    * {
+        font-size: 20px;
+    }
+
+    #main-app-container-chat {
+        --main-chat-info-size: 300px;
+    }
+}
+
 
 @media (max-width: 1200px) {
     * {
-        font-size: 16px;
+        font-size: 18px;
     }
 
     #main-app-container-chat {
@@ -37,6 +86,9 @@
 
         --main-sidebar-margin-vert: 10px;
         --main-chat-selector-scroll-size: 8px;
+
+        --main-chat-selector-margin-vert: 3px;
+        --main-chat-selector-padding: 8px;
     }
 }
 
@@ -55,17 +107,59 @@
     }
 }
 
-@media (max-width: 650px) {
+@media (max-width: 680px) {
+    * {
+        font-size: 14px;
+    }
+
+    #main-app-container-chat {
+        --main-sidebar-size: 50px;
+        --main-chat-selector-size: 120px;
+        --main-chat-info-size: 120px;
+
+        --main-sidebar-margin-vert: 6px;
+        --main-chat-selector-scroll-size: 4px;
+
+        --main-chat-selector-margin-vert: 2px;
+        --main-chat-selector-padding: 6px;
+    }
+}
+
+
+@media (max-width: 450px) {
     * {
         font-size: 10px;
     }
 
     #main-app-container-chat {
         --main-sidebar-size: 40px;
-        --main-chat-selector-size: 100px;
+        --main-chat-selector-size: 70px;
         --main-chat-info-size: 120px;
 
         --main-sidebar-margin-vert: 6px;
         --main-chat-selector-scroll-size: 4px;
+
+        --main-chat-selector-margin-vert: 2px;
+        --main-chat-selector-padding: 5px;
+    }
+}
+
+
+
+@media (max-width: 300px) {
+    * {
+        font-size: 6px;
+    }
+
+    #main-app-container-chat {
+        --main-sidebar-size: 30px;
+        --main-chat-selector-size: 50px;
+        --main-chat-info-size: 120px;
+
+        --main-sidebar-margin-vert: 6px;
+        --main-chat-selector-scroll-size: 4px;
+
+        --main-chat-selector-margin-vert: 2px;
+        --main-chat-selector-padding: 2px;
     }
 }

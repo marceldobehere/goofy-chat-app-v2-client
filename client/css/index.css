@@ -191,8 +191,8 @@ body {
 
 .chat-selector-entry {
     width: 90%;
-    padding: var(--main-sidebar-margin-vert) 0px var(--main-sidebar-margin-vert) 0px;
-    margin: 0px auto 0px auto;
+    margin: var(--main-chat-selector-margin-vert) 0px var(--main-chat-selector-margin-vert) 0px;
+    padding: var(--main-chat-selector-padding);
     display: block;
 }
 
@@ -223,8 +223,8 @@ body {
 }
 
 .chat-entry {
-    margin: 10px auto 15px auto;
-    padding: 5px;
+    margin: var(--main-chat-margin-vert) auto var(--main-chat-margin-vert) auto;
+    padding: var(--main-chat-padding);
     width: 90%;
     background-color: #202030;
 }
@@ -234,5 +234,9 @@ body {
 }
 
 #main-chat-content-header {
+    padding: 5px;
+}
+
+#main-chat-info-header {
     padding: 5px;
 }

@@ -137,14 +137,15 @@ async function doConnInit() {
 
 doConnInit().then();
 
-
+const rootElement = document.querySelector(':root');
 function setChatInfoVisibility(visible)
 {
-    document.documentElement.style.setProperty("--main-chat-show-info", visible ? "1" : "0");
+    rootElement.style.setProperty("--main-chat-show-info", visible ? "1" : "0");
 }
 
 function toggleChatInfoVis()
 {
-    let visible = document.documentElement.style.getPropertyValue("--main-chat-show-info");
-    setChatInfoVisibility(visible === "0");
+    let visible = getComputedStyle(rootElement).getPropertyValue("--main-chat-show-info");
+    console.log(visible)
+    setChatInfoVisibility(visible == 0);
 }
