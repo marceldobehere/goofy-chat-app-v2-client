@@ -54,7 +54,7 @@ body {
     margin: 0px;
     padding: 0px;
     display: grid;
-    grid-template-rows: auto 100px;
+    grid-template-rows: auto var(--main-sidebar-settings-height);
     grid-template-columns: var(--main-sidebar-size);
     overflow: hidden;
 }
@@ -84,7 +84,7 @@ body {
     margin: 0px;
     padding: 0px;
     display: grid;
-    grid-template-rows: auto 100px;
+    grid-template-rows: auto var(--main-chat-selector-settings-height);
     grid-template-columns: var(--main-chat-selector-size);
     overflow: hidden;
 }
@@ -126,7 +126,7 @@ body {
     margin: 0px;
     padding: 0px;
     display: grid;
-    grid-template-rows: 50px auto 100px;
+    grid-template-rows: var(--main-chat-header-height) auto var(--main-chat-input-height);
     grid-template-columns: auto;
     overflow: hidden;
 }
@@ -138,6 +138,35 @@ body {
 
 #main-chat-content-input {
     border: 1px solid chartreuse;
+    display: grid;
+    grid-template-columns: 50px auto;
+}
+
+#main-chat-content-input-upload {
+    border: 1px solid pink;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+    background-color: var(--main-chat-upload-bg);
+}
+
+#main-chat-content-input-upload:hover {
+    cursor: pointer;
+    background-color: var(--main-chat-upload-hover-bg);
+}
+
+#main-chat-content-input-input {
+    width: calc(100% - 5px);
+    height: calc(100% - 5px);
+}
+
+#main-chat-content-input-input textarea {
+    width: calc(100% - 5px);
+    height: calc(100% - 5px);
+    padding: 5px;
+    background-color: var(--main-chat-upload-bg);
 }
 
 #main-chat-content-header {

@@ -34,22 +34,25 @@
 :root {
     --main-sidebar-size: 70px;
     --main-sidebar-margin-vert: 12px;
+    --main-sidebar-settings-height: 80px;
 
     --main-chat-selector-size: 250px;
     --main-chat-selector-scroll-size: 10px;
     --main-chat-selector-margin-vert: 5px;
     --main-chat-selector-padding: 10px;
+    --main-chat-selector-settings-height: 80px;
 
 
     --main-chat-size: 1fr;
     --main-chat-info-size: 400px;
     --main-chat-margin-vert: 15px;
     --main-chat-padding: 5px;
+    --main-chat-input-height: calc(3.6em + 10px);
+    --main-chat-header-height: 40px;
+
 
     --main-chat-show-selector: 1;
     --main-chat-show-info: 0;
-
-    --main-chat-media-query-minus: calc(var(--main-chat-info-size));
 }
 
 
