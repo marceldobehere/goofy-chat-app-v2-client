@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="./css/index.css">
     <link rel="stylesheet" href="./css/colors.css">
     <link rel="stylesheet" href="./css/media.css">
+    <script>
+        const documentHeight = () => {
+            const doc = document.documentElement
+            doc.style.setProperty('--main-app-height', `${window.innerHeight - 2}px`)
+        }
+        window.addEventListener('resize', documentHeight)
+        documentHeight()
+    </script>
 </head>
 <body>
     <div id="main-app-container">

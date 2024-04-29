@@ -1,10 +1,3 @@
-const documentHeight = () => {
-    const doc = document.documentElement
-    doc.style.setProperty('--main-app-height', `${window.innerHeight - 2}px`)
-}
-window.addEventListener('resize', documentHeight)
-documentHeight()
-
 const hoverElement = document.getElementById("goofy-server-popup");
 function serverHoverStart(element, serverName) {
     hoverElement.style.display = "block";
