@@ -156,6 +156,19 @@ function toggleChatInfoVis()
     setChatInfoVisibility(visible == 0);
 }
 
+
+function setChannelInfoVisibility(visible)
+{
+    rootElement.style.setProperty("--main-chat-show-selector", visible ? "1" : "0");
+
+}
+function toggleChannelInfoVis()
+{
+    let visible = getComputedStyle(rootElement).getPropertyValue("--main-chat-show-selector");
+    console.log(visible)
+    setChannelInfoVisibility(visible == 0);
+}
+
 function mainChatInputKey(event)
 {
     let key = event.keyCode;
