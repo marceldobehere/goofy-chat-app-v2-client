@@ -155,3 +155,43 @@ function toggleChatInfoVis()
     console.log(visible)
     setChatInfoVisibility(visible == 0);
 }
+
+function mainChatInputKey(event)
+{
+    let key = event.keyCode;
+    let shift = event.shiftKey;
+    if (key == 13 && !shift)
+    {
+        setTimeout(messageSend, 0);
+        event.preventDefault();
+    }
+}
+
+let messageSending = 0;
+async function messageSend() {
+    if (messageSending > 0)
+    {
+        messageSending++;
+        if (messageSending > 20) {
+            messageSending = 0;
+            console.log("SEND MAIL ANYWAY");
+        }
+        setTimeout(messageSend, 60);
+        return;
+    }
+    messageSending++;
+
+    let inputElement = document.getElementById("main-chat-content-input-input-textarea");
+    let text = inputElement.value;
+    inputElement.value = "";
+
+    try {
+        console.log(`Sending message: ${text}`);
+    }
+    catch (e)
+    {
+
+    }
+
+    messageSending = 0;
+}

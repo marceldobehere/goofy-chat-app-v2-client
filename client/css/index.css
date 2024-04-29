@@ -168,6 +168,7 @@ body {
     height: calc(100% - 5px);
     padding: 5px;
     background-color: var(--main-chat-upload-bg);
+    resize: none;
 }
 
 #main-chat-content-header {
