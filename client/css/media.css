@@ -32,6 +32,8 @@
 }
 
 :root {
+    --main-app-height: 100%;
+
     --main-sidebar-size: 70px;
     --main-sidebar-margin-vert: 12px;
     --main-sidebar-settings-height: 80px;

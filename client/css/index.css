@@ -6,11 +6,12 @@
 
 
 body {
-    width: 100dvw;
-    height: 100dvh;
+    width: 100vw;
+    height: var(--main-app-height);
     margin: 0px;
     padding: 0px;
 }
+
 
 #goofy-server-popup {
     display: none;
@@ -23,8 +24,8 @@ body {
 }
 
 #main-app-container {
-    width: calc(100dvw - 8px);
-    height: calc(100dvh - 8px);
+    width: calc(100vw - 8px);
+    height: calc(var(--main-app-height) - 8px);
 
     margin: 0px;
     padding: 0px;
