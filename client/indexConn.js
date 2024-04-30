@@ -151,8 +151,15 @@ function createChatEntry(username, time, message)
 
 async function createChatList(serverId, channelId, scrollDown) {
     docChatList.innerHTML = "";
+
+    let inputElement = document.getElementById('main-chat-content-input');
     if (serverId == NoId || channelId == NoId)
+    {
+        docChatList.textContent = "[No chat open]";
+        inputElement.style.display = "none";
         return;
+    }
+    inputElement.style.display = "";
 
     if (serverId == DMsId)
     {
@@ -206,7 +213,15 @@ async function channelClicked(element, channelId) {
         setChannelInfoVisibility(false);
 }
 
+function showId()
+{
+    let element = document.getElementById('main-chat-selector-settings-userid');
+    element.textContent = `${currentUser["mainAccount"]["userId"]}`;
+}
+
 async function doConnInit() {
+    showId();
+
     createServerList(DMsId);
 
     createChannelList(DMsId);
