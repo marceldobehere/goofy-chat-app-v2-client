@@ -109,7 +109,7 @@
 
     #main-app-container-chat {
         --main-sidebar-size: 55px;
-        --main-chat-selector-size: 180px;
+        --main-chat-selector-size: 170px;
         --main-chat-info-size: 180px;
 
         --main-sidebar-margin-vert: 10px;
@@ -124,7 +124,7 @@
 
     #main-app-container-chat {
         --main-sidebar-size: 50px;
-        --main-chat-selector-size: 120px;
+        --main-chat-selector-size: 140px;
         --main-chat-info-size: 120px;
 
         --main-sidebar-margin-vert: 6px;
@@ -145,7 +145,7 @@
 
     #main-app-container-chat {
         --main-sidebar-size: 40px;
-        --main-chat-selector-size: 70px;
+        --main-chat-selector-size: 100px;
         --main-chat-info-size: 120px;
 
         --main-sidebar-margin-vert: 6px;
@@ -165,7 +165,7 @@
 
     #main-app-container-chat {
         --main-sidebar-size: 30px;
-        --main-chat-selector-size: 50px;
+        --main-chat-selector-size: 70px;
         --main-chat-info-size: 120px;
 
         --main-sidebar-margin-vert: 6px;

@@ -58,6 +58,8 @@ body {
     grid-template-rows: auto var(--main-sidebar-settings-height);
     grid-template-columns: var(--main-sidebar-size);
     overflow: hidden;
+
+    transition: 0.35s ease-in-out;
 }
 
 #main-sidebar-uldiv {
@@ -88,6 +90,8 @@ body {
     grid-template-rows: auto var(--main-chat-selector-settings-height);
     grid-template-columns: var(--main-chat-selector-size);
     overflow: hidden;
+
+    transition: 0.35s ease-in-out;
 }
 
 #main-chat-selector-uldiv {
@@ -221,7 +225,6 @@ body {
     margin: var(--main-sidebar-margin-vert) auto var(--main-sidebar-margin-vert) auto;
     display: block;
     border-radius: 30%;
-    transition: 0.35s ease-in-out;
 }
 
 
