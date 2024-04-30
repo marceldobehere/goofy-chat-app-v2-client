@@ -158,6 +158,10 @@ body {
     background-color: var(--main-chat-upload-hover-bg);
 }
 
+#main-chat-content-input-upload:active {
+    background-color: var(--main-chat-upload-active-bg);
+}
+
 #main-chat-content-input-input {
     width: calc(100% - 5px);
     height: calc(100% - 5px);

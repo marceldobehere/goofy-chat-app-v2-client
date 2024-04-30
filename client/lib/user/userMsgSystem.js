@@ -150,7 +150,7 @@ async function internalGetUserMessages(account, userId)
     if (messages == undefined)
     {
         messages = [];
-        saveAccountObject(account, `USER_MSGS_${userId}`);
+        saveAccountObject(account, `USER_MSGS_${userId}`, messages);
     }
 
     return messages;

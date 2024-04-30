@@ -14,11 +14,14 @@ function serverHoverEnd() {
     hoverElement.style.display = "none";
 }
 
+const DMsId = -1;
+const NoId = -10;
 const docServerList = document.getElementById("main-sidebar-list");
 let docLastServerEntry = null;
+let docLastServerId = NoId;
 // also sidebar-entry-active
 // <li><img src="./assets/imgs/dm.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'A')" onmouseleave="serverHoverEnd()"></li>
-function createServerEntry(imgSrc, serverId, serverName) {
+function createServerEntry(imgSrc, serverId, serverName, shouldHighlight) {
     let li = document.createElement("li");
     let img = document.createElement("img");
     img.src = imgSrc;
@@ -30,46 +33,93 @@ function createServerEntry(imgSrc, serverId, serverName) {
     img.onclick = () => {
         serverClicked(img, serverId)
     };
+
+    if (shouldHighlight)
+    {
+        img.classList.add("sidebar-entry-active");
+        docLastServerEntry = img;
+        docLastServerId = serverId;
+    }
+
     li.appendChild(img);
     docServerList.appendChild(li);
 }
 
-function createServerList() {
+function createServerList(selectedServerId) {
     docServerList.innerHTML = "";
     docLastServerEntry = null;
+    docLastServerId = NoId;
 
-    createServerEntry("./assets/imgs/dm.png", -1, `DMs`);
+    createServerEntry("./assets/imgs/dm.png", DMsId, `DMs`, selectedServerId == DMsId);
+
+    let groups = getAllGroups();
+    for (let i = 0; i < groups.length; i++)
+        createServerEntry("./assets/imgs/uh.png", groups[i], `G: ${groups[i]}`, selectedServerId == groups[i]);
+
     for (let i = 0; i < 20; i++)
-        createServerEntry("./assets/imgs/uh.png", i, `S: ${i}`);
+        createServerEntry("./assets/imgs/uh.png", i, `TEMP S: ${i}`, selectedServerId == i);
 }
 
 
 const docChannelList = document.getElementById("main-chat-selector-list");
 let docLastChannelEntry = null;
+let docLastChannelId = NoId;
+let docLastChannelServerId = NoId;
 // also chat-selector-entry-active
 // <li><span class="chat-selector-entry">CHAT 1</span></li>
-function createChannelEntry(channelId, channelName) {
+function createChannelEntry(channelId, channelName, serverId, shouldHighlight) {
     let li = document.createElement("li");
     let span = document.createElement("span");
     span.className = "chat-selector-entry";
     span.textContent = channelName;
-    span.onclick = () => {
-        channelClicked(span, channelId)
-    };
+    if (channelId != NoId)
+        span.onclick = () => {
+            channelClicked(span, channelId)
+        };
+
+    if (shouldHighlight)
+    {
+        span.classList.add("chat-selector-entry-active");
+        docLastChannelEntry = span;
+        docLastChannelId = channelId;
+        docLastChannelServerId = serverId;
+    }
+
     li.appendChild(span);
     docChannelList.appendChild(li);
 }
 
-function createChannelList(serverId) {
+function createChannelList(serverId, selectedChatId, forceRefresh) {
+    if (serverId == docLastChannelServerId && !forceRefresh)
+        return;
+    docLastChannelServerId = serverId;
+
     docChannelList.innerHTML = "";
     docLastChannelEntry = null;
+    docLastChannelId = NoId;
+    if (serverId == NoId)
+        return;
 
-    createChannelEntry(0, "General");
-    for (let i = 0; i < 40; i++)
-        createChannelEntry(i, `Channel ${i}`);
+
+    if (serverId == DMsId)
+    {
+        let userIds = getAllUsers();
+        for (let i = 0; i < userIds.length; i++)
+            createChannelEntry(userIds[i], `User #${userIds[i]}`, serverId, selectedChatId == userIds[i]);
+        if (userIds.length == 0)
+            createChannelEntry(NoId, "No Friends", serverId, false);
+    }
+    else
+    {
+        createChannelEntry(0, "General", serverId, false);
+        for (let i = 0; i < 40; i++)
+            createChannelEntry(i, `Channel ${i} S${serverId}`, serverId, selectedChatId == i);
+
+    }
 }
 
 const docChatList = document.getElementById("main-chat-content-list");
+const docChatUlDiv = document.getElementById("main-chat-content-uldiv");
 // <li><div class="chat-entry"><span class="chat-entry-username">Username</span> at <span>TIME</span><br><p class="chat-entry-message">Message yes es</p></div></li>
 function createChatEntry(username, time, message)
 {
@@ -99,11 +149,35 @@ function createChatEntry(username, time, message)
     docChatList.appendChild(li);
 }
 
-function createChatList(channelId) {
+async function createChatList(serverId, channelId, scrollDown) {
     docChatList.innerHTML = "";
+    if (serverId == NoId || channelId == NoId)
+        return;
 
-    for (let i = 0; i < 30; i++)
-        createChatEntry(`User ${i}`, "2024-04-27T17:43:03.164Z", `Message ${i} for chat ${channelId}`);
+    if (serverId == DMsId)
+    {
+        let messages = await userGetMessages(channelId);
+        if (messages == null)
+            return;
+        console.log(messages);
+
+        for (let i = 0; i < messages.length; i++)
+        {
+            let msg = messages[i];
+            createChatEntry(`User ${msg["from"]}`, msg["date"], msg["data"]);
+        }
+    }
+    else
+    {
+        for (let i = 0; i < 30; i++)
+            createChatEntry(`User ${i}`, "2024-04-27T17:43:03.164Z", `Test Message ${i} for chat ${channelId}`);
+    }
+
+
+    if (scrollDown)
+    {
+        docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
+    }
 }
 
 function serverClicked(element, serverId) {
@@ -112,29 +186,35 @@ function serverClicked(element, serverId) {
         docLastServerEntry.classList.remove("sidebar-entry-active");
     element.classList.add("sidebar-entry-active");
     docLastServerEntry = element;
+    docLastServerId = serverId;
 
     createChannelList(serverId);
+    if (settingsObj["chat"]["auto-show-chat"])
+        setChannelInfoVisibility(true);
 }
 
-function channelClicked(element, channelId) {
+async function channelClicked(element, channelId) {
     console.log(`Channel ${channelId} clicked`);
     if (docLastChannelEntry)
         docLastChannelEntry.classList.remove("chat-selector-entry-active");
     element.classList.add("chat-selector-entry-active");
     docLastChannelEntry = element;
+    docLastChannelId = channelId;
 
-    createChatList(channelId);
+    await createChatList(docLastChannelServerId, channelId, true);
+    if (settingsObj["chat"]["auto-hide-chat"])
+        setChannelInfoVisibility(false);
 }
 
 async function doConnInit() {
-    createServerList();
+    createServerList(DMsId);
 
-    createChannelList(0);
+    createChannelList(DMsId);
 
-    createChatList(0);
+    await createChatList(DMsId, NoId);
 }
 
-doConnInit().then();
+//doConnInit().then();
 
 const rootElement = document.querySelector(':root');
 function setChatInfoVisibility(visible)
@@ -175,6 +255,9 @@ function mainChatInputKey(event)
 
 let messageSending = 0;
 async function messageSend() {
+    if (docLastChannelServerId == NoId || docLastChannelId == NoId)
+        return;
+
     if (messageSending > 0)
     {
         messageSending++;
@@ -190,14 +273,56 @@ async function messageSend() {
     let inputElement = document.getElementById("main-chat-content-input-input-textarea");
     let text = inputElement.value;
     inputElement.value = "";
+    if (text == "")
+    {
+        messageSending = 0;
+        return;
+    }
 
     try {
         console.log(`Sending message: ${text}`);
+
+        if (docLastChannelServerId == DMsId)
+        {
+            let userId = docLastChannelId;
+            let res = await userSendDirectMessage(userId, text, "text");
+            console.log(res);
+        }
+        else
+        {
+            alert('Group chats not implemented yet');
+        }
     }
     catch (e)
     {
 
     }
 
+    await createChatList(docLastChannelServerId, docLastChannelId, true);
+
     messageSending = 0;
+}
+
+async function addFriendUser()
+{
+    let userId = prompt("Enter user id:");
+    if (userId == null)
+        return;
+    userId = parseInt(userId);
+    if (isNaN(userId))
+        return alert("Invalid user id");
+
+    logInfo(`Adding user ${userId}`);
+
+    let symmKey = await getUserMySymmKey(currentUser["mainAccount"], userId);
+    if (symmKey == null)
+    {
+        alert("User does not exist!");
+        return;
+    }
+
+    addUserIdIfNotExists(userId);
+
+    if (docLastServerId == DMsId)
+        createChannelList(DMsId, docLastChannelId, docLastServerId, true);
 }

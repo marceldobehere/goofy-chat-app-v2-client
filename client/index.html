@@ -31,7 +31,10 @@
             </div>
             <div id="main-chat-selector">
                 <div id="main-chat-selector-uldiv"><ul class="hidden-ul" id="main-chat-selector-list"></ul></div>
-                <div id="main-chat-selector-settings">CHAT SETTINGS</div>
+                <div id="main-chat-selector-settings">
+                    CHANNEL SETTINGS<br>
+                    <button id="main-chat-selector-settings-add-friend" onclick="addFriendUser()">Add friend</button>
+                </div>
             </div>
             <div id="main-chat-content">
                 <div id="main-chat-content-header">
@@ -79,6 +82,7 @@
 <script src="./clientJs/profileStuff.js"></script>
 <script src="./lib/other/importExport.js"></script>
 <script src="./lib/chat/chatStuff.js"></script>
+<script src="./lib/user/settingsObj.js"></script>
 <script src="./indexConn.js"></script>
 <script src="./index.js"></script>
 </html>
