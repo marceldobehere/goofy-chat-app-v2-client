@@ -147,6 +147,7 @@ function createChatEntry(username, time, message)
     let p = document.createElement("p");
     p.className = "chat-entry-message";
     p.textContent = message;
+    p.innerHTML = p.innerHTML.replaceAll("\n", "<br>");
     div.appendChild(span1);
     div.appendChild(document.createTextNode(" at "));
     div.appendChild(span2);
