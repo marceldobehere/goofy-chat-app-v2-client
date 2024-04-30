@@ -224,6 +224,8 @@ async function channelClicked(element, channelId, serverId) {
     await createChatList(docLastChannelServerId, channelId, true);
     if (settingsObj["chat"]["auto-hide-chat"])
         setChannelInfoVisibility(false);
+
+    docChatInputElement.focus();
 }
 
 function showId()
@@ -269,6 +271,7 @@ function mainChatInputKey(event)
     }
 }
 
+const docChatInputElement = document.getElementById("main-chat-content-input-input-textarea");
 let messageSending = 0;
 async function messageSend() {
     if (docChatLastServerId == NoId || docChatLastChannelId == NoId)
@@ -286,9 +289,8 @@ async function messageSend() {
     }
     messageSending++;
 
-    let inputElement = document.getElementById("main-chat-content-input-input-textarea");
-    let text = inputElement.value;
-    inputElement.value = "";
+    let text = docChatInputElement.value;
+    docChatInputElement.value = "";
     if (text == "")
     {
         messageSending = 0;
