@@ -42,7 +42,7 @@
     --main-chat-selector-scroll-size: 10px;
     --main-chat-selector-margin-vert: 5px;
     --main-chat-selector-padding: 10px;
-    --main-chat-selector-settings-height: 80px;
+    --main-chat-selector-settings-height: 5em;
 
 
     --main-chat-size: 1fr;

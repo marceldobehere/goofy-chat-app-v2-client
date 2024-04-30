@@ -14,12 +14,18 @@ function serverHoverEnd() {
     hoverElement.style.display = "none";
 }
 
-const DMsId = -1;
+
+
+
+
+
 const NoId = -10;
+
+
+const DMsId = -1;
 const docServerList = document.getElementById("main-sidebar-list");
 let docLastServerEntry = null;
 let docLastServerId = NoId;
-// also sidebar-entry-active
 // <li><img src="./assets/imgs/dm.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'A')" onmouseleave="serverHoverEnd()"></li>
 function createServerEntry(imgSrc, serverId, serverName, shouldHighlight) {
     let li = document.createElement("li");
@@ -65,7 +71,6 @@ const docChannelList = document.getElementById("main-chat-selector-list");
 let docLastChannelEntry = null;
 let docLastChannelId = NoId;
 let docLastChannelServerId = NoId;
-// also chat-selector-entry-active
 // <li><span class="chat-selector-entry">CHAT 1</span></li>
 function createChannelEntry(channelId, channelName, serverId, shouldHighlight) {
     let li = document.createElement("li");
@@ -73,8 +78,8 @@ function createChannelEntry(channelId, channelName, serverId, shouldHighlight) {
     span.className = "chat-selector-entry";
     span.textContent = channelName;
     if (channelId != NoId)
-        span.onclick = () => {
-            channelClicked(span, channelId)
+        span.onclick = async () => {
+            await channelClicked(span, channelId, serverId);
         };
 
     if (shouldHighlight)
@@ -120,6 +125,8 @@ function createChannelList(serverId, selectedChatId, forceRefresh) {
 
 const docChatList = document.getElementById("main-chat-content-list");
 const docChatUlDiv = document.getElementById("main-chat-content-uldiv");
+let docChatLastServerId = NoId;
+let docChatLastChannelId = NoId;
 // <li><div class="chat-entry"><span class="chat-entry-username">Username</span> at <span>TIME</span><br><p class="chat-entry-message">Message yes es</p></div></li>
 function createChatEntry(username, time, message)
 {
@@ -195,18 +202,24 @@ function serverClicked(element, serverId) {
     docLastServerEntry = element;
     docLastServerId = serverId;
 
-    createChannelList(serverId);
+    if (serverId == docChatLastServerId)
+        createChannelList(serverId, docChatLastChannelId);
+    else
+        createChannelList(serverId);
+
     if (settingsObj["chat"]["auto-show-chat"])
         setChannelInfoVisibility(true);
 }
 
-async function channelClicked(element, channelId) {
+async function channelClicked(element, channelId, serverId) {
     console.log(`Channel ${channelId} clicked`);
     if (docLastChannelEntry)
         docLastChannelEntry.classList.remove("chat-selector-entry-active");
     element.classList.add("chat-selector-entry-active");
     docLastChannelEntry = element;
     docLastChannelId = channelId;
+    docChatLastServerId = serverId;
+    docChatLastChannelId = channelId;
 
     await createChatList(docLastChannelServerId, channelId, true);
     if (settingsObj["chat"]["auto-hide-chat"])
@@ -219,36 +232,24 @@ function showId()
     element.textContent = `${currentUser["mainAccount"]["userId"]}`;
 }
 
-async function doConnInit() {
-    showId();
 
-    createServerList(DMsId);
 
-    createChannelList(DMsId);
 
-    await createChatList(DMsId, NoId);
-}
-
-//doConnInit().then();
 
 const rootElement = document.querySelector(':root');
 function setChatInfoVisibility(visible)
 {
     rootElement.style.setProperty("--main-chat-show-info", visible ? "1" : "0");
 }
-
 function toggleChatInfoVis()
 {
     let visible = getComputedStyle(rootElement).getPropertyValue("--main-chat-show-info");
     console.log(visible)
     setChatInfoVisibility(visible == 0);
 }
-
-
 function setChannelInfoVisibility(visible)
 {
     rootElement.style.setProperty("--main-chat-show-selector", visible ? "1" : "0");
-
 }
 function toggleChannelInfoVis()
 {
@@ -270,7 +271,7 @@ function mainChatInputKey(event)
 
 let messageSending = 0;
 async function messageSend() {
-    if (docLastChannelServerId == NoId || docLastChannelId == NoId)
+    if (docChatLastServerId == NoId || docChatLastChannelId == NoId)
         return;
 
     if (messageSending > 0)
@@ -297,9 +298,9 @@ async function messageSend() {
     try {
         console.log(`Sending message: ${text}`);
 
-        if (docLastChannelServerId == DMsId)
+        if (docChatLastServerId == DMsId)
         {
-            let userId = docLastChannelId;
+            let userId = docChatLastChannelId;
             let res = await userSendDirectMessage(userId, text, "text");
             console.log(res);
         }
@@ -313,7 +314,7 @@ async function messageSend() {
 
     }
 
-    await createChatList(docLastChannelServerId, docLastChannelId, true);
+    await createChatList(docChatLastServerId, docChatLastChannelId, true);
 
     messageSending = 0;
 }
@@ -340,4 +341,27 @@ async function addFriendUser()
 
     if (docLastServerId == DMsId)
         createChannelList(DMsId, docLastChannelId, docLastServerId, true);
+}
+
+
+async function doConnInit() {
+    //tryExtFn(extMsgNormalMessage, account, chatUserId, message);
+    extMsgNormalMessage = messageReceivedUI;
+
+
+    showId();
+
+    createServerList(DMsId);
+
+    createChannelList(DMsId);
+
+    await createChatList(DMsId, NoId);
+}
+
+async function messageReceivedUI(account, chatUserId, message)
+{
+    if (chatUserId == docChatLastChannelId && docChatLastServerId == DMsId)
+    {
+        await createChatList(DMsId, chatUserId, true);
+    }
 }
