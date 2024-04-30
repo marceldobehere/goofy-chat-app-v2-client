@@ -140,7 +140,7 @@ body {
 #main-chat-content-input {
     border: 1px solid chartreuse;
     display: grid;
-    grid-template-columns: 50px auto;
+    grid-template-columns: var(--main-chat-input-upload-size) auto;
 }
 
 #main-chat-content-input-upload {
@@ -221,6 +221,7 @@ body {
     margin: var(--main-sidebar-margin-vert) auto var(--main-sidebar-margin-vert) auto;
     display: block;
     border-radius: 30%;
+    transition: 0.35s ease-in-out;
 }
 
 

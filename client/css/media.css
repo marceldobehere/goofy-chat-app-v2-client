@@ -51,10 +51,12 @@
     --main-chat-padding: 5px;
     --main-chat-input-height: calc(3.6em + 10px);
     --main-chat-header-height: 40px;
+    --main-chat-input-upload-size: 60px;
 
 
     --main-chat-show-selector: 1;
     --main-chat-show-info: 0;
+
 }
 
 
@@ -75,6 +77,7 @@
 
     #main-app-container-chat {
         --main-chat-info-size: 300px;
+        --main-chat-input-upload-size: 50px;
     }
 }
 
@@ -94,6 +97,8 @@
 
         --main-chat-selector-margin-vert: 3px;
         --main-chat-selector-padding: 8px;
+
+        --main-chat-input-upload-size: 40px;
     }
 }
 
@@ -127,6 +132,8 @@
 
         --main-chat-selector-margin-vert: 2px;
         --main-chat-selector-padding: 6px;
+
+        --main-chat-input-upload-size: 30px;
     }
 }
 
