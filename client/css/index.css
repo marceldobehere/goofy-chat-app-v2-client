@@ -51,6 +51,7 @@ body {
 #main-sidebar {
     border: 1px solid red;
     background-color: var(--main-sidebar-bg);
+    width: var(--main-sidebar-size);
 
     margin: 0px;
     padding: 0px;
@@ -83,6 +84,7 @@ body {
 #main-chat-selector {
     border: 1px solid green;
     background-color: var(--main-chat-selector-bg);
+    width: calc(var(--main-chat-selector-size) * var(--main-chat-show-selector));
 
     margin: 0px;
     padding: 0px;
@@ -127,6 +129,7 @@ body {
 #main-chat-content {
     border: 1px solid orange;
     background-color: var(--main-chat-bg);
+    width: calc(var(--main-chat-size) * var(--main-chat-chat-shown));
 
     margin: 0px;
     padding: 0px;
@@ -139,6 +142,10 @@ body {
 #main-chat-content-uldiv {
     overflow-y: scroll;
     overflow-x: hidden;
+}
+
+#main-chat-content-uldiv * {
+    font-size: var(--main-chat-font-size);
 }
 
 #main-chat-content-input {
@@ -204,6 +211,7 @@ body {
     border: 1px solid yellow;
     background-color: var(--main-chat-info-bg);
     overflow: hidden;
+    width: calc(100% * var(--main-chat-show-info));
 }
 
 .hidden-ul {

@@ -12,10 +12,12 @@
 
 @media (max-width: 800px) {
     #main-app-container-chat {
+        --main-chat-chat-shown: calc(1 - var(--main-chat-show-info));
+
         grid-template-columns:
             var(--main-sidebar-size)
             calc(var(--main-chat-selector-size) * var(--main-chat-show-selector))
-            calc((100% - var(--main-sidebar-size) - (var(--main-chat-selector-size) * var(--main-chat-show-selector))) * (1 - var(--main-chat-show-info)))
+            calc((100% - var(--main-sidebar-size) - (var(--main-chat-selector-size) * var(--main-chat-show-selector))) * var(--main-chat-chat-shown))
             calc((100% - var(--main-sidebar-size) - (var(--main-chat-selector-size) * var(--main-chat-show-selector))) * var(--main-chat-show-info));
     }
 
@@ -52,10 +54,12 @@
     --main-chat-input-height: calc(3.6em + 10px);
     --main-chat-header-height: 40px;
     --main-chat-input-upload-size: 60px;
+    --main-chat-font-size: 1.05em;
 
 
     --main-chat-show-selector: 1;
     --main-chat-show-info: 0;
+    --main-chat-chat-shown: 1;
 
 }
 
@@ -67,6 +71,7 @@
 
     #main-app-container-chat {
         --main-chat-info-size: 350px;
+        --main-chat-font-size: 1em;
     }
 }
 
@@ -99,6 +104,7 @@
         --main-chat-selector-padding: 8px;
 
         --main-chat-input-upload-size: 40px;
+        --main-chat-font-size: 1.05em;
     }
 }
 
@@ -111,6 +117,9 @@
         --main-sidebar-size: 55px;
         --main-chat-selector-size: 170px;
         --main-chat-info-size: 180px;
+
+        --main-chat-margin-vert: 10px;
+        --main-chat-padding: 4px;
 
         --main-sidebar-margin-vert: 10px;
         --main-chat-selector-scroll-size: 8px;
@@ -127,13 +136,15 @@
         --main-chat-selector-size: 140px;
         --main-chat-info-size: 120px;
 
-        --main-sidebar-margin-vert: 6px;
+        --main-sidebar-margin-vert: 8px;
         --main-chat-selector-scroll-size: 4px;
 
         --main-chat-selector-margin-vert: 2px;
         --main-chat-selector-padding: 6px;
 
         --main-chat-input-upload-size: 30px;
+
+        --main-chat-font-size: 1.1em;
     }
 }
 
@@ -153,6 +164,11 @@
 
         --main-chat-selector-margin-vert: 2px;
         --main-chat-selector-padding: 5px;
+
+        --main-chat-margin-vert: 6px;
+        --main-chat-padding: 3px;
+
+        --main-chat-font-size: 1.1em;
     }
 }
 
@@ -160,7 +176,7 @@
 
 @media (max-width: 300px) {
     * {
-        font-size: 6px;
+        font-size: 8px;
     }
 
     #main-app-container-chat {

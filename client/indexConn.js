@@ -123,6 +123,26 @@ function createChannelList(serverId, selectedChatId, forceRefresh) {
     }
 }
 
+function isoDateToReadable(isoDateStr, isToday)
+{
+    let tempStr = isoDateStr.slice(0, 19).replace("T", " ");
+    let parts = tempStr.split(" ");
+    let dateStr;
+    if (isToday)
+        dateStr = "Today";
+    else
+    {
+        let dateParts = parts[0].split("-");
+        dateStr = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+    }
+
+    let timeStr = parts[1];
+    let timeParts = timeStr.split(":");
+    timeStr = `${timeParts[0]}:${timeParts[1]}`;
+
+    return `${dateStr} at ${timeStr}`;
+}
+
 const docChatList = document.getElementById("main-chat-content-list");
 const docChatUlDiv = document.getElementById("main-chat-content-uldiv");
 let docChatLastServerId = NoId;
@@ -140,7 +160,7 @@ function createChatEntry(username, time, message)
 
     let utcDate = new Date(time);
     let localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
-    time = localDate.toISOString().slice(0, 19).replace("T", " ");
+    time = isoDateToReadable(localDate.toISOString(), utcDate.toDateString() == new Date().toDateString());
 
     span2.textContent = time;
     let br = document.createElement("br");
@@ -149,7 +169,7 @@ function createChatEntry(username, time, message)
     p.textContent = message;
     p.innerHTML = p.innerHTML.replaceAll("\n", "<br>");
     div.appendChild(span1);
-    div.appendChild(document.createTextNode(" at "));
+    div.appendChild(document.createTextNode(" - "));
     div.appendChild(span2);
     div.appendChild(br);
     div.appendChild(p);
