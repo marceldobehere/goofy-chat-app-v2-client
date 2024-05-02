@@ -10,6 +10,26 @@ async function userSendGroupMessage(groupId, data, type)
     logWarn("Group messages are not implemented yet.");
 }
 
+async function userGetDirectMessageInfo(userId)
+{
+    return await getUserChatInfo(currentUser["mainAccount"], userId);
+}
+
+async function userSetDirectMessageInfo(userId, obj)
+{
+    await setUserChatInfo(currentUser["mainAccount"], userId, obj);
+}
+
+async function userGetGroupMessageInfo(groupId)
+{
+    return undefined;
+}
+
+async function userSetGroupMessageInfo(groupId, obj)
+{
+    alert("Group messages are not implemented yet.");
+}
+
 async function userGetMessages(userId)
 {
     return await internalGetUserMessages(currentUser["mainAccount"], userId);

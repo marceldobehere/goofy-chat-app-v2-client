@@ -15,6 +15,30 @@
         window.addEventListener('resize', documentHeight)
         documentHeight()
     </script>
+    <script src="./ext/jsencrypt.min.js"></script>
+    <script src="./ext/crypto_js/crypto-js.js"></script>
+    <script src="./ext/socket_io.js"></script>
+    <script src="./lib/other/logger.js"></script>
+    <script src="./lib/other/asyncLock.js"></script>
+    <script src="./lib/other/localStorageStuff.js"></script>
+    <script src="./lib/other/conn.js"></script>
+    <script src="./lib/socket/socketConvo.js"></script>
+    <script src="./lib/sec/enc.js"></script>
+    <script src="./lib/socket/socketStuff.js"></script>
+    <script src="./lib/sec/sec.js"></script>
+    <script src="./lib/user/accountStuff.js"></script>
+    <script src="./lib/user/userIdPubKeyInterface.js"></script>
+    <script src="./lib/user/userFuncs.js"></script>
+    <script src="./lib/msg/msgInterface.js"></script>
+    <script src="./lib/user/userMsgSystem.js"></script>
+    <script src="./lib/msg/msgSystem.js"></script>
+    <script src="./lib/client.js"></script>
+    <script src="./clientJs/extra.js"></script>
+    <script src="./clientJs/profileStuff.js"></script>
+    <script src="./lib/other/importExport.js"></script>
+    <script src="./lib/chat/chatStuff.js"></script>
+    <script src="./lib/user/settingsObj.js"></script>
+    <script src="./lib/user/userInfoStuff.js"></script>
 </head>
 <body>
     <div id="main-app-container">
@@ -56,34 +80,13 @@
                     CHAT INFO
                     <a id="main-chat-info-header-toggle-chat-info" style="float:right;" href="#" onclick="toggleChatInfoVis()">HIDE CHAT INFO</a>
                 </div>
-                BLAH
+                <div id="main-chat-info-body">
+                    BLEH
+                </div>
             </div>
         </div>
     </div>
 </body>
-<script src="./ext/jsencrypt.min.js"></script>
-<script src="./ext/crypto_js/crypto-js.js"></script>
-<script src="./ext/socket_io.js"></script>
-<script src="./lib/other/logger.js"></script>
-<script src="./lib/other/asyncLock.js"></script>
-<script src="./lib/other/localStorageStuff.js"></script>
-<script src="./lib/other/conn.js"></script>
-<script src="./lib/socket/socketConvo.js"></script>
-<script src="./lib/sec/enc.js"></script>
-<script src="./lib/socket/socketStuff.js"></script>
-<script src="./lib/sec/sec.js"></script>
-<script src="./lib/user/accountStuff.js"></script>
-<script src="./lib/user/userIdPubKeyInterface.js"></script>
-<script src="./lib/user/userFuncs.js"></script>
-<script src="./lib/msg/msgInterface.js"></script>
-<script src="./lib/user/userMsgSystem.js"></script>
-<script src="./lib/msg/msgSystem.js"></script>
-<script src="./lib/client.js"></script>
-<script src="./clientJs/extra.js"></script>
-<script src="./clientJs/profileStuff.js"></script>
-<script src="./lib/other/importExport.js"></script>
-<script src="./lib/chat/chatStuff.js"></script>
-<script src="./lib/user/settingsObj.js"></script>
 <script src="./indexConn.js"></script>
 <script src="./index.js"></script>
 </html>

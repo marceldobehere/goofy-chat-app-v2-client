@@ -179,6 +179,7 @@ function createChatEntry(username, time, message)
 
 async function createChatList(serverId, channelId, scrollDown) {
     docChatList.innerHTML = "";
+    await updateChatInfo(serverId, channelId);
 
     let inputElement = document.getElementById('main-chat-content-input');
     if (serverId == NoId || channelId == NoId)
@@ -214,6 +215,51 @@ async function createChatList(serverId, channelId, scrollDown) {
         docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
     }
 }
+
+const docChatInfo = document.getElementById("main-chat-info-body");
+async function updateChatInfo(serverId, channelId)
+{
+    if (serverId == NoId || channelId == NoId)
+    {
+        docChatInfo.innerHTML = "[No chat open]";
+        return;
+    }
+
+    if (serverId != DMsId)
+    {
+        docChatInfo.innerHTML = "[Group chat info not implemented yet]";
+        return;
+    }
+
+    {
+        let div = document.createElement("div");
+        let span = document.createElement("span");
+        span.textContent = `User Info: ${channelId}`;
+        div.appendChild(span);
+        docChatInfo.appendChild(div);
+    }
+
+    {
+        let userInfo = await userGetDirectMessageInfo(channelId);
+        let div = document.createElement("div");
+        let pre = document.createElement("pre");
+        let text = JSON.stringify(userInfo, null, 2);
+        pre.textContent = text;
+        div.appendChild(pre);
+        docChatInfo.appendChild(div);
+    }
+
+    {
+        let pubKey = await getPublicKeyFromUser(channelId);
+        let div = document.createElement("div");
+        let pre = document.createElement("pre");
+        pre.textContent = `Public Key: ${pubKey}`;
+        div.appendChild(pre);
+        docChatInfo.appendChild(div);
+    }
+
+}
+
 
 function serverClicked(element, serverId) {
     console.log(`Server ${serverId} clicked`);

@@ -10,7 +10,7 @@
     display: none;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 850px) {
     #main-app-container-chat {
         --main-chat-chat-shown: calc(1 - var(--main-chat-show-info));
 
@@ -48,7 +48,7 @@
 
 
     --main-chat-size: 1fr;
-    --main-chat-info-size: 400px;
+    --main-chat-info-size: 650px;
     --main-chat-margin-vert: 15px;
     --main-chat-padding: 5px;
     --main-chat-input-height: calc(3.6em + 10px);
@@ -70,7 +70,7 @@
     }
 
     #main-app-container-chat {
-        --main-chat-info-size: 350px;
+        --main-chat-info-size: 500px;
         --main-chat-font-size: 1em;
     }
 }
@@ -81,7 +81,7 @@
     }
 
     #main-app-container-chat {
-        --main-chat-info-size: 300px;
+        --main-chat-info-size: 400px;
         --main-chat-input-upload-size: 50px;
     }
 }
@@ -95,7 +95,7 @@
     #main-app-container-chat {
         --main-sidebar-size: 60px;
         --main-chat-selector-size: 180px;
-        --main-chat-info-size: 200px;
+        --main-chat-info-size: 350px;
 
         --main-sidebar-margin-vert: 10px;
         --main-chat-selector-scroll-size: 8px;
@@ -116,7 +116,7 @@
     #main-app-container-chat {
         --main-sidebar-size: 55px;
         --main-chat-selector-size: 170px;
-        --main-chat-info-size: 180px;
+        --main-chat-info-size: 240px;
 
         --main-chat-margin-vert: 10px;
         --main-chat-padding: 4px;
