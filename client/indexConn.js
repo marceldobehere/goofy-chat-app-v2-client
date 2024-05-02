@@ -231,6 +231,8 @@ async function updateChatInfo(serverId, channelId)
         return;
     }
 
+    docChatInfo.innerHTML = "";
+
     {
         let div = document.createElement("div");
         let span = document.createElement("span");
