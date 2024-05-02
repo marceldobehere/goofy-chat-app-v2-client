@@ -72,11 +72,10 @@ let docLastChannelEntry = null;
 let docLastChannelId = NoId;
 let docLastChannelServerId = NoId;
 // <li><span class="chat-selector-entry">CHAT 1</span></li>
-function createChannelEntry(channelId, channelName, serverId, shouldHighlight) {
+async function createChannelEntry(channelId, channelName, serverId, shouldHighlight) {
     let li = document.createElement("li");
     let span = document.createElement("span");
     span.className = "chat-selector-entry";
-    span.textContent = channelName;
     if (channelId != NoId)
         span.onclick = async () => {
             await channelClicked(span, channelId, serverId);
@@ -90,11 +89,25 @@ function createChannelEntry(channelId, channelName, serverId, shouldHighlight) {
         docLastChannelServerId = serverId;
     }
 
+    let notCount = 0;
+    if (serverId == DMsId && channelId != NoId)
+    {
+        notCount = (await userGetUnreadMessages(channelId)).length;
+    }
+
+    let chanText = channelName;
+    if (notCount > 0)
+        chanText += ` (${notCount})`;
+
+    span.textContent = chanText;
+
+
+
     li.appendChild(span);
     docChannelList.appendChild(li);
 }
 
-function createChannelList(serverId, selectedChatId, forceRefresh) {
+async function createChannelList(serverId, selectedChatId, forceRefresh) {
     if (serverId == docLastChannelServerId && !forceRefresh)
         return;
     docLastChannelServerId = serverId;
@@ -110,15 +123,15 @@ function createChannelList(serverId, selectedChatId, forceRefresh) {
     {
         let userIds = getAllUsers();
         for (let i = 0; i < userIds.length; i++)
-            createChannelEntry(userIds[i], `User #${userIds[i]}`, serverId, selectedChatId == userIds[i]);
+            await createChannelEntry(userIds[i], `User #${userIds[i]}`, serverId, selectedChatId == userIds[i]);
         if (userIds.length == 0)
-            createChannelEntry(NoId, "No Friends", serverId, false);
+            await createChannelEntry(NoId, "No Friends", serverId, false);
     }
     else
     {
-        createChannelEntry(0, "General", serverId, false);
+        await createChannelEntry(0, "General", serverId, false);
         for (let i = 0; i < 40; i++)
-            createChannelEntry(i, `Channel ${i} S${serverId}`, serverId, selectedChatId == i);
+            await createChannelEntry(i, `Channel ${i} S${serverId}`, serverId, selectedChatId == i);
 
     }
 }
@@ -263,7 +276,7 @@ async function updateChatInfo(serverId, channelId)
 }
 
 
-function serverClicked(element, serverId) {
+async function serverClicked(element, serverId) {
     console.log(`Server ${serverId} clicked`);
     if (docLastServerEntry)
         docLastServerEntry.classList.remove("sidebar-entry-active");
@@ -272,9 +285,9 @@ function serverClicked(element, serverId) {
     docLastServerId = serverId;
 
     if (serverId == docChatLastServerId)
-        createChannelList(serverId, docChatLastChannelId);
+        await createChannelList(serverId, docChatLastChannelId);
     else
-        createChannelList(serverId);
+        await createChannelList(serverId);
 
     if (settingsObj["chat"]["auto-show-chat"])
         setChannelInfoVisibility(true);
@@ -293,6 +306,12 @@ async function channelClicked(element, channelId, serverId) {
     await createChatList(docLastChannelServerId, channelId, true);
     if (settingsObj["chat"]["auto-hide-chat"])
         setChannelInfoVisibility(false);
+
+    if (serverId == DMsId)
+    {
+        await userMarkMessagesAsRead(channelId);
+        await createChannelList(DMsId, channelId, true);
+    }
 
     docChatInputElement.focus();
 }
@@ -411,7 +430,7 @@ async function addFriendUser()
     addUserIdIfNotExists(userId);
 
     if (docLastServerId == DMsId)
-        createChannelList(DMsId, docLastChannelId, docLastServerId, true);
+        await createChannelList(DMsId, docLastChannelId, docLastServerId, true);
 }
 
 
@@ -424,7 +443,7 @@ async function doConnInit() {
 
     createServerList(DMsId);
 
-    createChannelList(DMsId);
+    await createChannelList(DMsId);
 
     await createChatList(DMsId, NoId);
 }
@@ -433,11 +452,12 @@ async function messageReceivedUI(account, chatUserId, message)
 {
     if (chatUserId == docChatLastChannelId && docChatLastServerId == DMsId)
     {
+        await userMarkMessagesAsRead(chatUserId);
         await createChatList(DMsId, chatUserId, true);
     }
 
-    if (docLastServerId == DMsId && (await userGetMessages(chatUserId)).length == 1)
+    if (docLastServerId == DMsId)// && (await userGetMessages(chatUserId)).length == 1)
     {
-        createChannelList(DMsId, docLastChannelId, true);
+        await createChannelList(DMsId, docLastChannelId, true);
     }
 }
