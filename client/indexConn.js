@@ -387,4 +387,9 @@ async function messageReceivedUI(account, chatUserId, message)
     {
         await createChatList(DMsId, chatUserId, true);
     }
+
+    if (docLastServerId == DMsId && (await userGetMessages(chatUserId)).length == 1)
+    {
+        createChannelList(DMsId, docLastChannelId, true);
+    }
 }
