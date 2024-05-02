@@ -67,3 +67,21 @@ function addGroupIdIfNotExists(groupId)
     chatGroupObj[groupId] = {};
     saveObject("chatGroupList", chatGroupObj);
 }
+
+function removeUserIfExists(userId)
+{
+    if (chatUserObj[userId] == undefined)
+        return;
+
+    delete chatUserObj[userId];
+    saveObject("chatUserList", chatUserObj);
+}
+
+function removeGroupIfExists(groupId)
+{
+    if (chatGroupObj[groupId] == undefined)
+        return;
+
+    delete chatGroupObj[groupId];
+    saveObject("chatGroupList", chatGroupObj);
+}

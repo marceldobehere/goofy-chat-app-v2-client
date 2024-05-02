@@ -271,6 +271,10 @@ body {
     background-color: var(--main-chat-selector-selected-bg);
 }
 
+.chat-selector-entry-not {
+    color: var(--main-chat-selector-not-color);
+}
+
 /*Only active*/
 .sidebar-entry-active {
     filter: opacity(0.5) drop-shadow(0 0 0 var(--main-sidebar-selected-color));
@@ -286,6 +290,7 @@ body {
 .chat-selector-entry-active:hover {
     color: var(--main-chat-selector-selected-color);
 }
+
 
 .chat-entry {
     margin: var(--main-chat-margin-vert) auto var(--main-chat-margin-vert) auto;

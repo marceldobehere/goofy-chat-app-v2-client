@@ -58,3 +58,8 @@ async function userMarkMessagesAsRead(userId)
 
     await addSentMessage(accountFrom, userId, msg, true);
 }
+
+async function deleteDirectMessages(userId)
+{
+    await internalRemoveUserMessages(currentUser["mainAccount"], userId);
+}

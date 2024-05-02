@@ -209,6 +209,16 @@ async function internalRemoveUserMessage(account, userId, messageId)
     saveAccountObject(account, `USER_MSGS_${userId}`, newMessages);
 }
 
+async function internalRemoveUserMessages(account, userId)
+{
+    saveAccountObject(account, `USER_MSGS_${userId}`, []);
+    saveAccountObject(account, `USER_UNREAD_MSG_IDS_${userId}`, []);
+    saveAccountObject(account, `USER_MSG_IDS_${userId}`, []);
+
+    removeUserIfExists(userId);
+
+}
+
 const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "call-join", "call-join-fail", "ice-candidate"];
 
 async function addMessageToUser(account, userIdFrom, chatUserId, message, date)

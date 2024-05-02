@@ -97,7 +97,10 @@ async function createChannelEntry(channelId, channelName, serverId, shouldHighli
 
     let chanText = channelName;
     if (notCount > 0)
+    {
         chanText += ` (${notCount})`;
+        span.classList.add("chat-selector-entry-not");
+    }
 
     span.textContent = chanText;
 
@@ -156,6 +159,7 @@ function isoDateToReadable(isoDateStr, isToday)
     return `${dateStr} at ${timeStr}`;
 }
 
+
 const docChatList = document.getElementById("main-chat-content-list");
 const docChatUlDiv = document.getElementById("main-chat-content-uldiv");
 let docChatLastServerId = NoId;
@@ -190,8 +194,10 @@ function createChatEntry(username, time, message)
     docChatList.appendChild(li);
 }
 
+const docChatHeaderDeleteBtn = document.getElementById("main-chat-content-header-delete-chat");
 async function createChatList(serverId, channelId, scrollDown) {
     docChatList.innerHTML = "";
+    docChatHeaderDeleteBtn.style.display = "none";
     await updateChatInfo(serverId, channelId);
 
     let inputElement = document.getElementById('main-chat-content-input');
@@ -205,6 +211,8 @@ async function createChatList(serverId, channelId, scrollDown) {
 
     if (serverId == DMsId)
     {
+        docChatHeaderDeleteBtn.style.display = "";
+
         let messages = await userGetMessages(channelId);
         if (messages == null)
             return;
@@ -434,19 +442,7 @@ async function addFriendUser()
 }
 
 
-async function doConnInit() {
-    //tryExtFn(extMsgNormalMessage, account, chatUserId, message);
-    extMsgNormalMessage = messageReceivedUI;
 
-
-    showId();
-
-    createServerList(DMsId);
-
-    await createChannelList(DMsId);
-
-    await createChatList(DMsId, NoId);
-}
 
 async function messageReceivedUI(account, chatUserId, message)
 {
@@ -460,4 +456,42 @@ async function messageReceivedUI(account, chatUserId, message)
     {
         await createChannelList(DMsId, docLastChannelId, true);
     }
+}
+
+async function deleteCurrDm()
+{
+    if (docChatLastServerId == NoId || docChatLastChannelId == NoId)
+        return;
+
+    if (docChatLastServerId != DMsId)
+        return;
+
+    if (!confirm("Do you really want to delete this chat?"))
+        return;
+
+    await deleteDirectMessages(docChatLastChannelId);
+
+    await resetUiList();
+}
+
+
+
+
+
+
+async function resetUiList()
+{
+    createServerList(DMsId);
+    await createChannelList(DMsId, undefined, true);
+    await createChatList(DMsId, NoId);
+}
+
+
+async function doConnInit() {
+    //tryExtFn(extMsgNormalMessage, account, chatUserId, message);
+    extMsgNormalMessage = messageReceivedUI;
+
+
+    showId();
+    await resetUiList();
 }
