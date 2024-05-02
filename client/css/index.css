@@ -2,6 +2,7 @@
     color: var(--main-text-color);
     background-color: var(--main-app-bg-color);
     font-family: Arial, sans-serif;
+    text-wrap: normal;
 }
 
 
@@ -291,6 +292,10 @@ body {
     padding: var(--main-chat-padding);
     width: 90%;
     background-color: #202030;
+    overflow: hidden;
+    text-wrap: normal;
+    word-break: break-word;
+    hyphens: auto;
 }
 
 .chat-entry > * {
