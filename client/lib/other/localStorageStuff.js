@@ -33,8 +33,16 @@ async function initLocalStorageStuff(askPasswordCallback, passwordInvalidCallbac
         if (isPasswordSecured)
         {
             let password = await askPasswordCallback();
-            let hash = hashString(password);
-            _saveObject("securedPasswordHash", hash);
+            if (password == undefined || password == "")
+            {
+                isPasswordSecured = false;
+                _saveObject("isPasswordSecured", isPasswordSecured);
+            }
+            else
+            {
+                let hash = hashString(password);
+                _saveObject("securedPasswordHash", hash);
+            }
         }
     }
 
