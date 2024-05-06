@@ -88,15 +88,17 @@ async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)
     return await sendRsaMessageToUser(accountFrom, userIdTo, data);
 }
 
-async function sendAesMessageToUser(accountFrom, userIdTo, data, onlyTrySend)
+async function sendAesMessageToUser(accountFrom, userIdTo, data, onlyTrySend, skipLock)
 {
-    await lockOutgoingAes.enable();
+    if (!skipLock)
+        await lockOutgoingAes.enable();
     try {
         let symmKey = await getUserMySymmKey(accountFrom, userIdTo);
         if (symmKey == undefined)
         {
             logError(`No symm key for user ${userIdTo}`);
-            lockOutgoingAes.disable();
+            if (!skipLock)
+                lockOutgoingAes.disable();
             return false;
         }
 
@@ -108,15 +110,18 @@ async function sendAesMessageToUser(accountFrom, userIdTo, data, onlyTrySend)
         }
 
         let res = await accSendRawMessage(accountFrom, userIdTo, msgObj, onlyTrySend);
-        lockOutgoingAes.disable();
+        if (!skipLock)
+            lockOutgoingAes.disable();
         return res;
     }
     catch (e) {
         logError(e);
-        lockOutgoingAes.disable();
+        if (!skipLock)
+            lockOutgoingAes.disable();
         return false;
     }
-    lockOutgoingAes.disable();
+    if (!skipLock)
+        lockOutgoingAes.disable();
 }
 
 async function _sendAesMessageToUser(accountFrom, userIdTo, data, symmKey)
@@ -164,9 +169,10 @@ async function sendRsaMessageToUser(accountFrom, userIdTo, data)
     lockOutgoingRsa.disable();
 }
 
-async function sendSecureMessageToUser(accountFrom, userIdTo, data, type, onlyTrySend)
+async function sendSecureMessageToUser(accountFrom, userIdTo, data, type, onlyTrySend, dontActuallyAdd, skipLock)
 {
-    await lockOutgoing.enable();
+    if (!skipLock)
+        await lockOutgoing.enable();
     let status = true;
 
     try {
@@ -176,18 +182,20 @@ async function sendSecureMessageToUser(accountFrom, userIdTo, data, type, onlyTr
             type: type
         };
 
-        status = await sendAesMessageToUser(accountFrom, userIdTo, msg, onlyTrySend);
+        status = await sendAesMessageToUser(accountFrom, userIdTo, msg, onlyTrySend, skipLock);
 
         msg["date"] = new Date();
         msg["from"] = accountFrom["userId"];
 
-        await addSentMessage(accountFrom, userIdTo, msg);
+        await addSentMessage(accountFrom, userIdTo, msg, dontActuallyAdd);
     }
     catch (e) {
         logError(e);
         status = false;
     }
-    lockOutgoing.disable();
+
+    if (!skipLock)
+        lockOutgoing.disable();
 
     return status;
 }

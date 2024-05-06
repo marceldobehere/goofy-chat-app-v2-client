@@ -126,7 +126,10 @@ async function createChannelList(serverId, selectedChatId, forceRefresh) {
     {
         let userIds = getAllUsers();
         for (let i = 0; i < userIds.length; i++)
-            await createChannelEntry(userIds[i], `User #${userIds[i]}`, serverId, selectedChatId == userIds[i]);
+        {
+            let username = userGetInfoDisplayUsername(currentUser['mainAccount'], userIds[i]);
+            await createChannelEntry(userIds[i], username, serverId, selectedChatId == userIds[i]);
+        }
         if (userIds.length == 0)
             await createChannelEntry(NoId, "No Friends", serverId, false);
     }
@@ -221,7 +224,8 @@ async function createChatList(serverId, channelId, scrollDown) {
         for (let i = 0; i < messages.length; i++)
         {
             let msg = messages[i];
-            createChatEntry(`User ${msg["from"]}`, msg["date"], msg["data"]);
+            let username = userGetInfoDisplayUsername(currentUser['mainAccount'], msg["from"]);
+            createChatEntry(username, msg["date"], msg["data"]);
         }
     }
     else
@@ -260,6 +264,39 @@ async function updateChatInfo(serverId, channelId)
         span.textContent = `User Info: ${channelId}`;
         div.appendChild(span);
         docChatInfo.appendChild(div);
+    }
+
+    {
+        let nick = getUserChatInfo(currentUser["mainAccount"], channelId)["baseNickname"];
+        let div = document.createElement("div");
+        let span = document.createElement("span");
+        span.textContent = `Remote Nickname: ${nick}`;
+        div.appendChild(span);
+        docChatInfo.appendChild(div);
+    }
+
+    {
+        let nick = getUserChatInfo(currentUser["mainAccount"], channelId)["overlayNickname"];
+        let div = document.createElement("div");
+        let span = document.createElement("span");
+        span.textContent = `Local Nickname: ${nick}`;
+        div.appendChild(span);
+        docChatInfo.appendChild(div);
+
+        let btn = document.createElement("button");
+        btn.textContent = "Change Nickname";
+        btn.onclick = async () => {
+            let nick = prompt("Enter new nickname:");
+            if (nick == null)
+                return;
+            if (nick == "")
+                nick = null;
+            let info = getUserChatInfo(currentUser["mainAccount"], channelId);
+            info["overlayNickname"] = nick;
+            await setUserChatInfo(currentUser["mainAccount"], channelId, info);
+            await channelClicked(docLastChannelEntry, channelId, DMsId);
+        };
+        div.appendChild(btn);
     }
 
     {
@@ -494,4 +531,26 @@ async function doConnInit() {
 
     showId();
     await resetUiList();
+}
+
+function promptUntilText(text)
+{
+    while (true)
+    {
+        let res = prompt(text);
+        if (res != null && res != "")
+            return res;
+    }
+}
+
+async function askOwnChatInfo()
+{
+    let chatInfo = getOwnUserChatInfo(currentUser);
+
+    alert('Initial Account Stuff');
+    let baseNickname = promptUntilText("Enter your nickname:");
+
+    chatInfo["baseNickname"] = baseNickname;
+
+    await setOwnUserChatInfo(currentUser, chatInfo, false);
 }

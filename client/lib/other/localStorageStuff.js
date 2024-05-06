@@ -130,6 +130,11 @@ function loadObjectOrCreateDefault(key, defaultObj)
     return temp;
 }
 
+function deleteObject(key)
+{
+    localStorage.removeItem(key);
+}
+
 function loadAccountObjectOrCreateDefault(account, key, defaultObj)
 {
     return loadObjectOrCreateDefault(`ACC_${account["userId"]}_${key}`, defaultObj);
@@ -145,6 +150,10 @@ function saveAccountObject(account, key, obj)
     saveObject(`ACC_${account["userId"]}_${key}`, obj);
 }
 
+function deleteAccountObject(account, key)
+{
+    deleteObject(`ACC_${account["userId"]}_${key}`);
+}
 
 
 function _encryptTheValue(word, key) {

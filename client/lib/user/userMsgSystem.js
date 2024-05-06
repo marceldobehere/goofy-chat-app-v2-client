@@ -14,6 +14,8 @@ async function getUserMySymmKey(account, userId)
     if (userId == account["userId"])
         return privateSymmKey(account);
 
+    let initialMsg = false;
+
     await lockSymmKey.enable();
     try {
         let symmKey = loadAccountObject(account, `USER_MY_SYMM_KEY_${userId}`);
@@ -29,9 +31,25 @@ async function getUserMySymmKey(account, userId)
             }
             logInfo(`Setting symm key for ${userId}:`, symmKey);
             await setUserMySymmKey(account, userId, symmKey);
+            initialMsg = true;
         }
 
         lockSymmKey.disable();
+
+        if (initialMsg)
+        {
+            console.log("Initial message");
+            try {
+                let info = getOwnAccountChatInfo(account);
+                info = tryConformUserChatInfo(info);
+                await sendNewUserChatInfo(account, userId, info, true);
+
+            } catch (e) {
+                logError(e);
+            }
+        }
+
+
         return symmKey;
     }
     catch (e) {
@@ -220,6 +238,7 @@ async function internalRemoveUserMessages(account, userId)
 }
 
 const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "call-join", "call-join-fail", "ice-candidate"];
+const dontAddTypes = ["chat-info"];
 
 async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
 {
@@ -268,6 +287,18 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
         logInfo("Setting symm key");
         let symmKey = message["symmKey"];
         await setUserLastSymmKey(account, chatUserId, symmKey);
+    }
+    else if (type == "chat-info")
+    {
+        let info = message["data"];
+        info = tryConformUserChatInfo(info);
+
+        let localInfo = getUserChatInfo(account, chatUserId);
+        console.log(localInfo);
+        localInfo = mergeUserChatInfo(localInfo, info);
+        setUserChatInfo(account, chatUserId, localInfo);
+
+        console.log(info);
     }
     else if (type == "text")
     {
