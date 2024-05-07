@@ -93,10 +93,15 @@ async function createChannelEntry(channelId, channelName, serverId, shouldHighli
     }
 
     let notCount = 0;
-    if (serverId == DMsId && channelId != NoId)
+    if (channelId != NoId)
     {
-        notCount = (await userGetUnreadMessages(channelId)).length;
+        if (serverId == DMsId)
+            notCount = (await userGetUnreadMessages(channelId)).length;
+        else
+            notCount = (await userGetGroupUnreadMessages(serverId, channelId)).length;
     }
+
+
 
     let chanText = channelName;
     if (notCount > 0)
@@ -141,7 +146,7 @@ async function createChannelList(serverId, selectedChatId, forceRefresh) {
         let info = getGroupChatInfo(currentUser['mainAccount'], serverId);
 
         for (let channel of info["channels"])
-            await createChannelEntry(channel["id"], channel["name"], serverId, false);
+            await createChannelEntry(channel["id"], channel["name"], serverId, selectedChatId == channel["id"]);
 
         // await createChannelEntry(0, "General", serverId, false);
         // for (let i = 0; i < 40; i++)
@@ -379,6 +384,11 @@ async function channelClicked(element, channelId, serverId) {
         await userMarkMessagesAsRead(channelId);
         await createChannelList(DMsId, channelId, true);
     }
+    else if (serverId != NoId)
+    {
+        await userMarkGroupMessagesAsRead(serverId, channelId);
+        await createChannelList(serverId, channelId, true);
+    }
 
     docChatInputElement.focus();
 }
@@ -507,15 +517,34 @@ async function addFriendUser()
 
 async function messageReceivedUI(account, chatUserId, message)
 {
-    if (chatUserId == docChatLastChannelId && docChatLastServerId == DMsId)
+    console.log(chatUserId);
+    console.log(message);
+    if (isStrChannelFromGroup(chatUserId))
     {
-        await userMarkMessagesAsRead(chatUserId);
-        await createChatList(DMsId, chatUserId, true);
-    }
+        let groupInfo = getGroupAndChannelFromChannelStr(chatUserId);
+        if (groupInfo == null)
+            return;
 
-    if (docLastServerId == DMsId)// && (await userGetMessages(chatUserId)).length == 1)
+        if (docLastServerId == groupInfo["groupId"] && docLastChannelId == groupInfo["channelId"])
+        {
+            await userMarkGroupMessagesAsRead(groupInfo["groupId"], groupInfo["channelId"]);
+            await createChatList(groupInfo["groupId"], groupInfo["channelId"], true);
+        }
+
+
+        if (docLastServerId == groupInfo["groupId"])
+            await createChannelList(groupInfo["groupId"], docChatLastChannelId, true);
+    }
+    else
     {
-        await createChannelList(DMsId, docLastChannelId, true);
+        if (chatUserId == docChatLastChannelId && docChatLastServerId == DMsId)
+        {
+            await userMarkMessagesAsRead(chatUserId);
+            await createChatList(DMsId, chatUserId, true);
+        }
+
+        if (docLastServerId == DMsId)// && (await userGetMessages(chatUserId)).length == 1)
+            await createChannelList(DMsId, docLastChannelId, true);
     }
 }
 

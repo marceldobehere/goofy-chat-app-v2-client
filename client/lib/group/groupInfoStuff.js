@@ -4,6 +4,7 @@ function tryConformGroupChatInfo(obj)
     if (obj["groupName"] == undefined) obj["groupName"] = null;
     if (obj["groupId"] == undefined) obj["groupId"] = null;
     if (obj["members"] == undefined) obj["members"] = [];
+    if (obj["admins"] == undefined) obj["admins"] = [];
     if (obj["channels"] == undefined) obj["channels"] = [];
 
     return obj;
@@ -17,6 +18,7 @@ function mergeGroupChatInfo(local, received)
     local["groupName"] = received["groupName"];
     local["members"] = received["members"];
     local["channels"] = received["channels"];
+    local["admins"] = received["admins"];
 
     return local;
 }
@@ -29,6 +31,7 @@ function getGroupChatInfoToSend(obj)
     send["groupName"] = obj["groupName"];
     send["members"] = obj["members"];
     send["channels"] = obj["channels"];
+    send["admins"] = obj["admins"];
 
     return send;
 }

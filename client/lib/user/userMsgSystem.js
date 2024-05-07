@@ -238,7 +238,6 @@ async function internalRemoveUserMessages(account, userId)
 }
 
 const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "call-join", "call-join-fail", "ice-candidate"];
-const dontAddTypes = ["chat-info"];
 
 async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
 {
@@ -294,15 +293,19 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
         info = tryConformUserChatInfo(info);
 
         let localInfo = getUserChatInfo(account, chatUserId);
-        console.log(localInfo);
+        //console.log(localInfo);
         localInfo = mergeUserChatInfo(localInfo, info);
         setUserChatInfo(account, chatUserId, localInfo);
 
-        console.log(info);
+        //console.log(info);
+    }
+    else if (type == "group-chat-msg")
+    {
+        await handleGroupMessage(account, message["data"]);
     }
     else if (type == "text")
     {
-        await addNormalMessageToUser(account, chatUserId, message, false);
+        await addNormalMessageToUser(account, chatUserId, message);
     }
     else if (type == "redirect")
     {
@@ -430,10 +433,10 @@ async function addSentMessage(account, userIdTo, message, dontActuallyAdd)
         await internalAddUserMessageSorted(account, userIdTo, message);
 }
 
-async function addNormalMessageToUser(account, chatUserId, message, isGroup)
+async function addNormalMessageToUser(account, chatUserId, message)
 {
     logInfo(`New message from user ${chatUserId}:`, message);
-    if (isGroup)
+    if (isStrChannelFromGroup(chatUserId))
         logWarn("Group messages not implemented yet");
     else
         addUserIdIfNotExists(chatUserId);
