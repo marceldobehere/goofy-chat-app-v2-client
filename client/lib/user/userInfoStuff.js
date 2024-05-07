@@ -113,3 +113,10 @@ function userGetInfoDisplayUsername(account, userId)
 
     return username;
 }
+
+async function updateOwnBaseNickname(newNickname)
+{
+    let info = getOwnUserChatInfo(currentUser);
+    info["baseNickname"] = newNickname;
+    await setOwnUserChatInfo(currentUser, info, true);
+}

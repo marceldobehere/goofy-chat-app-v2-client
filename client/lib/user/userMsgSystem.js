@@ -303,6 +303,14 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
     {
         await handleGroupMessage(account, message["data"]);
     }
+    else if (type == "group-chat-join-invite")
+    {
+        await handleGroupInvite(account, message);
+    }
+    else if (type == "group-chat-kick")
+    {
+        await handleGroupKick(account, message);
+    }
     else if (type == "text")
     {
         await addNormalMessageToUser(account, chatUserId, message);

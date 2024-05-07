@@ -128,68 +128,6 @@ async function userMarkGroupMessagesAsRead(groupId, channelId)
 
 
 
-
-async function handleGroupMessage(account, msgObj)
-{
-    logInfo("Group Message: ", msgObj);
-    let from = msgObj["from"];
-    let sign = msgObj["sign"];
-    let msg = msgObj["msg"];
-
-    let pubKey = await getPublicKeyFromUser(from);
-    if (pubKey === undefined)
-    {
-        logError("User not found on server");
-        return;
-    }
-
-    if (!verifySignature(msg, sign, pubKey))
-    {
-        logError("Invalid signature from", from);
-        return;
-    }
-
-    let groupId = msg["groupId"];
-    let channelId = msg["channelId"];
-    let data = msg["data"];
-    let type = msg["type"];
-    let date = msg["date"];
-    let messageId = msg["messageId"];
-
-    let info = getGroupChatInfo(account, groupId);
-    console.log(info);
-    if (info === undefined)
-    {
-        logError("Group not found");
-        return;
-    }
-
-    if (!info["members"].includes(from))
-    {
-        logError("User not in group");
-        return;
-    }
-
-    if (!info["channels"].find(x => x["id"] === channelId))
-    {
-        logError("Channel not in group");
-        return;
-    }
-
-    let sendMsgObj = {
-        messageId: messageId,
-        data: data,
-        type: type,
-        date: date,
-        from: from
-    };
-
-    await addMessageToUser(account, from, getChannelStrFromGroup(groupId, channelId), sendMsgObj, date);
-
-    logWarn("Group messages not fully implemented yet");
-}
-
-
 async function sendGroupChatMessageToAll(user, groupId, msg)
 {
     // send the message to all people
@@ -216,4 +154,149 @@ async function sendGroupChatMessageToOne(account, userId, msg)
     let type = msg["type"]
     let data = msg["data"];
     await sendSecureMessageToUser(account, userId, data, type, false, true);
+}
+
+async function addChannelToGroup(account, groupId, channelName)
+{
+    let info = getGroupChatInfo(account, groupId);
+    if (info === undefined)
+    {
+        logError("Group not found");
+        return;
+    }
+
+    let channels = info["channels"];
+    let id = getRandomIntInclusive(0, 99999999999);
+    channels.push({id: id, name: channelName});
+    setGroupChatInfo(account, groupId, info);
+
+    await sendNewGroupChatInfoToAll(account, groupId);
+}
+
+async function removeChannelFromGroup(account, groupId, channelId)
+{
+    let info = getGroupChatInfo(account, groupId);
+    if (info === undefined)
+    {
+        logError("Group not found");
+        return;
+    }
+
+    let channels = info["channels"];
+    let index = channels.findIndex(x => x["id"] === channelId);
+    if (index === -1)
+    {
+        logError("Channel not found");
+        return;
+    }
+
+    channels.splice(index, 1);
+    setGroupChatInfo(account, groupId, info);
+
+    await sendNewGroupChatInfoToAll(account, groupId);
+}
+
+async function updateChannelFromGroup(account, groupId, channelId, newChannelName)
+{
+    let info = getGroupChatInfo(account, groupId);
+    if (info === undefined)
+    {
+        logError("Group not found");
+        return;
+    }
+
+    let channels = info["channels"];
+    let index = channels.findIndex(x => x["id"] === channelId);
+    if (index === -1)
+    {
+        logError("Channel not found");
+        return;
+    }
+
+    channels[index]["name"] = newChannelName;
+    setGroupChatInfo(account, groupId, info);
+
+    await sendNewGroupChatInfoToAll(account, groupId);
+}
+
+async function addUserToGroup(account, groupId, userId)
+{
+    let info = getGroupChatInfo(account, groupId);
+    if (info === undefined)
+    {
+        logError("Group not found");
+        return;
+    }
+
+    let members = info["members"];
+    if (members.includes(userId))
+    {
+        logWarn("User already in group");
+        return;
+    }
+
+    members.push(userId);
+    setGroupChatInfo(account, groupId, info);
+
+    await sendNewGroupChatInfoToAll(account, groupId);
+
+    await internal_sendUserGroupJoinInvite(account, groupId, userId);
+}
+
+async function removeUserFromGroup(account, groupId, userId)
+{
+    let info = getGroupChatInfo(account, groupId);
+    if (info === undefined)
+    {
+        logError("Group not found");
+        return;
+    }
+
+    let members = info["members"];
+    let index = members.findIndex(x => x === userId);
+    if (index === -1)
+    {
+        logError("User not found");
+        return;
+    }
+
+    members.splice(index, 1);
+    setGroupChatInfo(account, groupId, info);
+
+    await sendNewGroupChatInfoToAll(account, groupId);
+
+    await internal_sendUserGroupLeaveInvite(account, groupId, userId);
+}
+
+async function internal_sendUserGroupJoinInvite(account, groupId, userId)
+{
+    let info = getGroupChatInfo(account, groupId);
+    if (info === undefined)
+    {
+        logError("Group not found");
+        return;
+    }
+
+    let msg = {
+        groupInfo: getGroupChatInfoToSend(info)
+    };
+
+
+    await sendSecureMessageToUser(account, userId, msg, "group-chat-join-invite", false, true);
+}
+
+async function internal_sendUserGroupLeaveInvite(account, groupId, userId)
+{
+    let info = getGroupChatInfo(account, groupId);
+    if (info === undefined)
+    {
+        logError("Group not found");
+        return;
+    }
+
+    let msg = {
+        groupId: groupId
+    };
+
+    await sendSecureMessageToUser(account, userId, msg, "group-chat-kick", false, true);
 }

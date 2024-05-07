@@ -29,6 +29,7 @@ function getGroupChatInfoToSend(obj)
 
     let send = {};
     send["groupName"] = obj["groupName"];
+    send["groupId"] = obj["groupId"];
     send["members"] = obj["members"];
     send["channels"] = obj["channels"];
     send["admins"] = obj["admins"];
@@ -58,3 +59,7 @@ function deleteGroupChatInfo(account, groupId)
     deleteAccountObject(account, `GROUP_INFO_${groupId}`);
 }
 
+async function sendNewGroupChatInfoToAll(account, groupId)
+{
+    logError("GROUP CHAT INFO UPDATE NOT IMPLEMENTED YET")
+}
