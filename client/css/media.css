@@ -4,6 +4,8 @@
             calc(var(--main-chat-selector-size) * var(--main-chat-show-selector))
             var(--main-chat-size)
             calc(var(--main-chat-info-size) * var(--main-chat-show-info));
+
+    --main-sidebar-settings-height: calc(2 * (0.8 * var(--main-sidebar-size) + 2 * var(--main-sidebar-margin-vert)) - var(--main-sidebar-margin-vert));
 }
 
 #main-chat-info-header-toggle-chat-info {
@@ -38,7 +40,6 @@
 
     --main-sidebar-size: 70px;
     --main-sidebar-margin-vert: 12px;
-    --main-sidebar-settings-height: 80px;
 
     --main-chat-selector-size: 250px;
     --main-chat-selector-scroll-size: 10px;

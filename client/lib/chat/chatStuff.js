@@ -27,28 +27,28 @@ function getAllGroups()
         ids.push(parseInt(id));
     return ids;
 }
+//
+// function getUserInfo(userId)
+// {
+//     return chatUserObj[userId];
+// }
+//
+// function setUserInfo(userId, info)
+// {
+//     chatUserObj[userId] = info;
+//     saveObject("chatUserList", chatUserObj);
+// }
+//
+// function getGroupInfo(groupId)
+// {
+//     return chatGroupObj[groupId];
+// }
 
-function getUserInfo(userId)
-{
-    return chatUserObj[userId];
-}
-
-function setUserInfo(userId, info)
-{
-    chatUserObj[userId] = info;
-    saveObject("chatUserList", chatUserObj);
-}
-
-function getGroupInfo(groupId)
-{
-    return chatGroupObj[groupId];
-}
-
-function setGroupInfo(groupId, info)
-{
-    chatGroupObj[groupId] = info;
-    saveObject("chatGroupList", chatGroupObj);
-}
+// function setGroupInfo(groupId, info)
+// {
+//     chatGroupObj[groupId] = info;
+//     saveObject("chatGroupList", chatGroupObj);
+// }
 
 function addUserIdIfNotExists(userId)
 {
@@ -84,4 +84,14 @@ function removeGroupIfExists(groupId)
 
     delete chatGroupObj[groupId];
     saveObject("chatGroupList", chatGroupObj);
+}
+
+function groupExists(groupId)
+{
+    return chatGroupObj[groupId] != undefined;
+}
+
+function userExists(userId)
+{
+    return chatUserObj[userId] != undefined;
 }

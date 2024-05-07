@@ -1,9 +1,6 @@
 function tryConformUserChatInfo(obj)
 {
     if (obj == undefined) obj = {};
-    // if (obj["chat"] == undefined) obj["chat"] = {};
-    // if (obj["chat"]["auto-show-chat"] == undefined) obj["chat"]["auto-show-chat"] = true;
-    // if (obj["chat"]["auto-hide-chat"] == undefined) obj["chat"]["auto-hide-chat"] = true;
     if (obj["baseNickname"] == undefined) obj["baseNickname"] = null; // from original user
     if (obj["overlayNickname"] == undefined) obj["overlayNickname"] = null; // from local user
 

@@ -71,6 +71,11 @@ body {
 
 #main-sidebar-settings {
     border: 1px solid aqua;
+    transition: 0.35s ease-in-out;
+}
+
+#main-sidebar-settings * {
+    transition: all 0.35s ease-in-out, filter 1ms;
 }
 
 /*Hide the scrollbar*/
@@ -265,6 +270,9 @@ body {
 /*Only Hover*/
 .sidebar-entry:hover {
     filter: opacity(0.5) drop-shadow(0 0 0 var(--main-sidebar-hover-color));
+}
+.sidebar-entry:active {
+    filter: opacity(0.8) drop-shadow(0 0 0 var(--main-sidebar-hover-color));
 }
 .chat-selector-entry:hover {
     color: var(--main-chat-selector-hover-color);

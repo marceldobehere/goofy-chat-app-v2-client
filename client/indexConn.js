@@ -60,10 +60,13 @@ function createServerList(selectedServerId) {
 
     let groups = getAllGroups();
     for (let i = 0; i < groups.length; i++)
-        createServerEntry("./assets/imgs/uh.png", groups[i], `G: ${groups[i]}`, selectedServerId == groups[i]);
+    {
+        let info = getGroupChatInfo(currentUser['mainAccount'], groups[i]);
+        createServerEntry("./assets/imgs/uh.png", groups[i], info["groupName"], selectedServerId == groups[i]);
+    }
 
-    for (let i = 0; i < 20; i++)
-        createServerEntry("./assets/imgs/uh.png", i, `TEMP S: ${i}`, selectedServerId == i);
+    // for (let i = 0; i < 20; i++)
+    //     createServerEntry("./assets/imgs/uh.png", i, `TEMP S: ${i}`, selectedServerId == i);
 }
 
 
@@ -135,9 +138,16 @@ async function createChannelList(serverId, selectedChatId, forceRefresh) {
     }
     else
     {
-        await createChannelEntry(0, "General", serverId, false);
-        for (let i = 0; i < 40; i++)
-            await createChannelEntry(i, `Channel ${i} S${serverId}`, serverId, selectedChatId == i);
+        let info = getGroupChatInfo(currentUser['mainAccount'], serverId);
+
+        for (let channel of info["channels"])
+            await createChannelEntry(channel["id"], channel["name"], serverId, false);
+
+        // await createChannelEntry(0, "General", serverId, false);
+        // for (let i = 0; i < 40; i++)
+        // {
+        //     await createChannelEntry(i, `Channel ${i} S${serverId}`, serverId, selectedChatId == i);
+        // }
 
     }
 }
@@ -230,8 +240,20 @@ async function createChatList(serverId, channelId, scrollDown) {
     }
     else
     {
-        for (let i = 0; i < 30; i++)
-            createChatEntry(`User ${i}`, "2024-04-27T17:43:03.164Z", `Test Message ${i} for chat ${channelId}`);
+        let info = getGroupChatInfo(currentUser['mainAccount'], serverId);
+        let messages = await userGetGroupMessages(serverId, channelId);
+        if (messages == null)
+            return;
+
+        for (let i = 0; i < messages.length; i++)
+        {
+            let msg = messages[i];
+            let username = userGetInfoDisplayUsername(currentUser['mainAccount'], msg["from"]);
+            createChatEntry(username, msg["date"], msg["data"]);
+        }
+
+        // for (let i = 0; i < 30; i++)
+        //     createChatEntry(`User ${i}`, "2024-04-27T17:43:03.164Z", `Test Message ${i} for chat ${channelId}`);
     }
 
 
@@ -441,7 +463,9 @@ async function messageSend() {
         }
         else
         {
-            alert('Group chats not implemented yet');
+           //alert('Group chats not implemented yet');
+            let res = await userSendGroupMessage(docChatLastServerId, docChatLastChannelId, text, "text");
+            console.log(res);
         }
     }
     catch (e)
@@ -553,4 +577,39 @@ async function askOwnChatInfo()
     chatInfo["baseNickname"] = baseNickname;
 
     await setOwnUserChatInfo(currentUser, chatInfo, false);
+}
+
+async function createGroup()
+{
+    alert("GROUP ADD");
+
+    let groupName = prompt("Enter Group name");
+    if (groupName == null)
+        return;
+    let groupId = getRandomIntInclusive(0, 99999999999);
+
+    let channels = [];
+    while (true)
+    {
+        let channel = prompt("Enter channel name");
+        if (channel == null || channel == "")
+            break;
+
+        let channelExists = !!channels.find((x) => x.name == channel);
+        if (channelExists)
+        {
+            alert("Channel already exists");
+            continue;
+        }
+
+        let channelId = getRandomIntInclusive(0, 99999999999);
+        channels.push({id: channelId, name: channel});
+    }
+
+    if (channels.length == 0)
+        return;
+
+    await accCreateGroupChat(currentUser['mainAccount'], groupId, groupName, channels);
+
+    await createServerList(docLastServerId);
 }
