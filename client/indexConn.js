@@ -483,7 +483,8 @@ async function messageSend() {
 
     }
 
-    await createChatList(docChatLastServerId, docChatLastChannelId, true);
+    if (docChatLastServerId == DMsId)
+        await createChatList(docChatLastServerId, docChatLastChannelId, true);
 
     messageSending = 0;
 }
