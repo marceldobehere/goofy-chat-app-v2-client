@@ -170,6 +170,12 @@ async function addChannelToGroup(user, groupId, channelName)
     }
     let info = getGroupChatInfo(account, groupId);
 
+    if (!info["admins"].includes(user["userId"]))
+    {
+        logError("User not admin");
+        return;
+    }
+
     let channels = info["channels"];
     let id = getRandomIntInclusive(0, 99999999999);
     channels.push({id: id, name: channelName});
@@ -189,6 +195,11 @@ async function removeChannelFromGroup(user, groupId, channelId)
     }
     let info = getGroupChatInfo(account, groupId);
 
+    if (!info["admins"].includes(user["userId"]))
+    {
+        logError("User not admin");
+        return;
+    }
 
     let channels = info["channels"];
     let index = channels.findIndex(x => x["id"] === channelId);
@@ -215,6 +226,12 @@ async function updateChannelFromGroup(user, groupId, channelId, newChannelName)
     }
     let info = getGroupChatInfo(account, groupId);
 
+    if (!info["admins"].includes(user["userId"]))
+    {
+        logError("User not admin");
+        return;
+    }
+
     let channels = info["channels"];
     let index = channels.findIndex(x => x["id"] === channelId);
     if (index === -1)
@@ -240,7 +257,11 @@ async function addUserToGroup(user, groupId, userId)
     }
     let info = getGroupChatInfo(account, groupId);
 
-
+    if (!info["admins"].includes(user["userId"]))
+    {
+        logError("User not admin");
+        return;
+    }
 
     let members = info["members"];
     if (members.includes(userId))
@@ -267,6 +288,12 @@ async function removeUserFromGroup(user, groupId, userId)
         return;
     }
     let info = getGroupChatInfo(account, groupId);
+
+    if (!info["admins"].includes(user["userId"]))
+    {
+        logError("User not admin");
+        return;
+    }
 
     let members = info["members"];
     let index = members.findIndex(x => x === userId);
