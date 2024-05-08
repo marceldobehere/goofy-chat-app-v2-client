@@ -549,6 +549,22 @@ async function messageReceivedUI(account, chatUserId, message)
     }
 }
 
+async function groupJoinedUI()
+{
+    await createServerList(docLastServerId);
+}
+
+async function groupLeftUI(groupId, groupName)
+{
+    await createServerList(docLastServerId);
+
+    logWarn("NEED TO CHECK IF GROUP WAS SELECTED AND IF YES, UNSELECT IT AND REMOVE CHANNELS");
+
+    alert(`You left group ${groupName}`);
+}
+
+
+
 async function deleteCurrDm()
 {
     if (docChatLastServerId == NoId || docChatLastChannelId == NoId)
@@ -581,6 +597,8 @@ async function resetUiList()
 async function doConnInit() {
     //tryExtFn(extMsgNormalMessage, account, chatUserId, message);
     extMsgNormalMessage = messageReceivedUI;
+    extGroupJoined = groupJoinedUI;
+    extGroupLeft = groupLeftUI;
 
 
     showId();

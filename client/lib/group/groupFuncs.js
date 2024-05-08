@@ -300,3 +300,4 @@ async function internal_sendUserGroupLeaveInvite(account, groupId, userId)
 
     await sendSecureMessageToUser(account, userId, msg, "group-chat-kick", false, true);
 }
+

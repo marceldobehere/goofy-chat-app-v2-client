@@ -83,10 +83,13 @@ async function handleGroupInvite(account, msgObj)
         logError("Group already exists");
         return;
     }
+    let groupName = groupInfo["groupName"];
 
     setGroupChatInfo(account, groupId, groupInfo);
 
     addGroupIdIfNotExists(groupId);
+
+    await tryExtAsyncFn(extGroupJoined, groupId, groupName);
 }
 
 async function handleGroupKick(account, msgObj)
@@ -107,11 +110,23 @@ async function handleGroupKick(account, msgObj)
         logError("User not admin");
         return;
     }
+    let groupName = info["groupName"];
 
-    deleteGroupChatInfo(account, groupId);
+    deleteGroupChatInfo(account, groupId, groupName);
 
     removeGroupIfExists(groupId);
 
-    logWarn("Need to delete all saved group channels and stuff")
+
+
+    logWarn("Need to delete all saved group channels and stuff");
+
+    await tryExtAsyncFn(extGroupLeft, groupId, groupName);
 }
+
+
+
+
+
+let extGroupJoined = undefined;
+let extGroupLeft = undefined;
 
