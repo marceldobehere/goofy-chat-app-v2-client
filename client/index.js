@@ -8,4 +8,9 @@ async function init()
     console.log("> Done!");
 }
 
-init().then();
+//init().then();
+
+function domLoaded()
+{
+    init().then();
+}
