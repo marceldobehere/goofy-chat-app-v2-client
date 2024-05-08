@@ -268,6 +268,19 @@ async function removeUserFromGroup(account, groupId, userId)
     await internal_sendUserGroupLeaveInvite(account, groupId, userId);
 }
 
+async function leaveGroup(account, groupId)
+{
+    logError("Group leave not implemented yet.");
+
+    // find group
+
+    // Check if I am not the sole admin
+    // if yes, send normal group leave message and remove group
+    // if no, delete group -> send group kick/delete message to everyone and then leave
+}
+
+
+
 async function internal_sendUserGroupJoinInvite(account, groupId, userId)
 {
     let info = getGroupChatInfo(account, groupId);
@@ -300,4 +313,3 @@ async function internal_sendUserGroupLeaveInvite(account, groupId, userId)
 
     await sendSecureMessageToUser(account, userId, msg, "group-chat-kick", false, true);
 }
-

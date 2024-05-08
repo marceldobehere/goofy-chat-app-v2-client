@@ -129,4 +129,4 @@ async function handleGroupKick(account, msgObj)
 
 let extGroupJoined = undefined;
 let extGroupLeft = undefined;
-
+let extGroupInfoUpdate = undefined;

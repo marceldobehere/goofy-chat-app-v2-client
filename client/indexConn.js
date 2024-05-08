@@ -563,6 +563,11 @@ async function groupLeftUI(groupId, groupName)
     alert(`You left group ${groupName}`);
 }
 
+async function groupUpdateUI(groupInfo)
+{
+
+}
+
 
 
 async function deleteCurrDm()
@@ -599,6 +604,7 @@ async function doConnInit() {
     extMsgNormalMessage = messageReceivedUI;
     extGroupJoined = groupJoinedUI;
     extGroupLeft = groupLeftUI;
+    extGroupInfoUpdate = groupUpdateUI;
 
 
     showId();
