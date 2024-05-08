@@ -61,12 +61,11 @@ function createServerList(selectedServerId) {
     let groups = getAllGroups();
     for (let i = 0; i < groups.length; i++)
     {
+        if (!hasGroupChatInfo(currentUser["mainAccount"], groups[i]))
+            continue;
         let info = getGroupChatInfo(currentUser['mainAccount'], groups[i]);
         createServerEntry("./assets/imgs/uh.png", groups[i], info["groupName"], selectedServerId == groups[i]);
     }
-
-    // for (let i = 0; i < 20; i++)
-    //     createServerEntry("./assets/imgs/uh.png", i, `TEMP S: ${i}`, selectedServerId == i);
 }
 
 
@@ -143,17 +142,15 @@ async function createChannelList(serverId, selectedChatId, forceRefresh) {
     }
     else
     {
+        if (!hasGroupChatInfo(currentUser["mainAccount"], serverId))
+        {
+            logError("Group not found");
+            return;
+        }
         let info = getGroupChatInfo(currentUser['mainAccount'], serverId);
 
         for (let channel of info["channels"])
             await createChannelEntry(channel["id"], channel["name"], serverId, selectedChatId == channel["id"]);
-
-        // await createChannelEntry(0, "General", serverId, false);
-        // for (let i = 0; i < 40; i++)
-        // {
-        //     await createChannelEntry(i, `Channel ${i} S${serverId}`, serverId, selectedChatId == i);
-        // }
-
     }
 }
 
@@ -245,7 +242,6 @@ async function createChatList(serverId, channelId, scrollDown) {
     }
     else
     {
-        let info = getGroupChatInfo(currentUser['mainAccount'], serverId);
         let messages = await userGetGroupMessages(serverId, channelId);
         if (messages == null)
             return;
@@ -556,9 +552,27 @@ async function groupJoinedUI()
 
 async function groupLeftUI(groupId, groupName)
 {
+    if (docLastServerId == groupId)
+    {
+        logInfo("SERVER WAS SELECTED")
+        docLastServerId = NoId;
+        docLastChannelServerId = NoId;
+        docLastChannelId = NoId;
+
+        // docChatLastServerId = NoId;
+        // docChatLastChannelId = NoId;
+        await createChannelList(docChatLastServerId, docLastChannelId, true);
+    }
     await createServerList(docLastServerId);
 
-    logWarn("NEED TO CHECK IF GROUP WAS SELECTED AND IF YES, UNSELECT IT AND REMOVE CHANNELS");
+    if (docChatLastServerId == groupId)
+    {
+        logInfo("WAS IN CHANNEL")
+        docChatLastServerId = NoId;
+        docChatLastChannelId = NoId;
+        await createChannelList(docChatLastServerId, docLastChannelId, true);
+        await createChatList(docChatLastServerId, docChatLastChannelId, true);
+    }
 
     alert(`You left group ${groupName}`);
 }

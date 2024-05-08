@@ -132,7 +132,11 @@ async function sendGroupChatMessageToAll(user, groupId, msg)
 {
     // send the message to all people
     logInfo("Sending new user chat info to all people.");
-
+    if (!hasGroupChatInfo(currentUser['mainAccount'], groupId))
+    {
+        logError("Group not found");
+        return;
+    }
     let info = getGroupChatInfo(currentUser['mainAccount'], groupId);
 
     let users = info["members"];
@@ -156,31 +160,35 @@ async function sendGroupChatMessageToOne(account, userId, msg)
     await sendSecureMessageToUser(account, userId, data, type, false, true);
 }
 
-async function addChannelToGroup(account, groupId, channelName)
+async function addChannelToGroup(user, groupId, channelName)
 {
-    let info = getGroupChatInfo(account, groupId);
-    if (info === undefined)
+    let account = user['mainAccount'];
+    if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
         return;
     }
+    let info = getGroupChatInfo(account, groupId);
 
     let channels = info["channels"];
     let id = getRandomIntInclusive(0, 99999999999);
     channels.push({id: id, name: channelName});
     setGroupChatInfo(account, groupId, info);
 
-    await sendNewGroupChatInfoToAll(account, groupId);
+    await sendNewGroupChatInfoToAll(user, groupId);
 }
 
-async function removeChannelFromGroup(account, groupId, channelId)
+async function removeChannelFromGroup(user, groupId, channelId)
 {
-    let info = getGroupChatInfo(account, groupId);
-    if (info === undefined)
+    let account = user['mainAccount'];
+
+    if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
         return;
     }
+    let info = getGroupChatInfo(account, groupId);
+
 
     let channels = info["channels"];
     let index = channels.findIndex(x => x["id"] === channelId);
@@ -193,17 +201,19 @@ async function removeChannelFromGroup(account, groupId, channelId)
     channels.splice(index, 1);
     setGroupChatInfo(account, groupId, info);
 
-    await sendNewGroupChatInfoToAll(account, groupId);
+    await sendNewGroupChatInfoToAll(user, groupId);
 }
 
-async function updateChannelFromGroup(account, groupId, channelId, newChannelName)
+async function updateChannelFromGroup(user, groupId, channelId, newChannelName)
 {
-    let info = getGroupChatInfo(account, groupId);
-    if (info === undefined)
+    let account = user['mainAccount'];
+
+    if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
         return;
     }
+    let info = getGroupChatInfo(account, groupId);
 
     let channels = info["channels"];
     let index = channels.findIndex(x => x["id"] === channelId);
@@ -216,17 +226,21 @@ async function updateChannelFromGroup(account, groupId, channelId, newChannelNam
     channels[index]["name"] = newChannelName;
     setGroupChatInfo(account, groupId, info);
 
-    await sendNewGroupChatInfoToAll(account, groupId);
+    await sendNewGroupChatInfoToAll(user, groupId);
 }
 
-async function addUserToGroup(account, groupId, userId)
+async function addUserToGroup(user, groupId, userId)
 {
-    let info = getGroupChatInfo(account, groupId);
-    if (info === undefined)
+    let account = user['mainAccount'];
+
+    if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
         return;
     }
+    let info = getGroupChatInfo(account, groupId);
+
+
 
     let members = info["members"];
     if (members.includes(userId))
@@ -238,19 +252,21 @@ async function addUserToGroup(account, groupId, userId)
     members.push(userId);
     setGroupChatInfo(account, groupId, info);
 
-    await sendNewGroupChatInfoToAll(account, groupId);
-
     await internal_sendUserGroupJoinInvite(account, groupId, userId);
+
+    await sendNewGroupChatInfoToAll(user, groupId);
 }
 
-async function removeUserFromGroup(account, groupId, userId)
+async function removeUserFromGroup(user, groupId, userId)
 {
-    let info = getGroupChatInfo(account, groupId);
-    if (info === undefined)
+    let account = user['mainAccount'];
+
+    if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
         return;
     }
+    let info = getGroupChatInfo(account, groupId);
 
     let members = info["members"];
     let index = members.findIndex(x => x === userId);
@@ -263,32 +279,63 @@ async function removeUserFromGroup(account, groupId, userId)
     members.splice(index, 1);
     setGroupChatInfo(account, groupId, info);
 
-    await sendNewGroupChatInfoToAll(account, groupId);
+    await internal_sendUserGroupKick(account, groupId, userId);
 
-    await internal_sendUserGroupLeaveInvite(account, groupId, userId);
+    await sendNewGroupChatInfoToAll(user, groupId);
 }
 
-async function leaveGroup(account, groupId)
+
+async function leaveGroup(user, groupId)
 {
     logError("Group leave not implemented yet.");
 
-    // find group
+    if (!hasGroupChatInfo(user['mainAccount'], groupId))
+    {
+        logError("Group not found");
+        return;
+    }
+    let info = getGroupChatInfo(user['mainAccount'], groupId);
 
-    // Check if I am not the sole admin
-    // if yes, send normal group leave message and remove group
-    // if no, delete group -> send group kick/delete message to everyone and then leave
+    if (info["members"].length === 1)
+    {
+        logWarn("Last member in group. Deleting group.");
+        deleteGroupLocally(user["mainAccount"], groupId);
+
+        await extGroupLeft(groupId, info["groupName"]);
+        return;
+    }
+
+    if (info["admins"].length === 1 && info["admins"][0] === user["mainAccount"]["userId"])
+    {
+        logWarn("Last admin in group. Deleting group.");
+
+        let members = info["members"];
+        for (let member of members)
+            await removeUserFromGroup(user, groupId, member);
+
+        deleteGroupLocally(user['mainAccount'], groupId);
+
+        await extGroupLeft(groupId, info["groupName"]);
+        return;
+    }
+
+    await internal_sendUserGroupLeave(user['mainAccount'], groupId);
+
+    deleteGroupLocally(user['mainAccount'], groupId);
+
+    await extGroupLeft(groupId, info["groupName"]);
 }
 
 
 
 async function internal_sendUserGroupJoinInvite(account, groupId, userId)
 {
-    let info = getGroupChatInfo(account, groupId);
-    if (info === undefined)
+    if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
         return;
     }
+    let info = getGroupChatInfo(account, groupId);
 
     let msg = {
         groupInfo: getGroupChatInfoToSend(info)
@@ -298,18 +345,40 @@ async function internal_sendUserGroupJoinInvite(account, groupId, userId)
     await sendSecureMessageToUser(account, userId, msg, "group-chat-join-invite", false, true);
 }
 
-async function internal_sendUserGroupLeaveInvite(account, groupId, userId)
+async function internal_sendUserGroupKick(account, groupId, userId)
 {
-    let info = getGroupChatInfo(account, groupId);
-    if (info === undefined)
+    if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
         return;
     }
+    let info = getGroupChatInfo(account, groupId);
+
 
     let msg = {
         groupId: groupId
     };
 
     await sendSecureMessageToUser(account, userId, msg, "group-chat-kick", false, true);
+}
+
+async function internal_sendUserGroupLeave(account, groupId)
+{
+    if (!hasGroupChatInfo(account, groupId))
+    {
+        logError("Group not found");
+        return;
+    }
+    let info = getGroupChatInfo(account, groupId);
+
+
+    let msg = {
+        groupId: groupId,
+
+    };
+
+    // send to all members
+    let members = info["members"];
+    for (let member of members)
+        await sendSecureMessageToUser(account, member, msg, "group-chat-leave", false, true);
 }

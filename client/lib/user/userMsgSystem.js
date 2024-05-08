@@ -311,6 +311,14 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
     {
         await handleGroupKick(account, message);
     }
+    else if (type == "group-chat-leave")
+    {
+        await handleGroupLeave(account, message);
+    }
+    else if (type == "group-chat-info")
+    {
+        await handleGroupInfoUpdate(account, message);
+    }
     else if (type == "text")
     {
         await addNormalMessageToUser(account, chatUserId, message);

@@ -25,13 +25,12 @@ async function handleGroupMessage(account, msgObj)
     let date = msg["date"];
     let messageId = msg["messageId"];
 
-    let info = getGroupChatInfo(account, groupId);
-    console.log(info);
-    if (info === undefined)
+    if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
         return;
     }
+    let info = getGroupChatInfo(account, groupId);
 
     if (!info["members"].includes(from))
     {
@@ -97,12 +96,12 @@ async function handleGroupKick(account, msgObj)
     console.log("Group Kick: ", msgObj);
     let groupId = msgObj["data"]["groupId"];
 
-    let info = getGroupChatInfo(account, groupId);
-    if (info === undefined)
+    if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
         return;
     }
+    let info = getGroupChatInfo(account, groupId);
 
     let from = msgObj["from"];
     if (!info["admins"].includes(from))
@@ -112,18 +111,89 @@ async function handleGroupKick(account, msgObj)
     }
     let groupName = info["groupName"];
 
-    deleteGroupChatInfo(account, groupId, groupName);
-
-    removeGroupIfExists(groupId);
-
-
+    deleteGroupLocally(account, groupId);
 
     logWarn("Need to delete all saved group channels and stuff");
 
     await tryExtAsyncFn(extGroupLeft, groupId, groupName);
 }
 
+async function handleGroupLeave(account, msgObj)
+{
+    logInfo("Group Leave: ", msgObj);
+    let groupId = msgObj["data"]["groupId"];
 
+    if (!hasGroupChatInfo(account, groupId))
+    {
+        logError("Group not found");
+        return;
+    }
+    let info = getGroupChatInfo(account, groupId);
+
+
+    let from = msgObj["from"];
+    if (!info["members"].includes(from))
+    {
+        logError("User not in group");
+        return;
+    }
+
+    let groupName = info["groupName"];
+
+    let index = info["members"].indexOf(from);
+    if (index !== -1)
+        info["members"].splice(index, 1);
+
+    setGroupChatInfo(account, groupId, info);
+
+    await tryExtAsyncFn(extGroupInfoUpdate, groupId, groupName);
+
+}
+
+
+async function handleGroupInfoUpdate(account, msgObj)
+{
+    logInfo("Group Info Update: ", msgObj);
+    let groupId = msgObj["data"]["groupId"];
+    let groupInfo = tryConformGroupChatInfo(msgObj["data"]);
+
+    if (!hasGroupChatInfo(account, groupId))
+    {
+        logError("Group not found");
+        return;
+    }
+    let info = getGroupChatInfo(account, groupId);
+
+
+    let from = msgObj["from"];
+    if (!info["admins"].includes(from))
+    {
+        logError("User not admin");
+        return;
+    }
+
+
+
+    info = mergeGroupChatInfo(info, groupInfo);
+
+    if (info["groupId"] !== groupId)
+    {
+        logError("Group ID mismatch");
+        return;
+    }
+
+    if (info["members"].length === 0)
+    {
+        logError("Group has no members");
+        return;
+    }
+
+    logInfo("Final info:", info);
+
+    setGroupChatInfo(account, groupId, info);
+
+    await tryExtAsyncFn(extGroupInfoUpdate, groupId, groupInfo);
+}
 
 
 

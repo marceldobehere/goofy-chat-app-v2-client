@@ -44,7 +44,7 @@ function hasGroupChatInfo(account, groupId)
 
 function getGroupChatInfo(account, groupId)
 {
-    let info = loadAccountObjectOrCreateDefault(account, `GROUP_INFO_${groupId}`, {});
+    let info = loadAccountObject(account, `GROUP_INFO_${groupId}`);
     return tryConformGroupChatInfo(info);
 }
 
@@ -59,7 +59,49 @@ function deleteGroupChatInfo(account, groupId)
     deleteAccountObject(account, `GROUP_INFO_${groupId}`);
 }
 
-async function sendNewGroupChatInfoToAll(account, groupId)
+async function sendNewGroupChatInfoToAll(user, groupId)
 {
-    logError("GROUP CHAT INFO UPDATE NOT IMPLEMENTED YET")
+    logInfo("Sending new group chat info to all");
+
+    let account = user['mainAccount'];
+
+    if (!hasGroupChatInfo(account, groupId))
+    {
+        logError("Group not found");
+        return;
+    }
+    let info = getGroupChatInfo(account, groupId);
+
+
+    let members = info["members"];
+    for (let member of members)
+        await sendNewGroupChatInfoToOne(account, groupId, member);
+
+    // send the update to all redirects
+    let redirects = user["redirectAccounts"];
+    for (let redirect of redirects)
+        await sendNewGroupChatInfoToOne(account, groupId, redirect);
+}
+
+async function sendNewGroupChatInfoToOne(account, groupId, userId)
+{
+    logInfo(`Sending new group chat info to ${userId}`);
+
+    if (!hasGroupChatInfo(account, groupId))
+    {
+        logError("Group not found");
+        return;
+    }
+    let info = getGroupChatInfo(account, groupId);
+
+    let send = getGroupChatInfoToSend(info);
+    await sendSecureMessageToUser(account, userId, send, "group-chat-info", false, true);
+}
+
+
+
+function deleteGroupLocally(account, groupId)
+{
+    deleteGroupChatInfo(account, groupId);
+    removeGroupIfExists(groupId);
 }
