@@ -33,14 +33,14 @@
             <div id="main-sidebar">
                 <div id="main-sidebar-uldiv"><ul class="hidden-ul" id="main-sidebar-list"></ul></div>
                 <div id="main-sidebar-settings">
-                    <img src="./assets/imgs/add.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'Create Group')" onmouseleave="serverHoverEnd()" onclick="createGroup()">
-                    <img src="./assets/imgs/settings.png" class="sidebar-entry" onmouseover="serverHoverStart(this, 'Settings')" onmouseleave="serverHoverEnd()" onclick="">
+                    <img src="./assets/imgs/add.png" alt="Create Group" class="sidebar-entry" onmouseover="serverHoverStart(this, 'Create Group')" onmouseleave="serverHoverEnd()" onclick="createGroup()">
+                    <img src="./assets/imgs/settings.png" alt="Settings" class="sidebar-entry" onmouseover="serverHoverStart(this, 'Settings')" onmouseleave="serverHoverEnd()" onclick="">
                 </div>
             </div>
             <div id="main-chat-selector">
                 <div id="main-chat-selector-uldiv"><ul class="hidden-ul" id="main-chat-selector-list"></ul></div>
                 <div id="main-chat-selector-settings">
-                    <a onclick="settingsUiClicked()">SETTINGS</a><br>
+                    <button onclick="settingsUiClicked()">SETTINGS</button><br>
                     <button id="main-chat-selector-settings-add-friend" onclick="addFriendUser()">Add friend</button><br>
                     <span>ID# <span id="main-chat-selector-settings-userid">???</span></span>
                 </div>
@@ -48,9 +48,9 @@
             <div id="main-chat-content">
                 <div id="main-chat-content-header">
                     CHAT NAME &nbsp;
-                    <a id="main-chat-content-header-toggle-chat-info" style="float:right;padding:5px;" href="#" onclick="toggleChatInfoVis()">INFO</a>
-                    <a id="main-chat-content-header-toggle-message-selector" style="float:right;padding:5px;" href="#" onclick="toggleChannelInfoVis()">CHANNELS</a>
-                    <a id="main-chat-content-header-delete-chat" style="float:right;padding:5px;" href="#" onclick="deleteCurrDm()">DELETE DM</a>
+                    <button id="main-chat-content-header-toggle-chat-info" style="float:right;padding:5px;" href="#" onclick="toggleChatInfoVis()">INFO</button>
+                    <button id="main-chat-content-header-toggle-message-selector" style="float:right;padding:5px;" href="#" onclick="toggleChannelInfoVis()">CHANNELS</button>
+                    <button id="main-chat-content-header-delete-chat" style="float:right;padding:5px;" href="#" onclick="deleteCurrDm()">DELETE DM</button>
                 </div>
                 <div id="main-chat-content-uldiv"><ul class="hidden-ul" id="main-chat-content-list"></ul></div>
                 <div id="main-chat-content-input">
@@ -63,7 +63,7 @@
             <div id="main-chat-info">
                 <div id="main-chat-info-header">
                     CHAT INFO
-                    <a id="main-chat-info-header-toggle-chat-info" style="float:right;" href="#" onclick="toggleChatInfoVis()">HIDE CHAT INFO</a>
+                    <button id="main-chat-info-header-toggle-chat-info" style="float:right;" href="#" onclick="toggleChatInfoVis()">HIDE CHAT INFO</button>
                 </div>
                 <div id="main-chat-info-body">
                     [CHAT INFO]

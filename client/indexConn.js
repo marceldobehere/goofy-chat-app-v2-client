@@ -35,10 +35,12 @@ function createServerEntry(imgSrc, serverId, serverName, shouldHighlight) {
     img.onmouseover = () => {
         serverHoverStart(img, serverName)
     };
+    img.alt = `Group: ${serverName}`;
     img.onmouseleave = serverHoverEnd;
-    img.onclick = () => {
-        serverClicked(img, serverId)
+    img.onclick = async () => {
+        await serverClicked(img, serverId)
     };
+    img.loading = "lazy";
 
     if (shouldHighlight)
     {

@@ -251,7 +251,9 @@ body {
 
 
 .sidebar-entry {
-    width: 80%;
+    /*width: 80%;*/
+    width: calc(0.8 * var(--main-sidebar-size));
+    height: calc(0.8 * var(--main-sidebar-size));
     padding: 0px;
     margin: var(--main-sidebar-margin-vert) auto var(--main-sidebar-margin-vert) auto;
     display: block;
