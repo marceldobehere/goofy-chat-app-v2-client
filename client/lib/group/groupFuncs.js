@@ -170,7 +170,7 @@ async function addChannelToGroup(user, groupId, channelName)
     }
     let info = getGroupChatInfo(account, groupId);
 
-    if (!info["admins"].includes(user["userId"]))
+    if (!info["admins"].includes(account["userId"]))
     {
         logError("User not admin");
         return;
@@ -195,7 +195,7 @@ async function removeChannelFromGroup(user, groupId, channelId)
     }
     let info = getGroupChatInfo(account, groupId);
 
-    if (!info["admins"].includes(user["userId"]))
+    if (!info["admins"].includes(account["userId"]))
     {
         logError("User not admin");
         return;
@@ -222,11 +222,11 @@ async function updateChannelFromGroup(user, groupId, channelId, newChannelName)
     if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
-        return;
+        return "Group not found";
     }
     let info = getGroupChatInfo(account, groupId);
 
-    if (!info["admins"].includes(user["userId"]))
+    if (!info["admins"].includes(account["userId"]))
     {
         logError("User not admin");
         return;
@@ -251,24 +251,15 @@ async function addUserToGroup(user, groupId, userId)
     let account = user['mainAccount'];
 
     if (!hasGroupChatInfo(account, groupId))
-    {
-        logError("Group not found");
-        return;
-    }
+        return "Group not found";
     let info = getGroupChatInfo(account, groupId);
 
-    if (!info["admins"].includes(user["userId"]))
-    {
-        logError("User not admin");
-        return;
-    }
+    if (!info["admins"].includes(account["userId"]))
+        return "User not admin";
 
     let members = info["members"];
     if (members.includes(userId))
-    {
-        logWarn("User already in group");
-        return;
-    }
+        return "User already in group";
 
     members.push(userId);
     setGroupChatInfo(account, groupId, info);
@@ -276,6 +267,8 @@ async function addUserToGroup(user, groupId, userId)
     await internal_sendUserGroupJoinInvite(account, groupId, userId);
 
     await sendNewGroupChatInfoToAll(user, groupId);
+
+    return true;
 }
 
 async function removeUserFromGroup(user, groupId, userId)
@@ -283,25 +276,16 @@ async function removeUserFromGroup(user, groupId, userId)
     let account = user['mainAccount'];
 
     if (!hasGroupChatInfo(account, groupId))
-    {
-        logError("Group not found");
-        return;
-    }
+        return "Group not found";
     let info = getGroupChatInfo(account, groupId);
 
-    if (!info["admins"].includes(user["userId"]))
-    {
-        logError("User not admin");
-        return;
-    }
+    if (!info["admins"].includes(account["userId"]))
+        return "User not admin";
 
     let members = info["members"];
     let index = members.findIndex(x => x === userId);
     if (index === -1)
-    {
-        logError("User not found");
-        return;
-    }
+        return "User not in group";
 
     members.splice(index, 1);
     setGroupChatInfo(account, groupId, info);
@@ -309,6 +293,8 @@ async function removeUserFromGroup(user, groupId, userId)
     await internal_sendUserGroupKick(account, groupId, userId);
 
     await sendNewGroupChatInfoToAll(user, groupId);
+
+    return true;
 }
 
 
@@ -317,10 +303,7 @@ async function leaveGroup(user, groupId)
     logError("Group leave not implemented yet.");
 
     if (!hasGroupChatInfo(user['mainAccount'], groupId))
-    {
-        logError("Group not found");
-        return;
-    }
+        return "Group not found";
     let info = getGroupChatInfo(user['mainAccount'], groupId);
 
     if (info["members"].length === 1)
@@ -329,7 +312,7 @@ async function leaveGroup(user, groupId)
         deleteGroupLocally(user["mainAccount"], groupId);
 
         await extGroupLeft(groupId, info["groupName"]);
-        return;
+        return true;
     }
 
     if (info["admins"].length === 1 && info["admins"][0] === user["mainAccount"]["userId"])
@@ -343,7 +326,7 @@ async function leaveGroup(user, groupId)
         deleteGroupLocally(user['mainAccount'], groupId);
 
         await extGroupLeft(groupId, info["groupName"]);
-        return;
+        return true;
     }
 
     await internal_sendUserGroupLeave(user['mainAccount'], groupId);
@@ -351,6 +334,8 @@ async function leaveGroup(user, groupId)
     deleteGroupLocally(user['mainAccount'], groupId);
 
     await extGroupLeft(groupId, info["groupName"]);
+
+    return true;
 }
 
 

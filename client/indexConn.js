@@ -745,3 +745,89 @@ async function createGroup()
 
     await createServerList(docLastServerId);
 }
+
+async function settingsUiClicked()
+{
+    if (docLastServerId == NoId)
+        return;
+
+    if (docLastServerId == DMsId)
+    {
+        alert("NO DM SETTINGS YET")
+    }
+    else
+    {
+        let choice = prompt("1 Add User\n2 Kick User\n3 Leave Group");
+        if (choice == null)
+            return;
+
+        choice = parseInt(choice);
+        if (!(choice >= 1 && choice <= 3))
+            return;
+
+        if (choice == 1)
+        {
+            let userId = prompt("Enter user id:");
+            if (userId == null)
+                return;
+            userId = parseInt(userId);
+            if (isNaN(userId))
+                return alert("Invalid user id");
+
+            let symmKey = await getUserMySymmKey(currentUser["mainAccount"], userId);
+            if (symmKey == null)
+            {
+                alert("User does not exist!");
+                return;
+            }
+
+            try {
+                let res = await addUserToGroup(currentUser, docLastServerId, userId);
+                if (res !== true && res !== undefined)
+                    alert(res);
+            }
+            catch (e)
+            {
+                alert(e);
+            }
+        }
+        else if (choice == 2)
+        {
+            let userId = prompt("Enter user id:");
+            if (userId == null)
+                return;
+            userId = parseInt(userId);
+            if (isNaN(userId))
+                return alert("Invalid user id");
+
+            let symmKey = await getUserMySymmKey(currentUser["mainAccount"], userId);
+            if (symmKey == null)
+            {
+                alert("User does not exist!");
+                return;
+            }
+
+            try {
+                let res = await removeUserFromGroup(currentUser, docLastServerId, userId);
+                if (res !== true && res !== undefined)
+                    alert(res);
+            }
+            catch (e)
+            {
+                alert(e);
+            }
+        }
+        else if (choice == 3)
+        {
+            try {
+                let res = await leaveGroup(currentUser, docLastServerId);
+                if (res !== true && res !== undefined)
+                    alert(res);
+            }
+            catch (e)
+            {
+                alert(e);
+            }
+        }
+    }
+}
