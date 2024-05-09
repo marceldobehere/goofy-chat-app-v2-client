@@ -85,7 +85,7 @@ This means that there exists a possibility of collisions and potential brute for
 The brute force attack can be mitigated by using a slow, secure hashing algorithm.
 
 As for the collisions, there is yet to find a balance between usability and security.
-(Personally I a realistically usable and secure solution can be found)
+(Personally I think that a realistically usable and secure solution can be found)
 
 ### TL;DR
 
