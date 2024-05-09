@@ -119,12 +119,12 @@ Currently the server uses a secure websocket connection to communicate with the 
 Users can send the messages to a server. Currently they are plain text JSON objects.
 
 The structure is as follows
-```JSON
+```
 {
-    "from": <USER_ID>,
-    "to:" <USER_ID>,
-    "data": <JSON OBJECT>,
-    "store": <BOOLEAN>
+    from: number, (user id)
+    to: number, (user id)
+    data: any,
+    store: boolean
 }
 ```
 
@@ -137,6 +137,9 @@ The data field will be the actual data.
 The server is set up so that the client can send any data they want.
 This means that both clients need to know how to handle the data.
 But it also allows separate clients to have their own data structures.
+
+Also note that on reception the object will contain one additional field.
+This field is the date field and contains the UTC timestamp of when the message was received by the server.
 
 #### Server communication and key exchange
 
