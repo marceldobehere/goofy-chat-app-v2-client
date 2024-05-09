@@ -194,6 +194,12 @@ These will be handled accordingly.
 
 #### Voice/Video Calls
 
+Essentially the server acts as a signaling server for the two users to establish a P2P WebRTC connection.
+
+The clients will exchange their ICE candidates and SDP offers/answers through the server using special message types.
+
+Currently the STUN servers are hardcoded and set to the Google STUN servers.
+
 (Implementation details yet to follow)
 
 
