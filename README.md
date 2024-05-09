@@ -11,24 +11,186 @@ NOTE: It is very very very WIP right now.
 
 It is statically hosted [here](https://marceldobehere.github.io/goofy-chat-app-v2-client/client/)!
 
-Also NOTE: This is the statically hosted client. The server can be found [here](https://github.com/marceldobehere/goofy-chat-app-v2). 
+Also NOTE: This is only the statically hosted client. The server can be found [here](https://github.com/marceldobehere/goofy-chat-app-v2). 
 
+## Features
 
-## Implemented Features
+### Implemented Features
 * End-to-end encryption
 * Private Chats
 * Cross Device Sync
 * Fully Open Source
 
 
-## Partially implemented Features
+### Partially implemented Features
 * Private/Group Voice/Video calls (using WebRTC)
 * Group Chats
 
 
-## Planned Features
+### Planned Features
 * Image/Video/File Sharing
 * Portable Core Client Lib
 * Multiple Accounts
 * Customizable UI/Themes
 * Custom Clients
+
+## Goofy Chat 2 vs Goofy Chat 1
+
+The main difference between Goofy Chat 2 is the improved way of handling secure communication, group chats and P2P Voice/Video calls.
+
+There are also minor things like the support for communication using decentralized servers and more.
+
+This is also an attempt to turn this into a slowly more usable project.
+
+
+## The idea
+
+### Background
+
+E2E encryption is secure but the main problem lies within the key exchange.
+
+For fun I tried to make a secure chat app and stumbled upon this issue.
+
+From what I understand most applications offering E2E store userids and their corresponding public key.
+This means that you have to trust the server to give you the right keys. 
+
+This is a problem in two ways: The given public key could be wrong / manipulated and userids are specific to one server (if not planned).
+
+If a user wants to talk to another user they will need to request the public key and then afterwards verify it in a secure channel to be safe.
+
+### Solution
+
+The main idea I have come up with is to bind the cryptographic identity to a user id. 
+This can be achieved by making the userid be the hash of the public key.
+
+Now if a user knows the userid of another user, they can request the public key and then verify the integrity of the public key by hashing and comparing it to the userid.
+
+This way the user can be sure that the public key is correct and the user can be sure that the public key is bound to the userid.
+
+This removes the need for an extra verification step via a secure channel.
+Users just need to know the userid of other users.
+
+
+Additionally users can use their public keys across different servers and still be able to communicate with the same userid.
+(The servers would need to use the same hashing algorithm)
+
+### Drawbacks
+
+The main issue is the generation of the userid.
+
+The userid should not be extremely long and should be simple to be communicated.
+
+This means that there exists a possibility of collisions and potential brute force attacks.
+
+The brute force attack can be mitigated by using a slow, secure hashing algorithm.
+
+As for the collisions, there is yet to find a balance between usability and security.
+(Personally I a realistically usable and secure solution can be found)
+
+### TL;DR
+
+By binding the cryptographic identity to a user id, users can communicate securely without the need for a secure channel to verify the public key.
+
+This allows users to use decentralized servers while keeping their user ids and secure communication.
+
+The chats are E2E encrypted meaning that the only thing the server could do is drop or replay messages.
+
+
+
+### Implementation details
+
+Please note that this is a WIP project and the implementation is far from ideal and can change.
+
+#### Encryption
+
+For the general encryption I am using AES and RSA.
+
+For a conversation between two users there are two symmetric keys for both directions.
+This removes the need to decide on a single key from both sides.
+
+The userids are currently hashed using a simple non-cryptographic hash function. 
+The result is an integer. This current way will most likely change in the future. 
+It is still unknown whether the userid will remain numeric or if it will be alphanumeric.
+
+Currently the server uses a secure websocket connection to communicate with the clients.
+
+### Message Structure for server communication
+
+Users can send the messages to a server. Currently they are plain text JSON objects.
+
+The structure is as follows
+```JSON
+{
+    "from": <USER_ID>,
+    "to:" <USER_ID>,
+    "data": <JSON OBJECT>,
+    "store": <BOOLEAN>
+}
+```
+
+Note that the store field is optional.
+It is used to determine what the server should do in case the recipient is not connected.
+If store is true the server will store the message and send it to the recipient once they are connected.
+If store is false the server will drop the message.
+
+The data field will be the actual data.
+The server is set up so that the client can send any data they want.
+This means that both clients need to know how to handle the data.
+But it also allows separate clients to have their own data structures.
+
+#### Server communication and key exchange
+
+Each user has a public and private key pair. 
+They then share their public key with the server and verify their identity through a challenge-response mechanism.
+
+Users can request the public key of another user by sending a request to the server. 
+The server will then respond with the public key of the user if it has one.
+The user will then hash the public key and compare it to the userid to verify the integrity of the public key.
+
+#### Conversation initiation
+
+When initiating a conversation user A will generate a symmetric key and encrypt it with the public key of user B. 
+User A will also send them a signature of the key.
+
+User B will then decrypt the symmetric key and verify the signature. 
+If the signature is correct user B will generate a symmetric key and send it back to user A encrypted with the public key of user A.
+
+Currently the symmetrically encrypted messages are not signed. 
+It is currently assumed that exchanged symmetric keys have been securely exchanged and therefore a signature is not needed.
+This could potentially change in the future.
+
+#### Conversation
+
+Messages will be encrypted with the symmetric key of the conversation and then sent to the server.
+
+The server acts as only a relay and will pass the message to the recipient once the recipient is connected.
+
+The recipient will then decrypt the message and handle it accordingly.
+
+Each message also has a random unique id to prevent firstly prevent replay attacks and secondly for synchronization purposes.
+
+##### Message Types
+Messages can have different types for different functions.
+
+There are normal text messages, but also messages to set the symmetric key, redirect messages, group chats, voice channels, etc.
+
+These will be handled accordingly.
+
+
+### Implementation details of features
+
+#### Cross Device Sync
+
+(Implementation details yet to follow)
+
+
+#### Group Chats
+
+(Implementation details yet to follow)
+
+
+#### Voice/Video Calls
+
+(Implementation details yet to follow)
+
+
