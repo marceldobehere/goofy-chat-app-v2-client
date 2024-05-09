@@ -1,3 +1,49 @@
+
+const settingsBgElement = document.getElementById("main-app-container-settings-bg");
+const settingsElement = document.getElementById("main-app-container-settings");
+
+function hideSettings()
+{
+    settingsBgElement.style.display = "none";
+}
+
+
+const settingsMainInputAutoHideChatElement = document.getElementById("settings-main-input-auto-hide-chat");
+const settingsMainInputAutoShowChatElement = document.getElementById("settings-main-input-auto-show-chat");
+async function showSettings()
+{
+    settingsMainInputAutoHideChatElement.checked = getSetting(["chat", "auto-hide-chat"]);
+    settingsMainInputAutoShowChatElement.checked = getSetting(["chat", "auto-show-chat"]);
+
+    settingsBgElement.style.display = "block";
+}
+
+
+function setSetting(objPathArr, value)
+{
+    let temp = settingsObj;
+    for (let key of objPathArr.slice(0, objPathArr.length - 1))
+        if (temp[key] == undefined)
+            return alert("Invalid setting path: " + JSON.stringify(objPathArr));
+        else
+            temp = temp[key];
+
+    temp[objPathArr[objPathArr.length - 1]] = value;
+    saveSettings();
+}
+
+function getSetting(objPathArr)
+{
+    let temp = settingsObj;
+    for (let key of objPathArr)
+        if (temp[key] == undefined)
+            return null;
+        else
+            temp = temp[key];
+
+    return temp;
+}
+
 const hoverElement = document.getElementById("goofy-server-popup");
 function serverHoverStart(element, serverName) {
     hoverElement.style.display = "block";

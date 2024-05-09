@@ -26,6 +26,32 @@
 <body>
     <div id="main-app-container">
 
+        <div id="main-app-container-settings-bg" onclick="hideSettings()">
+            <div id="main-app-container-settings" onclick="event.stopPropagation()">
+                <h2>Settings</h2>
+                <div>
+                    <h3>Main Settings</h3>
+                    <label>Auto Hide Chat</label><input type="checkbox" id="settings-main-input-auto-hide-chat" onclick="setSetting(['chat', 'auto-hide-chat'], this.checked)"><br>
+                    <label>Auto Show Chat</label><input type="checkbox" id="settings-main-input-auto-show-chat" onclick="setSetting(['chat', 'auto-show-chat'], this.checked)"><br>
+                    <br>
+                    <button onclick="exportProfile()">Export Profile</button>
+                    <button onclick="importProfile()">Import Profile</button><br>
+
+
+                    <br>
+                </div>
+
+
+
+
+                <div>
+                    <hr>
+                    <h3>Info and Disclaimers</h3>
+                    <p>Goofy Chat 2 is open source and can be found <a target="_blank" href="https://github.com/marceldobehere/goofy-chat-app-v2-client">here</a>!</p>
+                    <p>This site uses localstorage to store the encryption keys and all messages</p>
+                </div>
+            </div>
+        </div>
 
 
         <div id="main-app-container-chat">
@@ -36,7 +62,7 @@
                 <div id="main-sidebar-uldiv"><ul class="hidden-ul" id="main-sidebar-list"></ul></div>
                 <div id="main-sidebar-settings">
                     <img src="./assets/imgs/add.png" alt="Create Group" class="sidebar-entry" onmouseover="serverHoverStart(this, 'Create Group')" onmouseleave="serverHoverEnd()" onclick="createGroup()">
-                    <img src="./assets/imgs/settings.png" alt="Settings" class="sidebar-entry" onmouseover="serverHoverStart(this, 'Settings')" onmouseleave="serverHoverEnd()" onclick="">
+                    <img src="./assets/imgs/settings.png" alt="Settings" class="sidebar-entry" onmouseover="serverHoverStart(this, 'Settings')" onmouseleave="serverHoverEnd()" onclick="showSettings()">
                 </div>
             </div>
             <div id="main-chat-selector">
