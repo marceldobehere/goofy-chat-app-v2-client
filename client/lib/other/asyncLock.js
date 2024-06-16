@@ -1,3 +1,5 @@
+const logLock = false;
+
 class AsyncLock {
     constructor () {
         this.promiseArr = [];
@@ -8,7 +10,8 @@ class AsyncLock {
     {
         if (this.resolveArr.length > 0)
         {
-            console.log("Disabling lock");
+            if (logLock)
+                console.log("Disabling lock");
 
             this.promiseArr.shift();
             this.resolveArr.shift()();
@@ -19,7 +22,8 @@ class AsyncLock {
 
     async enable ()
     {
-        console.log("Enabling lock");
+        if (logLock)
+            console.log("Enabling lock");
 
         let tempPromises = [];
         for (let prom of this.promiseArr)
@@ -40,3 +44,4 @@ const lockOutgoingAes = new AsyncLock();
 const lockOutgoingRsa = new AsyncLock();
 const lockSymmKey = new AsyncLock();
 
+const locklocalMsg = new AsyncLock();

@@ -591,8 +591,8 @@ async function messageSend() {
 
     }
 
-    if (docChatLastServerId == DMsId)
-        await createChatList(docChatLastServerId, docChatLastChannelId, true);
+    // if (docChatLastServerId == DMsId)
+    //     await createChatList(docChatLastServerId, docChatLastChannelId, true);
 
     messageSending = 0;
 }
@@ -637,7 +637,10 @@ async function messageReceivedUI(account, chatUserId, message)
         if (docLastServerId == groupInfo["groupId"] && docLastChannelId == groupInfo["channelId"])
         {
             await userMarkGroupMessagesAsRead(groupInfo["groupId"], groupInfo["channelId"]);
-            await createChatList(groupInfo["groupId"], groupInfo["channelId"], true);
+
+            //await createChatList(groupInfo["groupId"], groupInfo["channelId"], true);
+            await createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"]);
+            docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
 
 
@@ -649,7 +652,10 @@ async function messageReceivedUI(account, chatUserId, message)
         if (chatUserId == docChatLastChannelId && docChatLastServerId == DMsId)
         {
             await userMarkMessagesAsRead(chatUserId);
-            await createChatList(DMsId, chatUserId, true);
+
+            //await createChatList(DMsId, chatUserId, true);
+            await createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"]);
+            docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
 
         if (docLastServerId == DMsId)// && (await userGetMessages(chatUserId)).length == 1)

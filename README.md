@@ -203,3 +203,11 @@ Currently the STUN servers are hardcoded and set to the Google STUN servers.
 (Implementation details yet to follow)
 
 
+
+
+
+## External Libraries
+* [CryptoJS](https://github.com/brix/crypto-js/tree/develop)
+* [JSEncrypt](https://github.com/travist/jsencrypt)
+* [Socket.io](https://github.com/socketio/socket.io)
+* [Dexie.js](https://github.com/dexie/Dexie.js)

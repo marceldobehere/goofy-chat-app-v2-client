@@ -5,6 +5,18 @@ function exportProfile()
     downloadTextFile(data, "profile.json");
 }
 
+async function resetProfile()
+{
+    if (!confirm("Are you sure?"))
+        return;
+    if (!confirm("Are you really sure?"))
+        return;
+
+    await internalResetAll();
+    localStorage.clear();
+    location.reload();
+}
+
 async function importProfile()
 {
     let data;

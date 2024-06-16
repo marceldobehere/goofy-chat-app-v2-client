@@ -122,121 +122,6 @@ async function setUserLastSymmKey(account, userId, key, dontRedirect)
     await addSentMessage(accountFrom, userId, msg, true);
 }
 
-async function messageIdInUser(account, userId, messageId)
-{
-    let messageIds = loadAccountObject(account, `USER_MSG_IDS_${userId}`);
-    if (messageIds == undefined)
-        messageIds = [];
-    return messageIds.includes(messageId);
-}
-
-async function addMessageIdToUser(account, userId, messageId)
-{
-    let messageIds = loadAccountObject(account, `USER_MSG_IDS_${userId}`);
-    if (messageIds == undefined)
-        messageIds = [];
-    messageIds.push(messageId);
-    saveAccountObject(account, `USER_MSG_IDS_${userId}`, messageIds);
-}
-
-async function addMessageToUnread(account, userId, message)
-{
-    let messageId = message["messageId"];
-    let fromId = message["from"];
-    if (fromId == account["userId"])
-        return logInfo(`Not adding message to unread for self:`, message);
-
-    let messageIds = loadAccountObjectOrCreateDefault(account, `USER_UNREAD_MSG_IDS_${userId}`, []);
-    if (!messageIds.includes(messageId))
-        messageIds.push(messageId);
-    saveAccountObject(account, `USER_UNREAD_MSG_IDS_${userId}`, messageIds);
-}
-
-async function readMessages(account, userId)
-{
-    saveAccountObject(account, `USER_UNREAD_MSG_IDS_${userId}`, []);
-}
-
-async function getUnreadMessages(account, userId)
-{
-    return loadAccountObjectOrCreateDefault(account, `USER_UNREAD_MSG_IDS_${userId}`, []);
-}
-
-async function internalGetUserMessages(account, userId)
-{
-    let messages = loadAccountObject(account, `USER_MSGS_${userId}`);
-    if (messages == undefined)
-    {
-        messages = [];
-        saveAccountObject(account, `USER_MSGS_${userId}`, messages);
-    }
-
-    return messages;
-}
-
-async function internalAddUserMessageSorted(account, userId, message)
-{
-    let messages = await internalGetUserMessages(account, userId);
-    let date;
-    try {
-        date = new Date(message["date"]);
-    }
-    catch (e) {
-        logWarn(`Invalid date:`, message);
-        return;
-    }
-
-    let index = 0;
-    for (let i = 0; i < messages.length; i++)
-    {
-        let msg = messages[i];
-        let msgDate;
-        try {
-            msgDate = new Date(msg["date"]);
-        }
-        catch (e) {
-            logWarn(`Invalid date:`, msg);
-            continue;
-        }
-
-        if (msgDate < date)
-            index = i + 1;
-    }
-
-    messages.splice(index, 0, message);
-    saveAccountObject(account, `USER_MSGS_${userId}`, messages);
-
-    if (message["from"] == account["userId"])
-    {
-        logInfo(`Message sent so marking messages as read: `, message)
-        await readMessages(account, userId);
-    }
-}
-
-async function internalRemoveUserMessage(account, userId, messageId)
-{
-    let messages = await internalGetUserMessages(account, userId);
-    let newMessages = [];
-    for (let i = 0; i < messages.length; i++)
-    {
-        let msg = messages[i];
-        if (msg["messageId"] != messageId)
-            newMessages.push(msg);
-    }
-
-    saveAccountObject(account, `USER_MSGS_${userId}`, newMessages);
-}
-
-async function internalRemoveUserMessages(account, userId)
-{
-    saveAccountObject(account, `USER_MSGS_${userId}`, []);
-    saveAccountObject(account, `USER_UNREAD_MSG_IDS_${userId}`, []);
-    saveAccountObject(account, `USER_MSG_IDS_${userId}`, []);
-
-    removeUserIfExists(userId);
-
-}
-
 const dontRedirectTypes = ["redirect", "call-start", "call-stop", "call-reply", "call-join", "call-join-fail", "ice-candidate"];
 
 async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
@@ -416,9 +301,12 @@ async function addSentMessage(account, userIdTo, message, dontActuallyAdd)
         return;
     }
 
+    console.log("check", messageId)
     if (!await messageIdInUser(account, userIdTo, messageId))
     {
+        console.log("not here yet", messageId)
         await addMessageIdToUser(account, userIdTo, messageId);
+        console.log("added", messageId)
 
         if (currentUser["redirectAccounts"].length > 0)
         {
@@ -440,9 +328,12 @@ async function addSentMessage(account, userIdTo, message, dontActuallyAdd)
     }
     else if (!dontRedirectTypes.includes(type))
     {
+        console.log("here 1", messageId)
         logWarn(`Message already in user:`, message);
         return;
     }
+    else
+        console.log("here 2", messageId)
 
     logInfo(`New sent message to user ${userIdTo}:`, message);
     if (!dontActuallyAdd)

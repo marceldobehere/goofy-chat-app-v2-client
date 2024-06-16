@@ -59,6 +59,7 @@ async function initClientLib()
     initServerListStuff();
     initUserPuKeyInterface();
 
+    await initLocalMsgInterface();
     await initUserMsgSystem();
     await initMsgSystem();
 

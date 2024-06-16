@@ -35,8 +35,8 @@
                     <label>Auto Show Chat</label><input type="checkbox" id="settings-main-input-auto-show-chat" onclick="setSetting(['chat', 'auto-show-chat'], this.checked)"><br>
                     <br>
                     <button onclick="exportProfile()">Export Profile</button>
-                    <button onclick="importProfile()">Import Profile</button><br>
-
+                    <button onclick="importProfile()">Import Profile</button>
+                    <button onclick="resetProfile()">Reset Profile</button><br>
 
                     <br>
                 </div>
@@ -103,6 +103,7 @@
 <script src="./ext/jsencrypt.min.js" defer></script>
 <script src="./ext/crypto_js/crypto-js.js" defer></script>
 <script src="./ext/socket_io.js" defer></script>
+<script src="./ext/dexie.js" defer></script>
 <script src="./lib/other/logger.js" defer></script>
 <script src="./lib/other/asyncLock.js" defer></script>
 <script src="./lib/other/localStorageStuff.js" defer></script>
@@ -114,7 +115,9 @@
 <script src="./lib/user/accountStuff.js" defer></script>
 <script src="./lib/user/userIdPubKeyInterface.js" defer></script>
 <script src="./lib/user/userFuncs.js" defer></script>
-<script src="./lib/msg/msgInterface.js" defer></script>
+<script src="lib/msg/localMsgInterface.js" defer></script>
+<script src="lib/msg/localMsgInterfaces/localDexieInterface.js" defer></script>
+<script src="lib/msg/localMsgInterfaces/localLocalStorageInterface.js" defer></script>
 <script src="./lib/user/userMsgSystem.js" defer></script>
 <script src="./lib/msg/msgSystem.js" defer></script>
 <script src="./lib/client.js" defer></script>
