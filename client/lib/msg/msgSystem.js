@@ -172,8 +172,11 @@ async function sendRsaMessageToUser(accountFrom, userIdTo, data)
 async function sendSecureMessageToUser(accountFrom, userIdTo, data, type, onlyTrySend, dontActuallyAdd, skipLock)
 {
     if (!skipLock)
+    {
         await lockOutgoing.enable();
-    let status = true;
+        await lockIncoming.enable();
+    }
+    let res;
 
     try {
         let msg = {
@@ -182,7 +185,7 @@ async function sendSecureMessageToUser(accountFrom, userIdTo, data, type, onlyTr
             type: type
         };
 
-        status = await sendAesMessageToUser(accountFrom, userIdTo, msg, onlyTrySend, skipLock);
+        res = await sendAesMessageToUser(accountFrom, userIdTo, msg, onlyTrySend, skipLock);
 
         msg["date"] = new Date();
         msg["from"] = accountFrom["userId"];
@@ -191,13 +194,16 @@ async function sendSecureMessageToUser(accountFrom, userIdTo, data, type, onlyTr
     }
     catch (e) {
         logError(e);
-        status = false;
+        res = undefined;
     }
 
     if (!skipLock)
+    {
         lockOutgoing.disable();
+        lockIncoming.disable();
+    }
 
-    return status;
+    return res;
 }
 
 async function handleMessageSock(socketFrom, userIdFrom, userIdTo, date, data)

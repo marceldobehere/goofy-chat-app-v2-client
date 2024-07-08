@@ -301,12 +301,9 @@ async function addSentMessage(account, userIdTo, message, dontActuallyAdd)
         return;
     }
 
-    console.log("check", messageId)
     if (!await messageIdInUser(account, userIdTo, messageId))
     {
-        console.log("not here yet", messageId)
         await addMessageIdToUser(account, userIdTo, messageId);
-        console.log("added", messageId)
 
         if (currentUser["redirectAccounts"].length > 0)
         {
@@ -326,18 +323,19 @@ async function addSentMessage(account, userIdTo, message, dontActuallyAdd)
             }
         }
     }
-    else if (!dontRedirectTypes.includes(type))
+    else
     {
-        console.log("here 1", messageId)
         logWarn(`Message already in user:`, message);
         return;
     }
-    else
-        console.log("here 2", messageId)
+
 
     logInfo(`New sent message to user ${userIdTo}:`, message);
     if (!dontActuallyAdd)
+    {
         await internalAddUserMessageSorted(account, userIdTo, message);
+        await extMsgNormalMessage(account, userIdTo, message);
+    }
 }
 
 async function addNormalMessageToUser(account, chatUserId, message)

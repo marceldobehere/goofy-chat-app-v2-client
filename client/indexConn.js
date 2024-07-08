@@ -626,8 +626,9 @@ async function addFriendUser()
 
 async function messageReceivedUI(account, chatUserId, message)
 {
+/*    console.log("MESSAGE RECEIVED")
     console.log(chatUserId);
-    console.log(message);
+    console.log(message);*/
     if (isStrChannelFromGroup(chatUserId))
     {
         let groupInfo = getGroupAndChannelFromChannelStr(chatUserId);

@@ -37,11 +37,16 @@ function _logExtra(level, arr)
     if (!logEnabled)
         return;
 
-    let txt = toOneStr(arr);
-    if (level === undefined || level === "")
-        console.log(getWithTimeStampIfNeeded(`${txt}`));
-    else
-        console.log(getWithTimeStampIfNeeded(`${level}: ${txt}`));
+    let str = "";
+    if (level !== undefined && level !== "")
+        str = `${level}:`;
+    console.log(str, ...arr)
+
+    // let txt = toOneStr(arr);
+    // if (level === undefined || level === "")
+    //     console.log(getWithTimeStampIfNeeded(`${txt}`));
+    // else
+    //     console.log(getWithTimeStampIfNeeded(`${level}: ${txt}`));
 }
 
 function logTxt(...arr)
@@ -67,14 +72,17 @@ function logError(...arr)
     if (logErrorEnabled)
     {
         _logExtra("ERROR", arr);
-        console.log("ERROR ", arr);
+        console.trace(arr);
     }
 }
 
 function logFatalErrorAndCrash(...arr)
 {
     if (logErrorEnabled)
+    {
         _logExtra("FATAL ERROR", arr);
+        console.trace(arr);
+    }
 
     throw `FATAL ERROR: ${toOneStr(arr)}`;
 }

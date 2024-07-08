@@ -37,6 +37,18 @@ class AsyncLock {
 
         await bigPromise;
     }
+
+    async tryEnable ()
+    {
+        if (logLock)
+            console.log("Trying to enable lock");
+
+        if (this.resolveArr.length > 0)
+            return false;
+
+        await this.enable();
+        return true;
+    }
 }
 const lockIncoming = new AsyncLock();
 const lockOutgoing = new AsyncLock();
