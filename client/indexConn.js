@@ -256,7 +256,7 @@ function createChatEntry(username, time, message)
     replyButton.className = "chat-entry-reply";
     replyButton.textContent = "<-";
     replyButton.onclick = () => {
-        docChatInputElement.value = `[${username}]\n${getReplyStr(message)}\n`;
+        docChatInputElement.value = `${getReplyStr(message)}\n`;
         docChatInputElement.focus();
     };
 
