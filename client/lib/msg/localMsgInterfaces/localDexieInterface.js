@@ -6,6 +6,19 @@ async function _lMsgDxCreateDb()
 {
     db = new Dexie(localDbName);
 
+    if (isPasswordSecured)
+    {
+        logInfo("Using encrypted DB");
+        const tables = ['messages', 'unread', 'msgIds'];
+        const encryption = {
+            encrypt: values => aesEncrypt(values, securedPasswordKey),
+            decrypt: data => aesDecrypt(data, securedPasswordKey)
+        };
+
+        await dexieEncMiddleware({ db, encryption, tables });
+        logInfo("Encrypted DB ready");
+    }
+
     await db.version(1).stores({
         messages: `
         &messageId,
