@@ -556,6 +556,8 @@ async function messageSend() {
         if (messageSending > 20) {
             messageSending = 0;
             console.log("SEND MAIL ANYWAY");
+
+            resetMsgLocks();
         }
         setTimeout(messageSend, 60);
         return;

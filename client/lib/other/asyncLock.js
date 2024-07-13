@@ -38,6 +38,12 @@ class AsyncLock {
         await bigPromise;
     }
 
+    reset()
+    {
+        this.promiseArr = [];
+        this.resolveArr = [];
+    }
+
     async tryEnable ()
     {
         if (logLock)
@@ -57,3 +63,15 @@ const lockOutgoingRsa = new AsyncLock();
 const lockSymmKey = new AsyncLock();
 
 const locklocalMsg = new AsyncLock();
+
+
+function resetMsgLocks()
+{
+    logWarn("Force resetting message locks");
+    lockIncoming.reset();
+    lockOutgoing.reset();
+    lockOutgoingAes.reset();
+    lockOutgoingRsa.reset();
+    lockSymmKey.reset();
+    locklocalMsg.reset();
+}
