@@ -1,11 +1,23 @@
 async function exportProfile()
 {
-    let exportObj = {
-        localStorage: localStorage,
-        msgData: await internalMsgExportAll(currentUser['mainAccount'])
+    await lockIncoming.enable();
+    await lockOutgoing.enable();
+
+    let data;
+
+    try {
+        let exportObj = {
+            localStorage: localStorage,
+            msgData: await internalMsgExportAll(currentUser['mainAccount'])
+        }
+
+        data = JSON.stringify(exportObj);
+    } catch (e) {
+        logError(e);
     }
 
-    let data = JSON.stringify(exportObj);
+    lockIncoming.disable();
+    lockOutgoing.disable();
 
     downloadTextFile(data, "profile.json");
 }
@@ -16,6 +28,9 @@ async function resetProfile()
         return;
     if (!confirm("Are you really sure?"))
         return;
+
+    await lockIncoming.enable();
+    await lockOutgoing.enable();
 
     await internalResetAll();
     localStorage.clear();
@@ -42,18 +57,21 @@ async function importProfile()
     else
         return alert("Aborted");
 
+    await lockIncoming.enable();
+    await lockOutgoing.enable();
+
     localStorage.clear();
     let ls = data["localStorage"];
     for (let key in ls)
         localStorage.setItem(key, ls[key]);
 
-    let currUser = loadObject("currentUser");
-
-    let msgData = data["msgData"];
     await internalResetAll();
-    await internalMsgImportAll(currUser['mainAccount'], msgData);
 
     await initClientLib();
+
+    let currUser = loadObject("currentUser");
+    let msgData = data["msgData"];
+    await internalMsgImportAll(currUser['mainAccount'], msgData);
 
     await currUserFullImport(currUser, !loadBackup);
 
