@@ -122,15 +122,33 @@ async function internalResetAll()
 
 async function internalMsgExportAll(account)
 {
-    return await _intLockMethod(
+    let res = await _intLockMethod(
         _lMsgDxExportAllMsgs,
         _lMsgLSExportAllMsgs,
         [account]
     );
+
+    try {
+        if (isPasswordSecured)
+            res = aesEncrypt(res, securedPasswordKey);
+    } catch (e) {
+        logError(e);
+        return undefined;
+    }
+
+    return res;
 }
 
 async function internalMsgImportAll(account, data)
 {
+    try {
+        if (isPasswordSecured)
+            data = aesDecrypt(data, securedPasswordKey);
+    } catch (e) {
+        logError(e);
+        return;
+    }
+
     return await _intLockMethod(
         _lMsgDxImportAllMsgs,
         _lMsgLSImportAllMsgs,
