@@ -92,7 +92,7 @@ async function _lMsgLSAddMsg(account, userId, message)
     if (message["from"] == account["userId"])
     {
         logInfo(`Message sent so marking messages as read: `, message)
-        await readMessages(account, userId);
+        await _lMsgLSReadMsgs(account, userId);
     }
 }
 
@@ -122,3 +122,14 @@ async function _lMsgLSResetAll()
 {
 
 }
+
+async function _lMsgLSExportAllMsgs(account)
+{
+    return [];
+}
+
+async function _lMsgLSImportAllMsgs(account, data)
+{
+    throw new Error("Not implemented");
+}
+

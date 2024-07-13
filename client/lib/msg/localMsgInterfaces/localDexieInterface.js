@@ -2,7 +2,7 @@ let db;
 
 async function initLocalMsgDexieInterface()
 {
-    db = new Dexie("FriendDatabase");
+    db = new Dexie("GoofyChatMsgDB");
 
     db.version(1).stores({
         messages: `
@@ -88,3 +88,15 @@ async function _lMsgDxResetAll()
 {
     await db.delete();
 }
+
+async function _lMsgDxExportAllMsgs(account)
+{
+    return [];
+}
+
+async function _lMsgDxImportAllMsgs(account, data)
+{
+    throw new Error("Not implemented");
+}
+
+
