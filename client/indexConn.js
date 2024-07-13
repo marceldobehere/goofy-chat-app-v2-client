@@ -222,6 +222,15 @@ function isoDateToReadable(isoDateStr, isToday)
     return `${dateStr} at ${timeStr}`;
 }
 
+function getReplyStr(message)
+{
+    // Add a > infront of every line
+    let lines = message.split("\n");
+    let newLines = [];
+    for (let line of lines)
+        newLines.push(`> ${line}`);
+    return newLines.join("\n");
+}
 
 const docChatList = document.getElementById("main-chat-content-list");
 const docChatUlDiv = document.getElementById("main-chat-content-uldiv");
@@ -241,8 +250,16 @@ function createChatEntry(username, time, message)
     let utcDate = new Date(time);
     let localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
     time = isoDateToReadable(localDate.toISOString(), utcDate.toDateString() == new Date().toDateString());
-
     span2.textContent = time;
+
+    let replyButton = document.createElement("button");
+    replyButton.className = "chat-entry-reply";
+    replyButton.textContent = "<-";
+    replyButton.onclick = () => {
+        docChatInputElement.value = `[${username}]\n${getReplyStr(message)}\n`;
+        docChatInputElement.focus();
+    };
+
     let br = document.createElement("br");
     let p = document.createElement("p");
     p.className = "chat-entry-message";
@@ -251,6 +268,7 @@ function createChatEntry(username, time, message)
     div.appendChild(span1);
     div.appendChild(document.createTextNode(" - "));
     div.appendChild(span2);
+    div.appendChild(replyButton);
     div.appendChild(br);
     div.appendChild(p);
     li.appendChild(div);

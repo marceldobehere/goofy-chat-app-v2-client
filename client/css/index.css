@@ -338,6 +338,10 @@ body {
     background-color: #202030;
 }
 
+.chat-entry-reply {
+    float: right;
+}
+
 #main-chat-content-header {
     padding: 5px;
 }
