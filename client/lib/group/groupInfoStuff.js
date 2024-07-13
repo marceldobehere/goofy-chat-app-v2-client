@@ -105,3 +105,22 @@ function deleteGroupLocally(account, groupId)
     deleteGroupChatInfo(account, groupId);
     removeGroupIfExists(groupId);
 }
+
+
+
+
+function getAllGroupChannelIds(account)
+{
+    let groupIds = getAllGroups();
+
+    let channels = [];
+    for (let groupId of groupIds) {
+        let info = getGroupChatInfo(account, groupId);
+        let groupChannels = info["channels"];
+        for (let channel of groupChannels) {
+            channels.push(getChannelStrFromGroup(groupId, channel["id"]));
+        }
+    }
+
+    return channels;
+}

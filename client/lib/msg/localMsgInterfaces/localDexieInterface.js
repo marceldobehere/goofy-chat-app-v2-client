@@ -140,7 +140,7 @@ async function _lMsgDxResetAll()
 
 async function _lMsgDxExportAllMsgs(account)
 {
-    let userList = getAllUsers().concat(getAllGroups());
+    let userList = getAllUsers().concat(getAllGroupChannelIds(account));
     let msgList = [];
     let unreadList = [];
     let msgIdList = [];

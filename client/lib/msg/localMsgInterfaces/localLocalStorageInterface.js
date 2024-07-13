@@ -141,7 +141,7 @@ async function _lMsgLSResetAll()
 
 async function _lMsgLSExportAllMsgs(account)
 {
-    let userList = getAllUsers().concat(getAllGroups());
+    let userList = getAllUsers().concat(getAllGroupChannelIds(account));
     let msgList = [];
     let unreadList = [];
     let msgIdList = [];
@@ -177,7 +177,7 @@ async function _lMsgLSExportAllMsgs(account)
 
 async function _lMsgLSImportAllMsgs(account, data)
 {
-    let userList = getAllUsers().concat(getAllGroups());
+    let userList = getAllUsers().concat(getAllGroupChannelIds(account));
     let msgList = data["messages"];
     let unreadList = data["unread"];
     let msgIdList = data["msgIds"];
