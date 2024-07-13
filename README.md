@@ -4,7 +4,7 @@ This is the 2nd version of [goofy chat app](https://github.com/marceldobehere/go
 
 It is essentially a secure end-to-end encrypted chat app that allows users to chat with each other in real-time.
 
-NOTE: It is very very very WIP right now.
+NOTE: It is still WIP right now, but its mostly in a usable state!
 
 
 ![Screenshot](./imgs/img.png)
