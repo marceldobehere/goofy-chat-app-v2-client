@@ -263,11 +263,13 @@ async function createChatList(serverId, channelId, scrollDown) {
     docChatHeaderDeleteBtn.style.display = "none";
     await updateChatInfo(serverId, channelId);
 
+    let chatNameElement = document.getElementById("main-chat-content-header-toggle-chat-name");
     let inputElement = document.getElementById('main-chat-content-input');
     if (serverId == NoId || channelId == NoId)
     {
         docChatList.textContent = "[No chat open]";
         inputElement.style.display = "none";
+        chatNameElement.textContent = "";
         return;
     }
     inputElement.style.display = "";
@@ -275,6 +277,7 @@ async function createChatList(serverId, channelId, scrollDown) {
     if (serverId == DMsId)
     {
         docChatHeaderDeleteBtn.style.display = "";
+        chatNameElement.textContent = `${userGetInfoDisplayUsername(currentUser['mainAccount'], channelId)}`;
 
         let messages = await userGetMessages(channelId);
         if (messages == null)
@@ -290,6 +293,20 @@ async function createChatList(serverId, channelId, scrollDown) {
     }
     else
     {
+        {
+            if (!hasGroupChatInfo(currentUser["mainAccount"], serverId))
+            {
+                logError("Group not found");
+                return;
+            }
+            let info = getGroupChatInfo(currentUser['mainAccount'], serverId);
+
+            let channel = info["channels"].find(x => x["id"] == channelId);
+
+            // Server name and channel name
+            chatNameElement.textContent = `${info["groupName"]} - ${channel["name"]}`;
+        }
+
         let messages = await userGetGroupMessages(serverId, channelId);
         if (messages == null)
             return;
