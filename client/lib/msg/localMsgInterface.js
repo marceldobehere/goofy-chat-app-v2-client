@@ -1,11 +1,11 @@
 const localMsgIntUseDexie = true;
 
-async function initLocalMsgInterface()
+async function initLocalMsgInterface(account)
 {
     if (localMsgIntUseDexie)
-        await initLocalMsgDexieInterface();
+        await initLocalMsgDexieInterface(account);
     else
-        await initLocalMsgLocalStorageInterface();
+        await initLocalMsgLocalStorageInterface(account);
 }
 
 
@@ -117,5 +117,23 @@ async function internalResetAll()
         _lMsgDxResetAll,
         _lMsgLSResetAll,
         []
+    );
+}
+
+async function internalMsgExportAll(account)
+{
+    return await _intLockMethod(
+        _lMsgDxExportAllMsgs,
+        _lMsgLSExportAllMsgs,
+        [account]
+    );
+}
+
+async function internalMsgImportAll(account, data)
+{
+    return await _intLockMethod(
+        _lMsgDxImportAllMsgs,
+        _lMsgLSImportAllMsgs,
+        [account, data]
     );
 }

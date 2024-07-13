@@ -1,6 +1,14 @@
-async function initLocalMsgLocalStorageInterface()
+async function initLocalMsgLocalStorageInterface(account)
 {
 
+}
+
+async function _lMsgLSGetMsgIds(account, userId, msgId)
+{
+    let messageIds = loadAccountObject(account, `USER_MSG_IDS_${userId}`);
+    if (messageIds == undefined)
+        messageIds = [];
+    return messageIds;
 }
 
 async function _lMsgLSMsgIdInUser(account, userId, msgId)
@@ -120,16 +128,88 @@ async function _lMsgLSRemoveMsgs(account, userId)
 
 async function _lMsgLSResetAll()
 {
-
+    // search through all keys and delete the ones that contain USER_MSGS, USER_UNREAD_MSG_IDS, USER_MSG_IDS
+    let keys = Object.keys(localStorage);
+    for (let key of keys)
+    {
+        if (key.includes("_USER_MSGS_") ||
+            key.includes("_USER_UNREAD_MSG_IDS_") ||
+            key.includes("_USER_MSG_IDS_"))
+            localStorage.removeItem(key);
+    }
 }
 
 async function _lMsgLSExportAllMsgs(account)
 {
-    return [];
+    let userList = getAllUsers().concat(getAllGroups());
+    let msgList = [];
+    let unreadList = [];
+    let msgIdList = [];
+
+    for (let user of userList)
+    {
+        let msgs = await _lMsgLSGetUserMsgs(account, user);
+        for (let msg of msgs)
+        {
+            msg["chatId"] = user;
+            msgList.push(msg);
+        }
+
+        let unread = await _lMsgLSGetUnreadMsgIds(account, user);
+        for (let unreadId of unread)
+        {
+            unreadList.push({chatId:user, messageId:unreadId});
+        }
+
+        let msgIds = await _lMsgLSGetMsgIds(account, user);
+        for (let msgId of msgIds)
+        {
+            msgIdList.push({chatId:user, messageId:msgId});
+        }
+    }
+
+    return {
+        messages: msgList,
+        unread: unreadList,
+        msgIds: msgIdList
+    };
 }
 
 async function _lMsgLSImportAllMsgs(account, data)
 {
-    throw new Error("Not implemented");
+    let userList = getAllUsers().concat(getAllGroups());
+    let msgList = data["messages"];
+    let unreadList = data["unread"];
+    let msgIdList = data["msgIds"];
+
+    for (let user of userList)
+    {
+        let msgs = [];
+        for (let msg of msgList)
+        {
+            if (msg["chatId"] == user)
+            {
+                delete msg["chatId"];
+                msgs.push(msg);
+            }
+        }
+        saveAccountObject(account, `USER_MSGS_${user}`, msgs);
+
+        let unread = [];
+        for (let unreadMsg of unreadList)
+        {
+            if (unreadMsg["chatId"] == user)
+                unread.push(unreadMsg["messageId"]);
+        }
+        saveAccountObject(account, `USER_UNREAD_MSG_IDS_${user}`, unread);
+
+        let msgIds = [];
+        for (let msgId of msgIdList)
+        {
+            if (msgId["chatId"] == user)
+                msgIds.push(msgId["messageId"]);
+        }
+        saveAccountObject(account, `USER_MSG_IDS_${user}`, msgIds);
+    }
 }
 

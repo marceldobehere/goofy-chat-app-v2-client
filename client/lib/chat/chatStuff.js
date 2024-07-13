@@ -16,7 +16,12 @@ function getAllUsers()
 {
     let ids = [];
     for (let id in chatUserObj)
-        ids.push(parseInt(id));
+    {
+        let val = parseInt(id);
+        if (!isNaN(val))
+            ids.push(val);
+    }
+
     return ids;
 }
 

@@ -38,7 +38,7 @@ async function getUserMySymmKey(account, userId)
 
         if (initialMsg)
         {
-            console.log("Initial message");
+            logInfo("Initial message");
             try {
                 let info = getOwnAccountChatInfo(account);
                 info = tryConformUserChatInfo(info);

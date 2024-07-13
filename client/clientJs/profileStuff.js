@@ -1,6 +1,11 @@
-function exportProfile()
+async function exportProfile()
 {
-    let data = JSON.stringify(localStorage);
+    let exportObj = {
+        localStorage: localStorage,
+        msgData: await internalMsgExportAll(currentUser['mainAccount'])
+    }
+
+    let data = JSON.stringify(exportObj);
 
     downloadTextFile(data, "profile.json");
 }
@@ -38,12 +43,19 @@ async function importProfile()
         return alert("Aborted");
 
     localStorage.clear();
-    for (let key in data)
-        localStorage.setItem(key, data[key]);
+    let ls = data["localStorage"];
+    for (let key in ls)
+        localStorage.setItem(key, ls[key]);
+
+    let currUser = loadObject("currentUser");
+
+    let msgData = data["msgData"];
+    await internalResetAll();
+    await internalMsgImportAll(currUser['mainAccount'], msgData);
 
     await initClientLib();
 
-    await currUserFullImport(loadObject("currentUser"), !loadBackup);
+    await currUserFullImport(currUser, !loadBackup);
 
     location.reload();
 }
