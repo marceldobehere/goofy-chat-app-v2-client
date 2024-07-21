@@ -496,6 +496,21 @@ async function serverClicked(element, serverId) {
     if (docLastServerEntry)
         docLastServerEntry.classList.remove("sidebar-entry-active");
     element.classList.add("sidebar-entry-active");
+
+
+    if (settingsObj["chat"]["auto-show-chat"])
+    {
+        if (serverId == docLastServerId)
+        {
+            if (getChannelInfoVis())
+                setChannelInfoVisibility(false);
+            else
+                setChannelInfoVisibility(true);
+        }
+        else
+            setChannelInfoVisibility(true);
+    }
+
     docLastServerEntry = element;
     docLastServerId = serverId;
 
@@ -503,9 +518,6 @@ async function serverClicked(element, serverId) {
         await createChannelList(serverId, docChatLastChannelId);
     else
         await createChannelList(serverId);
-
-    if (settingsObj["chat"]["auto-show-chat"])
-        setChannelInfoVisibility(true);
 }
 
 async function channelClicked(element, channelId, serverId) {
@@ -566,6 +578,11 @@ function toggleChannelInfoVis()
     let visible = getComputedStyle(rootElement).getPropertyValue("--main-chat-show-selector");
     console.log(visible)
     setChannelInfoVisibility(visible == 0);
+}
+function getChannelInfoVis()
+{
+    let visible = getComputedStyle(rootElement).getPropertyValue("--main-chat-show-selector");
+    return visible == 1;
 }
 
 function mainChatInputKey(event)
