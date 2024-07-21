@@ -383,6 +383,7 @@ body {
     display: inline;
     max-width: 100%;
     overflow: hidden;
+    overflow-x: auto;
     text-wrap: normal;
     word-break: break-word;
     hyphens: auto;
