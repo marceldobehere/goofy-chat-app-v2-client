@@ -268,9 +268,14 @@ function createChatEntry(username, time, message)
     //message = message.replaceAll("\n", "\n\n");
     //message = message.replaceAll("\n\n>", "\n>");
 
-    const dirty = marked.parse(message);
-    const clean = DOMPurify.sanitize(dirty, { ADD_ATTR: ['target'] });
-    p.innerHTML = clean;
+    try {
+        const dirty = marked.parse(message);
+        const clean = DOMPurify.sanitize(dirty, { ADD_ATTR: ['target'] });
+        p.innerHTML = clean;
+    } catch (e) {
+        logError("Error rendering content:", e);
+        p.textContent = `ERROR RENDERING MESSAGE: ${JSON.stringify(e)}`;
+    }
 
     div.appendChild(span1);
     div.appendChild(document.createTextNode(" - "));

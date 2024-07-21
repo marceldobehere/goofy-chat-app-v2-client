@@ -33,6 +33,14 @@ const renderer = {
     codespan(token) {
         let text = token.text;
         return `<code class="code code-span">${text}</code>`;
+    },
+
+    html(token) {
+        let text = token.text;
+        text = text.replaceAll("<", "&lt;");
+        text = text.replaceAll(">", "&gt;");
+        text = text.replaceAll("\n", "<br>");
+        return text;
     }
 };
 
