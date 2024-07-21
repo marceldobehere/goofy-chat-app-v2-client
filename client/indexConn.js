@@ -229,7 +229,8 @@ function getReplyStr(message)
     let newLines = [];
     for (let line of lines)
         newLines.push(`> ${line}`);
-    return newLines.join("\n");
+    let tempUserStr = "";//`\n\n@${('USER')}`;
+    return newLines.join("\n")+`${tempUserStr}\n`;
 }
 
 const docChatList = document.getElementById("main-chat-content-list");
@@ -263,8 +264,14 @@ function createChatEntry(username, time, message)
     let br = document.createElement("br");
     let p = document.createElement("p");
     p.className = "chat-entry-message";
-    p.textContent = message;
-    p.innerHTML = p.innerHTML.replaceAll("\n", "<br>");
+
+    //message = message.replaceAll("\n", "\n\n");
+    //message = message.replaceAll("\n\n>", "\n>");
+
+    const dirty = marked.parse(message);
+    const clean = DOMPurify.sanitize(dirty, { ADD_ATTR: ['target'] });
+    p.innerHTML = clean;
+
     div.appendChild(span1);
     div.appendChild(document.createTextNode(" - "));
     div.appendChild(span2);

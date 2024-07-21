@@ -20,6 +20,7 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Private Chats
 * Cross Device Sync
 * Fully Open Source
+* Markdown Support (With Syntax Highlighting)
 
 
 ### Partially implemented Features
@@ -212,3 +213,6 @@ Currently the STUN servers are hardcoded and set to the Google STUN servers.
 * [Socket.io](https://github.com/socketio/socket.io)
 * [Dexie.js](https://github.com/dexie/Dexie.js)
 * [Dexie Easy Encrypt](https://github.com/jaetask/dexie-easy-encrypt/)
+* [Marked](https://github.com/markedjs/marked)
+* [DOMPurify](https://github.com/cure53/DOMPurify)
+* [Highlight.js](github.com/highlightjs/highlight.js)
