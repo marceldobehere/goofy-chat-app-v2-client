@@ -130,7 +130,8 @@ async function login(socket, account)
 
     if (replyUserId != account["userId"])
     {
-        logError("Error: Server sent invalid user id");
+        logError("Error: Server sent invalid user id: ", replyUserId);
+        alert("The Server sent an invalid user id, this could be due to an error or due to the server using a new hash function");
         return false;
     }
 

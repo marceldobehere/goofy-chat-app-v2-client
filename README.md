@@ -109,7 +109,7 @@ For the general encryption I am using AES and RSA.
 For a conversation between two users there are two symmetric keys for both directions.
 This removes the need to decide on a single key from both sides.
 
-The userids are currently hashed using a simple non-cryptographic hash function. 
+The userids are currently hashed using a pbkdf2, where we extract the first word from the result.
 The result is an integer. This current way will most likely change in the future. 
 It is still unknown whether the userid will remain numeric or if it will be alphanumeric.
 

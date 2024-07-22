@@ -1,16 +1,20 @@
-function hashString(str) {
-    let hash = 0, i, chr;
-    if (str === 0) return hash;
-    for (i = 0; i < str.length; i++) {
-        chr = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
-        hash |= 0; // Convert to 32bit integer
-    }
+let hashStringMap = new Map();
 
-    const adder = (1<<30)*4;
+function hashString(str)
+{
+    let res = hashStringMap.get(str);
+    if (res)
+        return res;
+
+    let hash = CryptoJS.PBKDF2(str, "GoofyHash123", {keySize: 16,iterations: 50000})["words"][0];
+
     if (hash < 0)
-        hash += adder;
+        hash *= -1;
 
+    if (hashStringMap.size > 1_000)
+        hashStringMap.clear();
+
+    hashStringMap.set(str, hash);
     return hash;
 }
 

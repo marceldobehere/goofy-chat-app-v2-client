@@ -32,6 +32,7 @@ async function accSendRawMessageSock(accountFrom, socketTo, userIdTo, data, only
         let socketIndex = serverSocketList.indexOf(socketTo);
         let addr = serverList[socketIndex];
         logWarn(`Error sending message to \"${addr}\": ${reply["error"]}`);
+        //alert(`Error sending message to \"${addr}\": ${reply["error"]}`);
         return false;
     }
     return true;

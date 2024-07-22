@@ -5,7 +5,16 @@ async function initUserMsgSystem()
 
 function privateSymmKey(account)
 {
-    return hashString(account["private-key"])+"";
+    let userId = account["userId"];
+    let pubKey = userPubKeyDict[userId];
+    if (pubKey === undefined)
+    {
+        pubKey = hashString(account["private-key"])+"";
+        userPubKeyDict[userId] = pubKey;
+        saveObject("userPubKeyDict", userPubKeyDict);
+    }
+
+    return userPubKeyDict[userId];
 }
 
 
