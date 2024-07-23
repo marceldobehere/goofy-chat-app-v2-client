@@ -1,11 +1,11 @@
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
-		module.exports = exports = factory(require("./core.js"), require("./enc-base64.js"), require("./md5.js"), require("./evpkdf.js"), require("./cipher-core.js"));
+		module.exports = exports = factory(require("./core"), require("./enc-base64"), require("./md5"), require("./evpkdf"), require("./cipher-core"));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
-		define(["./core.js", "./enc-base64", "./md5", "./evpkdf", "./cipher-core"], factory);
+		define(["./core", "./enc-base64", "./md5", "./evpkdf", "./cipher-core"], factory);
 	}
 	else {
 		// Global (browser)

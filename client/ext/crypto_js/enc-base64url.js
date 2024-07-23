@@ -1,11 +1,11 @@
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
-		module.exports = exports = factory(require("./core.js"));
+		module.exports = exports = factory(require("./core"));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
-		define(["./core.js"], factory);
+		define(["./core"], factory);
 	}
 	else {
 		// Global (browser)
@@ -39,7 +39,10 @@
 	         *
 	         *     var base64String = CryptoJS.enc.Base64url.stringify(wordArray);
 	         */
-	        stringify: function (wordArray, urlSafe=true) {
+	        stringify: function (wordArray, urlSafe) {
+	            if (urlSafe === undefined) {
+	                urlSafe = true
+	            }
 	            // Shortcuts
 	            var words = wordArray.words;
 	            var sigBytes = wordArray.sigBytes;
@@ -88,7 +91,11 @@
 	         *
 	         *     var wordArray = CryptoJS.enc.Base64url.parse(base64String);
 	         */
-	        parse: function (base64Str, urlSafe=true) {
+	        parse: function (base64Str, urlSafe) {
+	            if (urlSafe === undefined) {
+	                urlSafe = true
+	            }
+
 	            // Shortcuts
 	            var base64StrLength = base64Str.length;
 	            var map = urlSafe ? this._safe_map : this._map;
@@ -134,6 +141,7 @@
 	        return WordArray.create(words, nBytes);
 	    }
 	}());
+
 
 	return CryptoJS.enc.Base64url;
 

@@ -1,11 +1,11 @@
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
-		module.exports = exports = factory(require("./core.js"), require("./x64-core.js"));
+		module.exports = exports = factory(require("./core"), require("./x64-core"));
 	}
 	else if (typeof define === "function" && define.amd) {
 		// AMD
-		define(["./core.js", "./x64-core"], factory);
+		define(["./core", "./x64-core"], factory);
 	}
 	else {
 		// Global (browser)
