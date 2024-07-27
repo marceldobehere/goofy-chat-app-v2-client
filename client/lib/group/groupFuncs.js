@@ -166,20 +166,22 @@ async function addChannelToGroup(user, groupId, channelName)
     if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
-        return;
+        return "Group not found";
     }
     let info = getGroupChatInfo(account, groupId);
 
     if (!info["admins"].includes(account["userId"]))
     {
         logError("User not admin");
-        return;
+        return "You are not an admin";
     }
 
     let channels = info["channels"];
     let id = getRandomIntInclusive(0, 99999999999);
     channels.push({id: id, name: channelName});
     setGroupChatInfo(account, groupId, info);
+
+    await tryExtAsyncFn(extGroupInfoUpdate, groupId, info);
 
     await sendNewGroupChatInfoToAll(user, groupId);
 }
@@ -191,14 +193,14 @@ async function removeChannelFromGroup(user, groupId, channelId)
     if (!hasGroupChatInfo(account, groupId))
     {
         logError("Group not found");
-        return;
+        return "Group not found";
     }
     let info = getGroupChatInfo(account, groupId);
 
     if (!info["admins"].includes(account["userId"]))
     {
         logError("User not admin");
-        return;
+        return "You are not an admin";
     }
 
     let channels = info["channels"];
@@ -206,11 +208,13 @@ async function removeChannelFromGroup(user, groupId, channelId)
     if (index === -1)
     {
         logError("Channel not found");
-        return;
+        return "Invalid Channel id";
     }
 
     channels.splice(index, 1);
     setGroupChatInfo(account, groupId, info);
+
+    await tryExtAsyncFn(extGroupInfoUpdate, groupId, info);
 
     await sendNewGroupChatInfoToAll(user, groupId);
 }

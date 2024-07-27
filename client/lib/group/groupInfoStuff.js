@@ -81,6 +81,8 @@ async function sendNewGroupChatInfoToAll(user, groupId)
     let redirects = user["redirectAccounts"];
     for (let redirect of redirects)
         await sendNewGroupChatInfoToOne(account, groupId, redirect);
+
+    return true;
 }
 
 async function sendNewGroupChatInfoToOne(account, groupId, userId)

@@ -146,7 +146,7 @@ async function handleGroupLeave(account, msgObj)
 
     setGroupChatInfo(account, groupId, info);
 
-    await tryExtAsyncFn(extGroupInfoUpdate, groupId, groupName);
+    await tryExtAsyncFn(extGroupInfoUpdate, groupId, info);
 
 }
 

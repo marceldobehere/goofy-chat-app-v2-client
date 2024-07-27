@@ -762,9 +762,24 @@ async function groupLeftUI(groupId, groupName)
     alert(`You left group ${groupName}`);
 }
 
-async function groupUpdateUI(groupInfo)
+async function groupUpdateUI(groupId, groupInfo)
 {
+    await createServerList(docLastServerId);
+    logInfo(`Group Update: ${groupId} -> `, groupInfo)
 
+    if (docLastServerId == groupId)
+        await createChannelList(docLastServerId, docLastChannelId, true);
+
+    if (docChatLastServerId == groupId)
+    {
+        let channels = groupInfo["channels"];
+        if (channels.findIndex(x => x["id"] === docChatLastChannelId) == -1)
+        {
+            docChatLastServerId = NoId;
+            docChatLastChannelId = NoId;
+            await createChatList(docChatLastServerId, docChatLastChannelId, true);
+        }
+    }
 }
 
 
@@ -878,12 +893,12 @@ async function settingsUiClicked()
     }
     else
     {
-        let choice = prompt("1 Add User\n2 Kick User\n3 Leave Group");
+        let choice = prompt("1 Add User\n2 Kick User\n3 Leave Group\n4 Add Channel\n5 Remove Channel");
         if (choice == null)
             return;
 
         choice = parseInt(choice);
-        if (!(choice >= 1 && choice <= 3))
+        if (!(choice >= 1 && choice <= 5))
             return;
 
         if (choice == 1)
@@ -949,6 +964,29 @@ async function settingsUiClicked()
             {
                 alert(e);
             }
+        }
+        else if (choice == 4)
+        {
+            let channelName = prompt("Enter new channel name:");
+            if (channelName == "" || channelName == undefined)
+                return;
+
+            let res = await addChannelToGroup(currentUser, docLastServerId, channelName);
+            if (res !== true && res !== undefined)
+                alert(res);
+        }
+        else if (choice == 5)
+        {
+            let channelId = prompt("Enter channel id to delete:");
+            if (channelId == null)
+                return;
+            channelId = parseInt(channelId);
+            if (isNaN(channelId))
+                return alert("Invalid channel id");
+
+            let res = await removeChannelFromGroup(currentUser, docLastServerId, channelId);
+            if (res !== true && res !== undefined)
+                alert(res);
         }
     }
 }
