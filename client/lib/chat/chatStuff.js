@@ -1,19 +1,24 @@
 let chatUserObj;
+let chatUserSortedObj;
 let chatGroupObj;
 
 function initChatStuff()
 {
-    chatUserObj = loadObjectOrCreateDefault("chatUserList", {});
-    saveObject("chatUserList", chatUserObj);
+    const account = currentUser['mainAccount'];
+
+    chatUserObj = loadAccountObjectOrCreateDefault(account, "chatUserList", {});
     logTxt("User List:", chatUserObj);
 
-    chatGroupObj = loadObjectOrCreateDefault("chatGroupList", {});
-    saveObject("chatGroupList", chatGroupObj);
+    chatUserSortedObj = loadAccountObjectOrCreateDefault(account, "chatUserSortedList", []);
+    logTxt("User Sorted List:", chatUserSortedObj);
+
+    chatGroupObj = loadAccountObjectOrCreateDefault(account, "chatGroupList", {});
     logTxt("Group List:", chatGroupObj);
 }
 
 function getAllUsers()
 {
+    const account = currentUser['mainAccount'];
     let ids = [];
     for (let id in chatUserObj)
     {
@@ -21,7 +26,13 @@ function getAllUsers()
         if (!isNaN(val))
             ids.push(val);
     }
+    for (let id of ids)
+        userSortedAddEndIfNotExist(account, id);
+    for (let id of chatUserSortedObj)
+        if (ids.indexOf(id) == -1)
+            userSortedRemove(account, id);
 
+    ids = chatUserSortedObj.slice();
     return ids;
 }
 
@@ -61,7 +72,7 @@ function addUserIdIfNotExists(userId)
         return;
 
     chatUserObj[userId] = {};
-    saveObject("chatUserList", chatUserObj);
+    saveAccountObject(currentUser['mainAccount'], "chatUserList", chatUserObj);
 }
 
 function addGroupIdIfNotExists(groupId)
@@ -70,7 +81,7 @@ function addGroupIdIfNotExists(groupId)
         return;
 
     chatGroupObj[groupId] = {};
-    saveObject("chatGroupList", chatGroupObj);
+    saveAccountObject(currentUser['mainAccount'], "chatGroupList", chatGroupObj);
 }
 
 function removeUserIfExists(userId)
@@ -79,7 +90,7 @@ function removeUserIfExists(userId)
         return;
 
     delete chatUserObj[userId];
-    saveObject("chatUserList", chatUserObj);
+    saveAccountObject(currentUser['mainAccount'], "chatUserList", chatUserObj);
 }
 
 function removeGroupIfExists(groupId)
@@ -88,7 +99,7 @@ function removeGroupIfExists(groupId)
         return;
 
     delete chatGroupObj[groupId];
-    saveObject("chatGroupList", chatGroupObj);
+    saveAccountObject(currentUser['mainAccount'], "chatGroupList", chatGroupObj);
 }
 
 function groupExists(groupId)
@@ -99,4 +110,31 @@ function groupExists(groupId)
 function userExists(userId)
 {
     return chatUserObj[userId] != undefined;
+}
+
+function userSortedContains(userId)
+{
+    return chatUserSortedObj.indexOf(userId) != -1;
+}
+
+function userSortedAdd(account, userId)
+{
+    if (userSortedContains(userId))
+        userSortedRemove(account, userId);
+    chatUserSortedObj.unshift(userId);
+    saveAccountObject(account,"chatUserSortedList", chatUserSortedObj);
+}
+
+function userSortedAddEndIfNotExist(account, userId)
+{
+    if (userSortedContains(userId))
+        return;
+    chatUserSortedObj = chatUserSortedObj.concat(userId);
+    saveAccountObject(account, "chatUserSortedList", chatUserSortedObj);
+}
+
+function userSortedRemove(account, userId)
+{
+    chatUserSortedObj = chatUserSortedObj.filter((id)=>id!=userId);
+    saveAccountObject(account, "chatUserSortedList", chatUserSortedObj);
 }

@@ -342,6 +342,7 @@ async function addSentMessage(account, userIdTo, message, dontActuallyAdd)
     logInfo(`New sent message to user ${userIdTo}:`, message);
     if (!dontActuallyAdd)
     {
+        userSortedAdd(account, userIdTo);
         await internalAddUserMessageSorted(account, userIdTo, message);
         await extMsgNormalMessage(account, userIdTo, message);
     }
@@ -358,6 +359,7 @@ async function addNormalMessageToUser(account, chatUserId, message)
 
     await internalAddUserMessageSorted(account, chatUserId, message);
     await addMessageToUnread(account, chatUserId, message);
+    userSortedAdd(account, chatUserId);
     tryExtFn(extMsgNormalMessage, account, chatUserId, message);
 }
 
