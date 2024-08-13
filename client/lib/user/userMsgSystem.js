@@ -28,7 +28,7 @@ async function getUserMySymmKey(account, userId)
     await lockSymmKey.enable();
     try {
         let symmKey = loadAccountObject(account, `USER_MY_SYMM_KEY_${userId}`);
-        logInfo(`Symm key for ${userId}:`, symmKey);
+        //logInfo(`Symm key for ${userId}:`, symmKey);
         if (symmKey == undefined)
         {
             symmKey = generateSymmKey();

@@ -45,27 +45,38 @@ async function initClientLib()
 {
     await initLocalStorageStuff(
         () => {
+            setStatus("Request Password")
             return prompt("Enter password:");
         },
         () => {
             alert("Invalid password");
         },
         () => {
+            setStatus("Password?")
             return confirm("Do you want to secure your data with a password?");
         });
 
+    setStatus("Init User")
     initUserStuff();
+    setStatus("Init Chat")
     initChatStuff();
+    setStatus("Init Servers")
     initServerListStuff();
+    setStatus("Init Crypto")
     initUserPuKeyInterface();
 
+    setStatus("Init Msgs")
     await initLocalMsgInterface(currentUser["mainAccount"]);
     await initUserMsgSystem();
     await initMsgSystem();
 
+    setStatus("Init Sockets")
     await createSockets(serverList, currentUser);
+
+    setStatus("Check User")
     await checkUserStuff();
 
+    setStatus("Init VC?")
     tryExtFn(extFnVcInit);
 
     //console.log(await accSendRawMessage(currentUser["mainAccount"], currentUser["mainAccount"]["userId"], {text: "yooo"}));

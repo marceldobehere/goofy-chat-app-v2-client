@@ -13,7 +13,7 @@ async function handleFileChunkMsg(account, user, msg)
     let chunkData = msg["data"]["data"];
 
     let buf = Uint8Array.from(atob(chunkData), c => c.charCodeAt(0));
-    console.log(buf);
+    //console.log(buf);
     let decompressed = await decompressBuffer(buf);
     console.log(decompressed);
 
