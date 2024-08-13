@@ -85,7 +85,7 @@
                 <div id="main-chat-content-input">
                     <div id="main-chat-content-input-upload">+</div>
                     <div id="main-chat-content-input-input">
-                        <textarea id="main-chat-content-input-input-textarea" onkeydown="mainChatInputKey(event)" placeholder="Enter message"></textarea>
+                        <textarea id="main-chat-content-input-input-textarea" onpaste="filePastedInTextArea(event)" onkeydown="mainChatInputKey(event)" placeholder="Enter message"></textarea>
                     </div>
                 </div>
             </div>
@@ -114,6 +114,7 @@
 <script src="./lib/other/asyncLock.js" defer></script>
 <script src="./lib/other/localStorageStuff.js" defer></script>
 <script src="./lib/other/conn.js" defer></script>
+<script src="./lib/other/fileHandler.js" defer></script>
 <script src="./lib/socket/socketConvo.js" defer></script>
 <script src="./lib/sec/enc.js" defer></script>
 <script src="./lib/socket/socketStuff.js" defer></script>

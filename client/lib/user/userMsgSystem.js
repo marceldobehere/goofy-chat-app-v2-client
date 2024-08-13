@@ -193,6 +193,14 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
 
         //console.log(info);
     }
+    else if (type == "file-desc")
+    {
+        await handleFileDescMsg(account, chatUserId, message);
+    }
+    else if (type == "file-chunk")
+    {
+        await handleFileChunkMsg(account, chatUserId, message);
+    }
     else if (type == "group-chat-msg")
     {
         await handleGroupMessage(account, message["data"]);

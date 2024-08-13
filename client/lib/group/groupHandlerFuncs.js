@@ -1,4 +1,4 @@
-async function handleGroupMessage(account, msgObj)
+async function handleGroupMessage(account, msgObj, dontAdd)
 {
     logInfo("Group Message: ", msgObj);
     let from = msgObj["from"];
@@ -52,7 +52,8 @@ async function handleGroupMessage(account, msgObj)
         from: from
     };
 
-    await addMessageToUser(account, from, getChannelStrFromGroup(groupId, channelId), sendMsgObj, date);
+    if (!dontAdd)
+        await addMessageToUser(account, from, getChannelStrFromGroup(groupId, channelId), sendMsgObj, date);
 
     logWarn("Group messages not fully implemented yet");
 }

@@ -19,7 +19,7 @@ async function _lMsgDxCreateDb()
         logInfo("Encrypted DB ready");
     }
 
-    await db.version(1).stores({
+    await db.version(2).stores({
         messages: `
         &messageId,
         accountUserId,
@@ -31,7 +31,11 @@ async function _lMsgDxCreateDb()
         msgIds: `
         &messageId,
         accountUserId,
-        userId`
+        userId`,
+        files: `
+        &fileId,
+        accountUserId,
+        userId`,
     });
 
     await db.open();
@@ -138,12 +142,134 @@ async function _lMsgDxResetAll()
     await _lMsgDxCreateDb();
 }
 
+
+
+
+async function _lMsgDxGetFiles(account, userId)
+{
+    let temp = await db.files.where({accountUserId: account["userId"], userId: userId}).toArray();
+
+    // Filter out only files
+    let files = [];
+    for (let i = 0; i < temp.length; i++)
+        files.push(temp[i]);
+
+    return files;
+}
+
+async function _lMsgDxSetFullFile(account, userId, fileId, data)
+{
+    return await db.files.add({accountUserId: account["userId"], userId: userId, fileId: fileId, data: data});
+}
+
+
+async function _lMsgDxGetFile(account, userId, fileId)
+{
+    let res = await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).toArray();
+    if (res.length < 1)
+        return undefined;
+    res = res[0];
+
+    logInfo(`> FILE ${fileId}:`, res);
+
+    // TODO: Get Filename and filedata
+    // Also decide on the format that filedata will be stored in
+    let fileName = "";
+    let fileData = ""; // combine all buffers?
+
+    // verify buffer size if finished?
+
+    // check if file is complete?
+    let finished = false;
+
+    return {
+        filename: fileName,
+        data: fileData,
+        finished: finished
+    };
+}
+
+async function _lMsgDxDeleteFile(account, userId, fileId)
+{
+    return await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).delete();
+}
+
+async function _lMsgDxCreateFile(account, userId, fileId, info)
+{
+    // TODO: Validate info object
+    // Create File Entry Object
+    // With block array
+
+    if (!info)
+        return;
+
+    let filename = "";
+    let fileSize = 123;
+    const chunkSize = 500_000;
+    let chunkCount = Math.ceil(fileSize / chunkSize);
+
+    let infoObj = {
+        filename: filename,
+        fileSize: fileSize,
+        chunkSize: chunkSize,
+        chunkCount: chunkCount
+    };
+
+    let chunks = [];
+    for (let i = 0; i < chunkSize; i++)
+        chunks.push("");
+
+    return await db.files.add({accountUserId: account["userId"], userId: userId, fileId: fileId, info:infoObj, chunks:chunks});
+}
+
+async function _lMsgDxUploadFile(account, userId, fileId, data)
+{
+    // TODO: Implement
+    // Get/Validate Upload Object
+    // Get File Entry
+    // Get Info
+    // Validate Size and Block Index
+    // Add the data
+    // Save Object
+
+    let res = await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).toArray();
+    if (res.length < 1)
+        return;
+    res = res[0];
+
+    let info = res["info"];
+    let chunks = res["chunks"];
+
+    let chunkSize = info["chunkSize"];
+    let chunkData = data["chunkData"];
+    if (chunkData.length > chunkSize) // could add check for == size and == filesize remainder on last index, but not super important
+        return;
+
+    let chunkIndex = data["chunkIndex"];
+    if (chunkIndex >= 0 && chunkIndex < chunks.length)
+        return;
+
+    chunks[chunkIndex] = chunkData;
+
+    return await db.files.update({accountUserId: account["userId"], userId: userId, fileId: fileId}, {chunks: chunks});
+}
+
+
+
+
+
+
+
+
+
+
 async function _lMsgDxExportAllMsgs(account)
 {
     let userList = getAllUsers().concat(getAllGroupChannelIds(account));
     let msgList = [];
     let unreadList = [];
     let msgIdList = [];
+    let fileList = [];
 
     for (let user of userList)
     {
@@ -156,22 +282,23 @@ async function _lMsgDxExportAllMsgs(account)
 
         let unread = await _lMsgDxGetUnreadMsgIds(account, user);
         for (let unreadId of unread)
-        {
             unreadList.push({chatId:user, messageId:unreadId});
-        }
 
         let msgIds = await _lMsgDxGetMsgIds(account, user);
         for (let msgId of msgIds)
-        {
             msgIdList.push({chatId:user, messageId:msgId});
-        }
+
+        let files = await _lMsgDxGetFiles(account, user);
+        for (let file of files)
+            fileList.push({chatId:user, fileData:file});
     }
 
 
     return {
         messages: msgList,
         unread: unreadList,
-        msgIds: msgIdList
+        msgIds: msgIdList,
+        files: fileList
     };
 }
 
@@ -181,6 +308,7 @@ async function _lMsgDxImportAllMsgs(account, data)
     let msgList = data["messages"];
     let unreadList = data["unread"];
     let msgIdList = data["msgIds"];
+    let fileList = data["files"];
 
     for (let msg of msgList)
         await _lMsgDxAddMsg(account, msg["chatId"], msg);
@@ -190,6 +318,9 @@ async function _lMsgDxImportAllMsgs(account, data)
 
     for (let msgId of msgIdList)
         await _lMsgDxAddMsgIdToUser(account, msgId["chatId"], msgId["messageId"]);
+
+    for (let file of fileList)
+        await _lMsgDxSetFullFile(account, file["chatId"], file["fileData"]["fileId"], file["fileData"]);
 }
 
 

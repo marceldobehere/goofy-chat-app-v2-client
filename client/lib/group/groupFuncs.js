@@ -80,6 +80,21 @@ async function userSendGroupMessage(groupId, channelId, data, type)
     await handleGroupMessage(currentUser["mainAccount"], msg["data"]);
 }
 
+
+async function userSendGroupMessageSpecial(groupId, channelId, data, type, dontAdd)
+{
+    addGroupIdIfNotExists(groupId);
+    logWarn("Group messages are not implemented yet.");
+
+    let msg = createGroupChatMessage(groupId, channelId, data, type);
+    logInfo("SEND GROUP MSG", msg);
+
+    await sendGroupChatMessageToAll(currentUser, groupId, msg, dontAdd);
+
+    await handleGroupMessage(currentUser["mainAccount"], msg["data"]);
+}
+
+
 async function userDeleteGroupMessages(groupId, channelId)
 {
     await internalRemoveUserMessages(currentUser["mainAccount"], getChannelStrFromGroup(groupId, channelId));

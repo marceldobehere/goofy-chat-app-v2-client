@@ -4,6 +4,12 @@ async function userSendDirectMessage(userId, data, type)
     return sendSecureMessageToUser(currentUser["mainAccount"], userId, data, type, false);
 }
 
+async function userSendDirectMessageSpecial(userId, data, type, dontAdd)
+{
+    addUserIdIfNotExists(userId);
+    return sendSecureMessageToUser(currentUser["mainAccount"], userId, data, type, false, dontAdd);
+}
+
 async function userGetDirectMessageInfo(userId)
 {
     return await getUserChatInfo(currentUser["mainAccount"], userId);
