@@ -145,6 +145,7 @@ async function _lMsgLSExportAllMsgs(account)
     let msgList = [];
     let unreadList = [];
     let msgIdList = [];
+    let fileList = [];
 
     for (let user of userList)
     {
@@ -171,7 +172,8 @@ async function _lMsgLSExportAllMsgs(account)
     return {
         messages: msgList,
         unread: unreadList,
-        msgIds: msgIdList
+        msgIds: msgIdList,
+        files: fileList
     };
 }
 
@@ -181,6 +183,7 @@ async function _lMsgLSImportAllMsgs(account, data)
     let msgList = data["messages"];
     let unreadList = data["unread"];
     let msgIdList = data["msgIds"];
+    let fileList = data["files"];
 
     for (let user of userList)
     {
