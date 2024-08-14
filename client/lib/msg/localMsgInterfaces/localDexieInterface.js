@@ -152,14 +152,38 @@ async function _lMsgDxGetFiles(account, userId)
     // Filter out only files
     let files = [];
     for (let i = 0; i < temp.length; i++)
-        files.push(temp[i]);
+    {
+        let tempFile = temp[i];
+        let chunks = tempFile["chunks"];
+
+        let newChunks = [];
+        for (let chunkData of chunks)
+        {
+            let compressed = await compressBuffer(chunkData);
+            let chunkStr = _arrayBufferToBase64(compressed);
+            newChunks.push(chunkStr);
+        }
+
+        tempFile["chunks"] = newChunks;
+        files.push(tempFile);
+    }
 
     return files;
 }
 
 async function _lMsgDxSetFullFile(account, userId, fileId, data)
 {
-    return await db.files.add({accountUserId: account["userId"], userId: userId, fileId: fileId, data: data});
+    let chunks = data["chunks"];
+    let newChunks = [];
+    for (let chunkStr of chunks)
+    {
+        let compressed = Uint8Array.from(atob(chunkStr), c => c.charCodeAt(0));
+        let chunkData = await decompressBuffer(compressed);
+        newChunks.push(chunkData);
+    }
+    data["chunks"] = newChunks;
+
+    return await db.files.add({accountUserId: account["userId"], userId: userId, fileId: fileId, ...data});
 }
 
 
