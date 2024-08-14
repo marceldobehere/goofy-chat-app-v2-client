@@ -419,6 +419,11 @@ body {
     max-width: 100%;
 }
 
+.chat-entry video {
+    max-height: 15rem;
+    max-width: 100%;
+}
+
 .chat-entry img:hover {
     cursor: pointer;
 }

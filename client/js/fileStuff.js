@@ -23,7 +23,7 @@ async function trySendFile(file)
     if (file.size == 0)
         return;
 
-    const chunkSize = 100 * 1024;
+    const chunkSize = 150 * 1024;
 
     console.log(`> File \"${file.name}\" (${file.size} bytes)`);
     // let imgData = await toBase64(file);
@@ -39,8 +39,9 @@ async function trySendFile(file)
     let chunkIndex = 0;
     let chunkCount = Math.ceil(file.size / chunkSize);
 
+
     // Upload chunks
-    let lastReply = undefined;
+    // let promiseArr = [];
     while (chunkIndex < chunkCount)
     {
         console.log(`  > Uploading... ${Math.round((10000*chunkIndex) / chunkCount) / 100}%`);
@@ -67,32 +68,23 @@ async function trySendFile(file)
 
         let sendMsg = {file:fileObj, chunkIndex: chunkIndex, data: chunkStr};
 
-        await doMsgSendThingy("file-msg", sendMsg, true);
 
-        await handleFilePartMsg(currentUser['mainAccount'], getCurrentChatUserId(), {data:sendMsg});
+        let p1 = doMsgSendThingy("file-msg", sendMsg, true);
+        //promiseArr.push(p1);
+        await p1;
 
-        // let reply = await msgSendAndGetReply("do-upload", {"id": id, "chunkIndex": chunkIndex, "data": chunkData});
-        // if (reply["error"] != undefined) {
-        //     lockUpload.disable();
-        //     return {error: reply["error"]};
-        // }
-        //console.log("> Chunk upload reply: ", reply);
-        //lastReply = reply;
+        let p2 =  handleFilePartMsg(currentUser['mainAccount'], getCurrentChatUserId(), {data:sendMsg});
+        //promiseArr.push(p2);
+        await p2;
+
+        //await new Promise(r => setTimeout(r, 100));
 
         chunkIndex++;
     }
-
-    // if (lastReply == undefined) {
-    //     lockUpload.disable();
-    //     return {error: "No reply from server"};
-    // }
-
-    //console.log("> Last reply: ", lastReply);
+    // await Promise.all(promiseArr);
 
     await doMsgSendThingy("text", `![${file.name}](${filePathStart + fileId})`);
-
     console.log(" > Done.")
-
 }
 
 

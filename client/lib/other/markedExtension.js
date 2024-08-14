@@ -29,6 +29,15 @@ const doesImageExist = (url) =>
         img.onerror = () => resolve(false);
     });
 
+const doesVideoExist = (url) =>
+    new Promise((resolve) => {
+        const video = document.createElement("video");
+
+        video.src = url;
+        video.onloadedmetadata = () => resolve(true);
+        video.onerror = () => resolve(false);
+    });
+
 // Override function
 const renderer = {
     image(token) {
@@ -65,6 +74,15 @@ const renderer = {
                         let newTab = window.open(newUrl, "_blank");
                         newTab.focus();
                     };
+                }
+                else if (await doesVideoExist(url))
+                {
+                    let videoNode = document.createElement("video");
+                    videoNode.src = url;
+                    videoNode.alt = filename;
+                    videoNode.className = "chat-video";
+                    videoNode.controls = true;
+                    element.replaceWith(videoNode);
                 }
                 // TODO: Maybe add back in again later will all kinds of text extensions?
                 // else if (filename.endsWith(".txt"))
