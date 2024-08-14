@@ -10,6 +10,7 @@ async function sockReqMessages(socket)
 
 async function accSendRawMessage(account, userIdTo, data, onlyTrySend)
 {
+    setStatus("Send Msg");
     let promises = [];
     for (let socket of serverSocketList)
         promises.push(accSendRawMessageSock(account, socket, userIdTo, data, onlyTrySend));
@@ -20,6 +21,7 @@ async function accSendRawMessage(account, userIdTo, data, onlyTrySend)
         if (await promise)
             work = true;
 
+    setStatus("Ready")
     return work;
 }
 
@@ -43,6 +45,7 @@ async function accSendRawMessageSock(accountFrom, socketTo, userIdTo, data, only
 async function _handleMessageSock(socketFrom, data)
 {
     await lockIncoming.enable();
+    setStatus("Rec Msg");
 
     try {
         if (data === undefined)
@@ -66,6 +69,7 @@ async function _handleMessageSock(socketFrom, data)
         if (userIdFrom === undefined || userIdTo === undefined || date === undefined || msg === undefined)
         {
             lockIncoming.disable();
+            setStatus("Ready");
             return logWarn(`Invalid message from ${socketFrom}:`, data);
         }
 
@@ -76,6 +80,7 @@ async function _handleMessageSock(socketFrom, data)
     }
 
     lockIncoming.disable();
+    setStatus("Ready");
 }
 
 async function sendUserNewSymmKey(accountFrom, userIdTo, symmKey)

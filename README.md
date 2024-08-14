@@ -23,14 +23,13 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Markdown Support (With Syntax Highlighting)
 
 
-### Partially implemented Features
+### Partially implemented / In Progress Features
 * Private/Group Voice/Video calls (using WebRTC)
 * Group Chats
-
-
-### Planned Features
 * Image/Video/File Sharing
 * Embedded Images
+
+### Planned Features
 * Friend System / DMs (?)
  * People sending friend/message requests before being able to chat with you
  * Blocking people
@@ -216,6 +215,10 @@ Essentially the server acts as a signaling server for the two users to establish
 The clients will exchange their ICE candidates and SDP offers/answers through the server using special message types.
 
 Currently the STUN servers are hardcoded and set to the Google STUN servers.
+
+(Implementation details yet to follow)
+
+#### File/Image sending
 
 (Implementation details yet to follow)
 
