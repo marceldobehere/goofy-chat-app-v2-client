@@ -12,6 +12,14 @@ function mainChatInputKey(event)
     }
 }
 
+function getCurrentChatUserId()
+{
+    if (docChatLastServerId == DMsId)
+        return docChatLastChannelId;
+    else
+        return docChatLastServerId;
+}
+
 async function doMsgSendThingy(type, data, dontAdd)
 {
     console.log(`Sending message: ${JSON.stringify(data)} (Type: ${type})`);

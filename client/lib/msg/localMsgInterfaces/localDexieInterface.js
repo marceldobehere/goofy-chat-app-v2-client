@@ -163,6 +163,18 @@ async function _lMsgDxSetFullFile(account, userId, fileId, data)
 }
 
 
+function mergeUint8Arrays(...arrays) {
+    const totalSize = arrays.reduce((acc, e) => acc + e.length, 0);
+    const merged = new Uint8Array(totalSize);
+
+    arrays.forEach((array, i, arrays) => {
+        const offset = arrays.slice(0, i).reduce((acc, e) => acc + e.length, 0);
+        merged.set(array, offset);
+    });
+
+    return merged;
+}
+
 async function _lMsgDxGetFile(account, userId, fileId)
 {
     let res = await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).toArray();
@@ -174,16 +186,18 @@ async function _lMsgDxGetFile(account, userId, fileId)
 
     // TODO: Get Filename and filedata
     // Also decide on the format that filedata will be stored in
-    let fileName = "";
-    let fileData = ""; // combine all buffers?
+    let info = res["info"];
+    let fileName = info["filename"];
+    let fileSize = info["fileSize"];
+    let chunkSize = info["chunkSize"];
 
-    // verify buffer size if finished?
-
-    // check if file is complete?
-    let finished = false;
+    let fileData = mergeUint8Arrays(...res["chunks"]);
+    let finished = fileData.length >= fileSize;
 
     return {
         filename: fileName,
+        fileSize: fileSize,
+        chunkSize: chunkSize,
         data: fileData,
         finished: finished
     };
@@ -203,9 +217,9 @@ async function _lMsgDxCreateFile(account, userId, fileId, info)
     if (!info)
         return;
 
-    let filename = "";
-    let fileSize = 123;
-    const chunkSize = 500_000;
+    let filename = info["filename"];
+    let fileSize = info["fileSize"];
+    const chunkSize = info["chunkSize"];
     let chunkCount = Math.ceil(fileSize / chunkSize);
 
     let infoObj = {
@@ -216,8 +230,8 @@ async function _lMsgDxCreateFile(account, userId, fileId, info)
     };
 
     let chunks = [];
-    for (let i = 0; i < chunkSize; i++)
-        chunks.push("");
+    for (let i = 0; i < chunkCount; i++)
+        chunks.push(new Uint8Array(0));
 
     return await db.files.add({accountUserId: account["userId"], userId: userId, fileId: fileId, info:infoObj, chunks:chunks});
 }
@@ -236,6 +250,7 @@ async function _lMsgDxUploadFile(account, userId, fileId, data)
     if (res.length < 1)
         return;
     res = res[0];
+    logInfo(`> UPLOAD FILE ${fileId}:`, res, data);
 
     let info = res["info"];
     let chunks = res["chunks"];
@@ -244,10 +259,13 @@ async function _lMsgDxUploadFile(account, userId, fileId, data)
     let chunkData = data["chunkData"];
     if (chunkData.length > chunkSize) // could add check for == size and == filesize remainder on last index, but not super important
         return;
+    logInfo(`> UPLOADING CHUNK1 ${data["chunkIndex"]}: ${chunkData.length} bytes`);
+
 
     let chunkIndex = data["chunkIndex"];
-    if (chunkIndex >= 0 && chunkIndex < chunks.length)
+    if (chunkIndex < 0 || chunkIndex >= chunks.length)
         return;
+    logInfo(`> UPLOADING CHUNK2 ${data["chunkIndex"]}: ${chunkData.length} bytes`);
 
     chunks[chunkIndex] = chunkData;
 

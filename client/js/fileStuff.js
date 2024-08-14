@@ -30,7 +30,9 @@ async function trySendFile(file)
     // console.log(imgData);
     let fileId = getRandomIntInclusive(100000000, 99999999999);
 
-    let res = await doMsgSendThingy("file-desc", {filename:file.name, filesize:file.size, chunkSize:chunkSize, fileId: fileId}, true);
+    let fileObj = {filename:file.name, filesize:file.size, chunkSize:chunkSize, fileId: fileId};
+
+    //let res = await doMsgSendThingy("file-desc", {filename:file.name, filesize:file.size, chunkSize:chunkSize, fileId: fileId}, true);
 
     // Read the file in chunks and send them
     let reader = new FileReader();
@@ -63,7 +65,11 @@ async function trySendFile(file)
         let chunkStr = _arrayBufferToBase64(compressed);
         console.log(`${chunkData.byteLength} -> ${compressed.byteLength} -> ${chunkStr.length}`);
 
-        res = await doMsgSendThingy("file-chunk", {fileId:fileId, chunkIndex: chunkIndex, data: chunkStr}, true);
+        let sendMsg = {file:fileObj, chunkIndex: chunkIndex, data: chunkStr};
+
+        await doMsgSendThingy("file-msg", sendMsg, true);
+
+        await handleFilePartMsg(currentUser['mainAccount'], getCurrentChatUserId(), {data:sendMsg});
 
         // let reply = await msgSendAndGetReply("do-upload", {"id": id, "chunkIndex": chunkIndex, "data": chunkData});
         // if (reply["error"] != undefined) {
@@ -82,6 +88,8 @@ async function trySendFile(file)
     // }
 
     //console.log("> Last reply: ", lastReply);
+
+    await doMsgSendThingy("text", `![${file.name}](${filePathStart + fileId})`);
 
     console.log(" > Done.")
 

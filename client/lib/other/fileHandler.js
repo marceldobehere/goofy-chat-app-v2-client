@@ -1,24 +1,47 @@
-async function handleFileDescMsg(account, user, msg)
-{
-    logInfo("> File Desc: ", msg["data"]);
-
-    // TODO: parse filedata and save it in db
-}
-
-async function handleFileChunkMsg(account, user, msg)
+async function handleFilePartMsg(account, user, msg)
 {
     logInfo("> File Chunk: ", msg["data"]);
     let chunkIndex = msg["data"]["chunkIndex"];
-    let fileId = msg["data"]["fileId"];
-    let chunkData = msg["data"]["data"];
+    let fileInfo = msg["data"]["file"];
+    let fileId = fileInfo["fileId"];
 
+
+
+    // Check if the file exists in the db, if not, create
+    let fileEntry = await internalGetFile(account, user, fileId);
+    if (fileEntry == undefined)
+    {
+        let filename = fileInfo["filename"];
+        let fileSize = fileInfo["filesize"];
+        let chunkSize = fileInfo["chunkSize"];
+
+        // TODO: Add safety and null checks xd
+
+        fileEntry = {
+            filename: filename,
+            fileSize: fileSize,
+            chunkSize: chunkSize,
+        };
+
+        logInfo("> Creating File Entry: ", fileEntry);
+        await internalCreateFile(account, user, fileId, fileEntry);
+
+        fileEntry = await internalGetFile(account, user, fileId);
+    }
+    logInfo("> File Entry: ", fileEntry);
+
+    let chunkData = msg["data"]["data"];
     let buf = Uint8Array.from(atob(chunkData), c => c.charCodeAt(0));
-    //console.log(buf);
     let decompressed = await decompressBuffer(buf);
     console.log(decompressed);
 
     // TODO: Call db functions to save the chunk
+    let res = await internalUploadFile(account, user, fileId, {chunkIndex: chunkIndex, chunkData: decompressed});
+    console.log("Upload Res: ", res);
+
+    console.log("File WA: ", await internalGetFile(account, user, fileId));
 }
+
 
 async function handleGetFileInfo(account, user, fileId)
 {
