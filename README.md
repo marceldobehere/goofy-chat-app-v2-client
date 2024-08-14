@@ -30,10 +30,26 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 
 ### Planned Features
 * Image/Video/File Sharing
-* Portable Core Client Lib
-* Multiple Accounts
+* Embedded Images
+* Friend System / DMs (?)
+ * People sending friend/message requests before being able to chat with you
+ * Blocking people
+ * Having open/closed "DMs"
+* Notification
+* Improved mobile usability
+* Potentially PWA Features (?)
+* Preferred Server for decentralized communication
+* Dynamic Chat List for improved performance
+* Pings
+* Message Reactions
+* Optional Message Read Acknowledgements
+* Stickers (?)
+* Portable Core Client Lib (May be in progress)
+* Improved Voice Chats / Potential integration into the main app
+* Multiple fully seperated Accounts
 * Customizable UI/Themes
-* Custom Clients
+* Potentially custom Clients
+
 
 ## Goofy Chat 2 vs Goofy Chat 1
 
