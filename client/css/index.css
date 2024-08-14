@@ -414,6 +414,15 @@ body {
     float: right;
 }
 
+.chat-entry img {
+    max-height: 15rem;
+    max-width: 100%;
+}
+
+.chat-entry img:hover {
+    cursor: pointer;
+}
+
 #main-chat-content-header {
     padding: 5px;
 }
