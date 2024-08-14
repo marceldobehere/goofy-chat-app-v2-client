@@ -43,11 +43,10 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Message Reactions
 * Optional Message Read Acknowledgements
 * Stickers (?)
-* Portable Core Client Lib (May be in progress)
+* Portable Core Client Lib in NodeJS/Java (May be in progress)
 * Improved Voice Chats / Potential integration into the main app
 * Multiple fully seperated Accounts
 * Customizable UI/Themes
-* Potentially custom Clients
 
 
 ## Goofy Chat 2 vs Goofy Chat 1
