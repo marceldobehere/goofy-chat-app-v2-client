@@ -38,6 +38,25 @@ const doesVideoExist = (url) =>
         video.onerror = () => resolve(false);
     });
 
+// function isBelowViewport(element) {
+//     let rect = element.getBoundingClientRect();
+//     let html = document.documentElement;
+//     return (
+//         //rect.top >= 0 &&
+//         rect.left >= 0 &&
+//         //rect.bottom <= (window.innerHeight || html.clientHeight) &&
+//         rect.right <= (window.innerWidth || html.clientWidth)
+//     );
+// }
+
+const fixSizeScroll = (element) => {
+    // if (isBelowViewport(element))
+    //     return;
+
+    // make it scroll down by the element height
+    docChatList.scrollTop += element.clientHeight;
+}
+
 // Override function
 const renderer = {
     image(token) {
@@ -64,6 +83,7 @@ const renderer = {
                     imgNode.src = url;
                     imgNode.alt = filename;
                     imgNode.className = "chat-image";
+                    imgNode.onload = () => fixSizeScroll(imgNode);
                     element.replaceWith(imgNode);
 
                     imgNode.onclick = () => {
@@ -82,19 +102,10 @@ const renderer = {
                     videoNode.alt = filename;
                     videoNode.className = "chat-video";
                     videoNode.controls = true;
+                    videoNode.onload = () => fixSizeScroll(videoNode);
                     element.replaceWith(videoNode);
                 }
-                // TODO: Maybe add back in again later will all kinds of text extensions?
-                // else if (filename.endsWith(".txt"))
-                // {
-                //     let aNode = document.createElement("a");
-                //     aNode.href = url;
-                //     aNode.target = "_blank";
-                //     aNode.textContent = `[${filename}]`;
-                //     element.replaceWith(aNode);
-                // }
                 else {
-                    // make a link element that onclick downloads the data
                     let aNode = document.createElement("a");
                     aNode.href = url;
                     aNode.download = filename;
@@ -102,7 +113,7 @@ const renderer = {
                     element.replaceWith(aNode);
                 }
             });
-            return `<p id="${imgId}"></p>`;
+            return `<a id="${imgId}">[Loading]</a>`;
         }
         else
             return `<a href="${url}" target="_blank">[Image ${text}]</a>`;
