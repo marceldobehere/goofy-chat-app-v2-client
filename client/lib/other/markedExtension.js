@@ -57,9 +57,12 @@ const renderer = {
                     imgNode.className = "chat-image";
                     element.replaceWith(imgNode);
 
-                    element.onclick = () => {
+                    imgNode.onclick = () => {
                         // open image in new tab
-                        let newTab = window.open(url, '_blank');
+                        // include the type of image
+                        let newBlob = new Blob([fileData], {type: "image/png"});
+                        let newUrl = URL.createObjectURL(newBlob);
+                        let newTab = window.open(newUrl, "_blank");
                         newTab.focus();
                     };
                 }
