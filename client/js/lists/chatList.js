@@ -195,7 +195,7 @@ async function messageReceivedUI(account, chatUserId, message)
         if (groupInfo == null)
             return;
 
-        if (docLastServerId == groupInfo["groupId"] && docLastChannelId == groupInfo["channelId"])
+        if (docChatLastServerId == groupInfo["groupId"] && docChatLastChannelId == groupInfo["channelId"])
         {
             await userMarkGroupMessagesAsRead(groupInfo["groupId"], groupInfo["channelId"]);
 

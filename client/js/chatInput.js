@@ -17,7 +17,7 @@ function getCurrentChatUserId()
     if (docChatLastServerId == DMsId)
         return docChatLastChannelId;
     else
-        return docChatLastServerId;
+        return getChannelStrFromGroup(docChatLastServerId, docChatLastChannelId);
 }
 
 async function doMsgSendThingy(type, data, dontAdd)
