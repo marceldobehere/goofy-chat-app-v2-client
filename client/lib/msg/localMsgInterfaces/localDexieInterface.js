@@ -148,7 +148,12 @@ async function _lMsgDxResetAll()
 }
 
 
+async function _lMsgDxGetRawFiles(account, userId)
+{
+    let temp = await db.files.where({accountUserId: account["userId"], userId: userId}).toArray();
 
+    return temp;
+}
 
 async function _lMsgDxGetFiles(account, userId)
 {

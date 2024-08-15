@@ -33,7 +33,7 @@
                 <div>
                     <h3>Main Settings</h3>
                     <label>Auto Hide Chat</label><input type="checkbox" id="settings-main-input-auto-hide-chat" onclick="setSetting(['chat', 'auto-hide-chat'], this.checked)"><br>
-                    <label>Auto Show Chat</label><input type="checkbox" id="settings-main-input-auto-show-chat" onclick="setSetting(['chat', 'auto-show-chat'], this.checked)"><br>
+                    <label>Auto Toggle Chat</label><input type="checkbox" id="settings-main-input-auto-show-chat" onclick="setSetting(['chat', 'auto-show-chat'], this.checked)"><br>
                     <br>
                     <button onclick="exportProfile()">Export Profile</button>
                     <button onclick="importProfile()">Import Profile</button>
@@ -42,7 +42,24 @@
                     <br>
                 </div>
 
-
+                <div>
+                    <hr>
+                    <h3 style="display:inline-block;">File List</h3>&nbsp;<button id="settings-file-list-load-btn" onclick="loadFileList(currentUser['mainAccount'])">Load</button>
+                    <div id="settings-file-list-div">
+                        <ul id="settings-file-list-ul">
+<!--                            <li><a>[AAAA.txt]</a> (1234234) - <button>DOWNLOAD</button> <button>DELETE</button></li>-->
+<!--                            <li><a>[AAAA.txt]</a> (1234234) - <button>DOWNLOAD</button> <button>DELETE</button></li>-->
+<!--                            <li><a>[AAAA.txt]</a> (1234234) - <button>DOWNLOAD</button> <button>DELETE</button></li>-->
+<!--                            <li><a>[AAAA.txt]</a> (1234234) - <button>DOWNLOAD</button> <button>DELETE</button></li>-->
+<!--                            <li><a>[AAAA.txt]</a> (1234234) - <button>DOWNLOAD</button> <button>DELETE</button></li>-->
+<!--                            <li><a>[AAAA.txt]</a> (1234234) - <button>DOWNLOAD</button> <button>DELETE</button></li>-->
+<!--                            <li><a>[AAAA.txt]</a> (1234234) - <button>DOWNLOAD</button> <button>DELETE</button></li>-->
+<!--                            <li><a>[AAAA.txt]</a> (1234234) - <button>DOWNLOAD</button> <button>DELETE</button></li>-->
+<!--                            <li><a>[AAAA.txt]</a> (1234234) - <button>DOWNLOAD</button> <button>DELETE</button></li>-->
+<!--                            <li><a>[AAAA.txt]</a> (1234234) - <button>DOWNLOAD</button> <button>DELETE</button></li>-->
+                        </ul>
+                    </div>
+                </div>
 
 
                 <div>

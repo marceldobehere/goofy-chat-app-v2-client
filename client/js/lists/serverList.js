@@ -64,6 +64,8 @@ async function serverClicked(element, serverId) {
         else
             setChannelInfoVisibility(true);
     }
+    else
+        setChannelInfoVisibility(true);
 
     docLastServerEntry = element;
     docLastServerId = serverId;

@@ -120,6 +120,15 @@ async function internalGetFile(account, userId, fileId)
     );
 }
 
+async function internalGetRawFiles(account, userId)
+{
+    return await _intLockMethod(
+        _lMsgDxGetRawFiles,
+        undefined,
+        [account, userId]
+    );
+}
+
 async function internalHasFile(account, userId, fileId)
 {
     return await _intLockMethod(

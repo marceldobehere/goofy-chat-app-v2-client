@@ -27,7 +27,7 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Private/Group Voice/Video calls (using WebRTC)
 * Group Chats
 * Image/Video/File Sharing
-* Embedded Images
+* Embedded Images/Videos/Audios
 
 ### Planned Features
 * Friend System / DMs (?)
