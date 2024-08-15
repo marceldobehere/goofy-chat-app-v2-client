@@ -94,13 +94,41 @@ async function fileDroppedInTextArea(event) {
     }
 }
 
+async function uploadFileFromString(str, filename)
+{
+    let file = new File([str], filename);
+    await trySendFile(file);
+}
+
 async function filePastedInTextArea(event) {
     const dT = event.clipboardData || window.clipboardData;
     const files = dT.files;
 
+    // Upload files
     for (let file of files) {
         console.log(`> Sending file: `, file);
         await trySendFile(file);
+    }
+
+    // Upload clipboard as a file if it's a long string
+    let paste = (event.clipboardData || window.clipboardData).getData("text");
+    if (paste != undefined && paste.length > 1000)
+    {
+        console.log(paste);
+        if (!confirm("Upload the clipboard as a file?"))
+        {
+            if (paste.length < 10000)
+                return;
+            else
+            {
+                event.preventDefault();
+                return alert("This is a bit much text for the input smh");
+            }
+        }
+
+
+        event.preventDefault();
+        await uploadFileFromString(paste, "message.txt");
     }
 }
 

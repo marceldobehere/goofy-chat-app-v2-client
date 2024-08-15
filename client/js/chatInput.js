@@ -8,7 +8,7 @@ function mainChatInputKey(event)
     if (key == 13 && !shift)
     {
         setTimeout(messageSend, 0);
-        event.preventDefault();
+        return event.preventDefault();
     }
 }
 
@@ -37,6 +37,7 @@ async function doMsgSendThingy(type, data, dontAdd)
         console.log(res);
     }
 }
+
 
 async function messageSend() {
     if (docChatLastServerId == NoId || docChatLastChannelId == NoId)
