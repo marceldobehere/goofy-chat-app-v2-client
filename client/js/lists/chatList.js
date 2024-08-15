@@ -85,6 +85,41 @@ function createChatEntry(username, time, message)
 }
 
 const docChatHeaderDeleteBtn = document.getElementById("main-chat-content-header-delete-chat");
+async function refreshChatListArea(serverId, channelId)
+{
+    await updateChatInfo(serverId, channelId);
+
+    docChatHeaderDeleteBtn.style.display = "none";
+    let chatNameElement = document.getElementById("main-chat-content-header-toggle-chat-name");
+    let inputElement = document.getElementById('main-chat-content-input');
+    if (serverId == NoId || channelId == NoId)
+    {
+        inputElement.style.display = "none";
+        chatNameElement.textContent = "";
+        return;
+    }
+    inputElement.style.display = "";
+
+    if (serverId == DMsId)
+    {
+        docChatHeaderDeleteBtn.style.display = "";
+        chatNameElement.textContent = `${userGetInfoDisplayUsername(currentUser['mainAccount'], channelId)}`;
+    }
+    else
+    {
+        if (!hasGroupChatInfo(currentUser["mainAccount"], serverId))
+        {
+            logError("Group not found");
+            return;
+        }
+        let info = getGroupChatInfo(currentUser['mainAccount'], serverId);
+
+        let channel = info["channels"].find(x => x["id"] == channelId);
+
+        // Server name and channel name
+        chatNameElement.textContent = `${info["groupName"]} - ${channel["name"]}`;
+    }
+}
 async function createChatList(serverId, channelId, scrollDown) {
     docChatList.innerHTML = "";
     docChatHeaderDeleteBtn.style.display = "none";
@@ -200,6 +235,7 @@ async function messageReceivedUI(account, chatUserId, message)
             await userMarkGroupMessagesAsRead(groupInfo["groupId"], groupInfo["channelId"]);
 
             //await createChatList(groupInfo["groupId"], groupInfo["channelId"], true);
+            await refreshChatListArea(groupInfo["groupId"], groupInfo["channelId"]);
             await createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"]);
             docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
@@ -215,6 +251,7 @@ async function messageReceivedUI(account, chatUserId, message)
             await userMarkMessagesAsRead(chatUserId);
 
             //await createChatList(DMsId, chatUserId, true);
+            await refreshChatListArea(DMsId, chatUserId);
             await createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"]);
             docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }

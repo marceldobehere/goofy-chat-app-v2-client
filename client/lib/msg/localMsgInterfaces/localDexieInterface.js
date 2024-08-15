@@ -1,6 +1,7 @@
 let db;
 
 const localDbName = "GoofyChat2MsgDB";
+const MAX_FILESIZE = 1024 * 1024 * 50; // 50MB
 
 async function _lMsgDxCreateDb()
 {
@@ -19,21 +20,25 @@ async function _lMsgDxCreateDb()
         logInfo("Encrypted DB ready");
     }
 
-    await db.version(2).stores({
+    await db.version(3).stores({
         messages: `
-        &messageId,
+        [messageId+accountUserId+userId],
+        userId,
         accountUserId,
-        userId`,
+        messageId`,
         unread:`
-        &messageId,
+        [messageId+accountUserId+userId],
+        messageId,
         accountUserId,
         userId`,
         msgIds: `
-        &messageId,
+        [messageId+accountUserId+userId],
+        messageId,
         accountUserId,
         userId`,
         files: `
-        &fileId,
+        [fileId+accountUserId+userId],
+        fileId,
         accountUserId,
         userId`,
     });
@@ -199,32 +204,63 @@ function mergeUint8Arrays(...arrays) {
     return merged;
 }
 
+let hasFileSet = new Set();
+async function _lMsgDxHasFile(account, userId, fileId)
+{
+    let key = `${account["userId"]}_${userId}_${fileId}`;
+    if (hasFileSet.has(key))
+        return true;
+
+    let res = (await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).count()) > 0;
+    if (res)
+        hasFileSet.add(key);
+
+    return res;
+}
+
+let finishedFileDataMap = new Map();
 async function _lMsgDxGetFile(account, userId, fileId)
 {
+    let mapKey = `FILE_${account["userId"]}_${userId}_${fileId}`;
+    if (finishedFileDataMap.has(mapKey))
+        return finishedFileDataMap.get(mapKey);
+
     let res = await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).toArray();
     if (res.length < 1)
         return undefined;
     res = res[0];
+    //console.log("DB FILE: ", res);
 
-    logInfo(`> FILE ${fileId}:`, res);
-
-    // TODO: Get Filename and filedata
-    // Also decide on the format that filedata will be stored in
     let info = res["info"];
     let fileName = info["filename"];
     let fileSize = info["fileSize"];
     let chunkSize = info["chunkSize"];
 
-    let fileData = mergeUint8Arrays(...res["chunks"]);
-    let finished = fileData.length >= fileSize;
+    let chunks = res["chunks"];
+    let finished = true;
+    for (let chunk of chunks)
+        if (chunk.length == 0)
+            finished = false;
 
-    return {
+    let fileData = new Uint8Array(0);
+    if (finished)
+    {
+        fileData = mergeUint8Arrays(...chunks);
+        finished = fileData.length >= fileSize;
+    }
+
+    let resObj = {
         filename: fileName,
         fileSize: fileSize,
         chunkSize: chunkSize,
         data: fileData,
         finished: finished
     };
+
+    if (finished)
+        finishedFileDataMap.set(mapKey, resObj);
+
+    return resObj;
 }
 
 async function _lMsgDxDeleteFile(account, userId, fileId)
@@ -234,16 +270,20 @@ async function _lMsgDxDeleteFile(account, userId, fileId)
 
 async function _lMsgDxCreateFile(account, userId, fileId, info)
 {
-    // TODO: Validate info object
-    // Create File Entry Object
-    // With block array
-
     if (!info)
         return;
 
     let filename = info["filename"];
     let fileSize = info["fileSize"];
     const chunkSize = info["chunkSize"];
+
+    if (filename == undefined || fileSize == undefined|| chunkSize == undefined)
+        return;
+    if (fileSize <= 0 || chunkSize <= 0)
+        return;
+    if (fileSize > MAX_FILESIZE)
+        return;
+
     let chunkCount = Math.ceil(fileSize / chunkSize);
 
     let infoObj = {
@@ -262,19 +302,13 @@ async function _lMsgDxCreateFile(account, userId, fileId, info)
 
 async function _lMsgDxUploadFile(account, userId, fileId, data)
 {
-    // TODO: Implement
-    // Get/Validate Upload Object
-    // Get File Entry
-    // Get Info
-    // Validate Size and Block Index
-    // Add the data
-    // Save Object
+    if (!data || data["chunkData"] == undefined || data["chunkIndex"] == undefined)
+        return logError("Invalid file upload data");
 
     let res = await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).toArray();
     if (res.length < 1)
-        return;
+        return logError("File not found");
     res = res[0];
-    logInfo(`> UPLOAD FILE ${fileId}:`, res, data);
 
     let info = res["info"];
     let chunks = res["chunks"];
@@ -282,14 +316,12 @@ async function _lMsgDxUploadFile(account, userId, fileId, data)
     let chunkSize = info["chunkSize"];
     let chunkData = data["chunkData"];
     if (chunkData.length > chunkSize) // could add check for == size and == filesize remainder on last index, but not super important
-        return;
-    logInfo(`> UPLOADING CHUNK1 ${data["chunkIndex"]}: ${chunkData.length} bytes`);
+        return logError("Chunk data too large");
 
 
     let chunkIndex = data["chunkIndex"];
     if (chunkIndex < 0 || chunkIndex >= chunks.length)
-        return;
-    logInfo(`> UPLOADING CHUNK2 ${data["chunkIndex"]}: ${chunkData.length} bytes`);
+        return logError("Invalid chunk index");
 
     chunks[chunkIndex] = chunkData;
 

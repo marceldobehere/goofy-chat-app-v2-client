@@ -120,6 +120,15 @@ async function internalGetFile(account, userId, fileId)
     );
 }
 
+async function internalHasFile(account, userId, fileId)
+{
+    return await _intLockMethod(
+        _lMsgDxHasFile,
+        undefined,
+        [account, userId, fileId]
+    );
+}
+
 async function internalDeleteFile(account, userId, fileId)
 {
     return await _intLockMethod(

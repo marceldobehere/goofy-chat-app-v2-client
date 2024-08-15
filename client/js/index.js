@@ -1,18 +1,25 @@
 async function init()
 {
-    setStatus("Init Lib")
-    console.log("> Initializing client lib...");
-    await initClientLib();
+    try {
+        setStatus("Init Lib")
+        console.log("> Initializing client lib...");
+        await initClientLib();
 
-    setStatus("Init UI")
-    await doConnInit();
+        setStatus("Init UI")
+        await doConnInit();
 
-    setStatus("Init Acc")
-    if (!hasOwnUserChatInfo(currentUser))
-        await askOwnChatInfo();
+        setStatus("Init Acc")
+        if (!hasOwnUserChatInfo(currentUser))
+            await askOwnChatInfo();
 
-    setStatus("Ready")
-    console.log("> Done!");
+        setStatus("Ready")
+        console.log("> Done!");
+    }
+    catch (e)
+    {
+        setStatus("Fatal Error");
+        logFatalErrorAndCrash(e);
+    }
 }
 
 //init().then();

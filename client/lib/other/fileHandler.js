@@ -1,59 +1,39 @@
 async function handleFilePartMsg(account, user, msg)
 {
-    logInfo("> File Chunk: ", msg["data"]);
+    logInfo("> Saving File Chunk: ", msg["data"]);
     let chunkIndex = msg["data"]["chunkIndex"];
     let fileInfo = msg["data"]["file"];
     let fileId = fileInfo["fileId"];
 
-
-
     // Check if the file exists in the db, if not, create
-    let fileEntry = await internalGetFile(account, user, fileId);
-    if (fileEntry == undefined)
+    if (!await internalHasFile(account, user, fileId))
     {
+        //alert("Create fole")
         let filename = fileInfo["filename"];
         let fileSize = fileInfo["filesize"];
         let chunkSize = fileInfo["chunkSize"];
 
-        // TODO: Add safety and null checks xd
+        if (filename == null || fileSize == null || chunkSize == null)
+            return logError("Invalid file info: ", fileInfo);
+        if (fileSize <= 0 || chunkSize <= 0)
+            return logError("Invalid file size or chunk size: ", fileInfo);
 
-        fileEntry = {
+        let fileEntry = {
             filename: filename,
             fileSize: fileSize,
             chunkSize: chunkSize,
         };
 
-        logInfo("> Creating File Entry: ", fileEntry);
         await internalCreateFile(account, user, fileId, fileEntry);
-
-        fileEntry = await internalGetFile(account, user, fileId);
     }
-    logInfo("> File Entry: ", fileEntry);
+    //logInfo("> File Entry: ", fileEntry);
 
     let chunkData = msg["data"]["data"];
-    let buf = Uint8Array.from(atob(chunkData), c => c.charCodeAt(0));
+    let buf = Uint8Array.from(atob(chunkData), c => c.charCodeAt(0)); // highly cursed but apparently works
     let decompressed = await decompressBuffer(buf);
-    console.log(decompressed);
 
-    // TODO: Call db functions to save the chunk
-    let res = await internalUploadFile(account, user, fileId, {chunkIndex: chunkIndex, chunkData: decompressed});
-    console.log("Upload Res: ", res);
-
-    console.log("File WA: ", await internalGetFile(account, user, fileId));
-}
-
-
-async function handleGetFileInfo(account, user, fileId)
-{
-    // TODO: Call db funcs to get the file data (just name, size, etc.) and return it
-    return undefined;
-}
-
-
-async function handleGetFile(account, user, fileId)
-{
-    // TODO: Call db funcs to get the file data, maybe combine chunks and return the whole object
-    return undefined;
+    // Save the new chunk data
+    await internalUploadFile(account, user, fileId, {chunkIndex: chunkIndex, chunkData: decompressed});
 }
 
 // https://dev.to/lucasdamianjohnson/compress-decompress-an-arraybuffer-client-side-in-js-2nf6
