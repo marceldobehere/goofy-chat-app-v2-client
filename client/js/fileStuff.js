@@ -83,6 +83,17 @@ async function trySendFile(file) {
 }
 
 
+async function fileDroppedInTextArea(event) {
+    event.preventDefault();
+    console.log(`File dropped in text area`, event);
+
+    const files = event.dataTransfer.files;
+    for (let file of files) {
+        console.log(`> Sending file: `, file);
+        await trySendFile(file);
+    }
+}
+
 async function filePastedInTextArea(event) {
     const dT = event.clipboardData || window.clipboardData;
     const files = dT.files;

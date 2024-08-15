@@ -103,7 +103,11 @@
                 <div id="main-chat-content-input">
                     <div id="main-chat-content-input-upload">+</div>
                     <div id="main-chat-content-input-input">
-                        <textarea id="main-chat-content-input-input-textarea" onpaste="filePastedInTextArea(event)" onkeydown="mainChatInputKey(event)" placeholder="Enter message"></textarea>
+                        <textarea id="main-chat-content-input-input-textarea"
+                                  ondrop="fileDroppedInTextArea(event)"
+                                  onpaste="filePastedInTextArea(event)"
+                                  onkeydown="mainChatInputKey(event)"
+                                  placeholder="Enter message"></textarea>
                     </div>
                 </div>
             </div>
