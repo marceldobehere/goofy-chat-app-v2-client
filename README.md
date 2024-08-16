@@ -22,20 +22,21 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Fully Open Source
 * Markdown Support (With Syntax Highlighting)
 
+### Mostly working Features
+* Group Chats
+* Image/Video/File Sharing
+* Embedded Images/Videos/Audios
 
 ### Partially implemented Features
 * Private/Group Voice/Video calls (using WebRTC)
-* Group Chats
-
 
 ### Planned Features
-* Image/Video/File Sharing
-* Embedded Images
 * Friend System / DMs (?)
  * People sending friend/message requests before being able to chat with you
  * Blocking people
  * Having open/closed "DMs"
-* Notification
+* Notifications
+* Upload Status Bar
 * Improved mobile usability
 * Potentially PWA Features (?)
 * Preferred Server for decentralized communication
@@ -44,11 +45,10 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Message Reactions
 * Optional Message Read Acknowledgements
 * Stickers (?)
-* Portable Core Client Lib (May be in progress)
+* Portable Core Client Lib in NodeJS/Java (May be in progress)
 * Improved Voice Chats / Potential integration into the main app
 * Multiple fully seperated Accounts
 * Customizable UI/Themes
-* Potentially custom Clients
 
 
 ## Goofy Chat 2 vs Goofy Chat 1
@@ -216,6 +216,10 @@ Essentially the server acts as a signaling server for the two users to establish
 The clients will exchange their ICE candidates and SDP offers/answers through the server using special message types.
 
 Currently the STUN servers are hardcoded and set to the Google STUN servers.
+
+(Implementation details yet to follow)
+
+#### File/Image sending
 
 (Implementation details yet to follow)
 

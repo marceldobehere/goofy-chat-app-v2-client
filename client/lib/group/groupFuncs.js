@@ -80,6 +80,21 @@ async function userSendGroupMessage(groupId, channelId, data, type)
     await handleGroupMessage(currentUser["mainAccount"], msg["data"]);
 }
 
+
+async function userSendGroupMessageSpecial(groupId, channelId, data, type, dontAdd)
+{
+    addGroupIdIfNotExists(groupId);
+    logWarn("Group messages are not implemented yet.");
+
+    let msg = createGroupChatMessage(groupId, channelId, data, type);
+    logInfo("SEND GROUP MSG", msg);
+
+    await sendGroupChatMessageToAll(currentUser, groupId, msg, dontAdd);
+
+    await handleGroupMessage(currentUser["mainAccount"], msg["data"]);
+}
+
+
 async function userDeleteGroupMessages(groupId, channelId)
 {
     await internalRemoveUserMessages(currentUser["mainAccount"], getChannelStrFromGroup(groupId, channelId));
@@ -144,16 +159,17 @@ async function sendGroupChatMessageToAll(user, groupId, msg)
         if (userId != user['listenerAccount']["userId"])
             await sendGroupChatMessageToOne(user['mainAccount'], userId, msg);
 
-    // send the message to all redirects
-    let redirects = user["redirectAccounts"];
-    for (let userId of redirects)
-        await sendGroupChatMessageToOne(user['mainAccount'], userId, msg);
+    // NOT NEEDED LOL
+    // // send the message to all redirects
+    // let redirects = user["redirectAccounts"];
+    // for (let userId of redirects)
+    //     await sendGroupChatMessageToOne(user['mainAccount'], userId, msg);
 }
 
 async function sendGroupChatMessageToOne(account, userId, msg)
 {
     // send the new account info to one person
-    logInfo(`Sending message to ${userId}.`);
+    logInfo(`Sending message to ${userId}:`, msg);
 
     let type = msg["type"]
     let data = msg["data"];

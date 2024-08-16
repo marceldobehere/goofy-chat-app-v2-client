@@ -57,8 +57,12 @@ async function importProfile()
     else
         return alert("Aborted");
 
-    await lockIncoming.enable();
-    await lockOutgoing.enable();
+
+    if (loadBackup)
+    {
+        await lockIncoming.enable();
+        await lockOutgoing.enable();
+    }
 
     localStorage.clear();
     let ls = data["localStorage"];

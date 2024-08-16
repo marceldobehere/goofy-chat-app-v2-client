@@ -111,6 +111,74 @@ async function internalRemoveUserMessages(account, userId)
     removeUserIfExists(userId);
 }
 
+async function internalGetFile(account, userId, fileId)
+{
+    return await _intLockMethod(
+        _lMsgDxGetFile,
+        undefined,
+        [account, userId, fileId]
+    );
+}
+
+async function internalGetRawFiles(account, userId)
+{
+    return await _intLockMethod(
+        _lMsgDxGetRawFiles,
+        undefined,
+        [account, userId]
+    );
+}
+
+async function internalGetAllRawFiles(account)
+{
+    return await _intLockMethod(
+        _lMsgDxGetAllRawFiles,
+        undefined,
+        [account]
+    );
+}
+
+async function internalHasFile(account, userId, fileId)
+{
+    return await _intLockMethod(
+        _lMsgDxHasFile,
+        undefined,
+        [account, userId, fileId]
+    );
+}
+
+async function internalDeleteFile(account, userId, fileId)
+{
+    return await _intLockMethod(
+        _lMsgDxDeleteFile,
+        undefined,
+        [account, userId, fileId]
+    );
+}
+
+async function internalCreateFile(account, userId, fileId, info)
+{
+    return await _intLockMethod(
+        _lMsgDxCreateFile,
+        undefined,
+        [account, userId, fileId, info]
+    );
+}
+
+async function internalUploadFile(account, userId, fileId, obj)
+{
+    return await _intLockMethod(
+        _lMsgDxUploadFile,
+        undefined,
+        [account, userId, fileId, obj]
+    );
+}
+
+
+
+
+
+
 async function internalResetAll()
 {
     return await _intLockMethod(

@@ -50,7 +50,36 @@ body {
     top: 10%;
     left: 10%;
 
+    overflow: auto;
+}
 
+#main-app-container-settings li {
+    margin-bottom: 0.3rem;
+}
+
+#settings-file-list-div {
+    height: 8rem;
+    overflow: auto;
+    border: 1px solid red;
+    padding: 0px;
+    margin-top: 0px;
+}
+
+
+/*Change the scrollbar*/
+#settings-file-list-div::-webkit-scrollbar {
+    width: var(--main-chat-selector-scroll-size);
+}
+
+/*Change the scrollbar track*/
+#settings-file-list-div::-webkit-scrollbar-track {
+    background-color: var(--main-chat-selector-scroll-bg);
+}
+
+/*Change the scrollbar thumb*/
+#settings-file-list-div::-webkit-scrollbar-thumb {
+    background-color: var(--main-chat-selector-scroll-color);
+    border-radius: var(--main-chat-selector-scroll-size);
 }
 
 #main-app-container-chat {
@@ -412,6 +441,20 @@ body {
 
 .chat-entry-reply {
     float: right;
+}
+
+.chat-entry img {
+    max-height: 15rem;
+    max-width: 100%;
+}
+
+.chat-entry video {
+    max-height: 15rem;
+    max-width: 100%;
+}
+
+.chat-entry img:hover {
+    cursor: pointer;
 }
 
 #main-chat-content-header {

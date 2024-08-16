@@ -1,6 +1,7 @@
 let db;
 
 const localDbName = "GoofyChat2MsgDB";
+const MAX_FILESIZE = 1024 * 1024 * 50; // 50MB
 
 async function _lMsgDxCreateDb()
 {
@@ -19,19 +20,27 @@ async function _lMsgDxCreateDb()
         logInfo("Encrypted DB ready");
     }
 
-    await db.version(1).stores({
+    await db.version(3).stores({
         messages: `
-        &messageId,
+        [messageId+accountUserId+userId],
+        userId,
         accountUserId,
-        userId`,
+        messageId`,
         unread:`
-        &messageId,
+        [messageId+accountUserId+userId],
+        messageId,
         accountUserId,
         userId`,
         msgIds: `
-        &messageId,
+        [messageId+accountUserId+userId],
+        messageId,
         accountUserId,
-        userId`
+        userId`,
+        files: `
+        [fileId+accountUserId+userId],
+        fileId,
+        accountUserId,
+        userId`,
     });
 
     await db.open();
@@ -138,12 +147,211 @@ async function _lMsgDxResetAll()
     await _lMsgDxCreateDb();
 }
 
+
+async function _lMsgDxGetRawFiles(account, userId)
+{
+    return await db.files.where({accountUserId: account["userId"], userId: userId}).toArray();
+}
+
+async function _lMsgDxGetAllRawFiles(account)
+{
+    return await db.files.where({accountUserId: account["userId"]}).toArray();
+}
+
+async function _lMsgDxGetFiles(account, userId)
+{
+    let temp = await db.files.where({accountUserId: account["userId"], userId: userId}).toArray();
+
+    // Filter out only files
+    let files = [];
+    for (let i = 0; i < temp.length; i++)
+    {
+        let tempFile = temp[i];
+        let chunks = tempFile["chunks"];
+
+        let newChunks = [];
+        for (let chunkData of chunks)
+        {
+            let compressed = await compressBuffer(chunkData);
+            let chunkStr = _arrayBufferToBase64(compressed);
+            newChunks.push(chunkStr);
+        }
+
+        tempFile["chunks"] = newChunks;
+        files.push(tempFile);
+    }
+
+    return files;
+}
+
+async function _lMsgDxSetFullFile(account, userId, fileId, data)
+{
+    let chunks = data["chunks"];
+    let newChunks = [];
+    for (let chunkStr of chunks)
+    {
+        let compressed = Uint8Array.from(atob(chunkStr), c => c.charCodeAt(0));
+        let chunkData = await decompressBuffer(compressed);
+        newChunks.push(chunkData);
+    }
+    data["chunks"] = newChunks;
+
+    return await db.files.add({accountUserId: account["userId"], userId: userId, fileId: fileId, ...data});
+}
+
+
+function mergeUint8Arrays(...arrays) {
+    const totalSize = arrays.reduce((acc, e) => acc + e.length, 0);
+    const merged = new Uint8Array(totalSize);
+
+    arrays.forEach((array, i, arrays) => {
+        const offset = arrays.slice(0, i).reduce((acc, e) => acc + e.length, 0);
+        merged.set(array, offset);
+    });
+
+    return merged;
+}
+
+let hasFileSet = new Set();
+async function _lMsgDxHasFile(account, userId, fileId)
+{
+    let key = `${account["userId"]}_${userId}_${fileId}`;
+    if (hasFileSet.has(key))
+        return true;
+
+    let res = (await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).count()) > 0;
+    if (res)
+        hasFileSet.add(key);
+
+    return res;
+}
+
+let finishedFileDataMap = new Map();
+async function _lMsgDxGetFile(account, userId, fileId)
+{
+    let mapKey = `FILE_${account["userId"]}_${userId}_${fileId}`;
+    if (finishedFileDataMap.has(mapKey))
+        return finishedFileDataMap.get(mapKey);
+
+    let res = await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).toArray();
+    if (res.length < 1)
+        return undefined;
+    res = res[0];
+    //console.log("DB FILE: ", res);
+
+    let info = res["info"];
+    let fileName = info["filename"];
+    let fileSize = info["fileSize"];
+    let chunkSize = info["chunkSize"];
+
+    let chunks = res["chunks"];
+    let finished = true;
+    for (let chunk of chunks)
+        if (chunk.length == 0)
+            finished = false;
+
+    let fileData = new Uint8Array(0);
+    if (finished)
+    {
+        fileData = mergeUint8Arrays(...chunks);
+        finished = fileData.length >= fileSize;
+    }
+
+    let resObj = {
+        filename: fileName,
+        fileSize: fileSize,
+        chunkSize: chunkSize,
+        data: fileData,
+        finished: finished
+    };
+
+    if (finished)
+        finishedFileDataMap.set(mapKey, resObj);
+
+    return resObj;
+}
+
+async function _lMsgDxDeleteFile(account, userId, fileId)
+{
+    return await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).delete();
+}
+
+async function _lMsgDxCreateFile(account, userId, fileId, info)
+{
+    if (!info)
+        return;
+
+    let filename = info["filename"];
+    let fileSize = info["fileSize"];
+    const chunkSize = info["chunkSize"];
+
+    if (filename == undefined || fileSize == undefined|| chunkSize == undefined)
+        return;
+    if (fileSize <= 0 || chunkSize <= 0)
+        return;
+    if (fileSize > MAX_FILESIZE)
+        return;
+
+    let chunkCount = Math.ceil(fileSize / chunkSize);
+
+    let infoObj = {
+        filename: filename,
+        fileSize: fileSize,
+        chunkSize: chunkSize,
+        chunkCount: chunkCount
+    };
+
+    let chunks = [];
+    for (let i = 0; i < chunkCount; i++)
+        chunks.push(new Uint8Array(0));
+
+    return await db.files.add({accountUserId: account["userId"], userId: userId, fileId: fileId, info:infoObj, chunks:chunks});
+}
+
+async function _lMsgDxUploadFile(account, userId, fileId, data)
+{
+    if (!data || data["chunkData"] == undefined || data["chunkIndex"] == undefined)
+        return logError("Invalid file upload data");
+
+    let res = await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).toArray();
+    if (res.length < 1)
+        return logError("File not found");
+    res = res[0];
+
+    let info = res["info"];
+    let chunks = res["chunks"];
+
+    let chunkSize = info["chunkSize"];
+    let chunkData = data["chunkData"];
+    if (chunkData.length > chunkSize) // could add check for == size and == filesize remainder on last index, but not super important
+        return logError("Chunk data too large");
+
+
+    let chunkIndex = data["chunkIndex"];
+    if (chunkIndex < 0 || chunkIndex >= chunks.length)
+        return logError("Invalid chunk index");
+
+    chunks[chunkIndex] = chunkData;
+
+    return await db.files.update({accountUserId: account["userId"], userId: userId, fileId: fileId}, {chunks: chunks});
+}
+
+
+
+
+
+
+
+
+
+
 async function _lMsgDxExportAllMsgs(account)
 {
     let userList = getAllUsers().concat(getAllGroupChannelIds(account));
     let msgList = [];
     let unreadList = [];
     let msgIdList = [];
+    let fileList = [];
 
     for (let user of userList)
     {
@@ -156,22 +364,23 @@ async function _lMsgDxExportAllMsgs(account)
 
         let unread = await _lMsgDxGetUnreadMsgIds(account, user);
         for (let unreadId of unread)
-        {
             unreadList.push({chatId:user, messageId:unreadId});
-        }
 
         let msgIds = await _lMsgDxGetMsgIds(account, user);
         for (let msgId of msgIds)
-        {
             msgIdList.push({chatId:user, messageId:msgId});
-        }
+
+        let files = await _lMsgDxGetFiles(account, user);
+        for (let file of files)
+            fileList.push({chatId:user, fileData:file});
     }
 
 
     return {
         messages: msgList,
         unread: unreadList,
-        msgIds: msgIdList
+        msgIds: msgIdList,
+        files: fileList
     };
 }
 
@@ -181,6 +390,7 @@ async function _lMsgDxImportAllMsgs(account, data)
     let msgList = data["messages"];
     let unreadList = data["unread"];
     let msgIdList = data["msgIds"];
+    let fileList = data["files"];
 
     for (let msg of msgList)
         await _lMsgDxAddMsg(account, msg["chatId"], msg);
@@ -190,6 +400,9 @@ async function _lMsgDxImportAllMsgs(account, data)
 
     for (let msgId of msgIdList)
         await _lMsgDxAddMsgIdToUser(account, msgId["chatId"], msgId["messageId"]);
+
+    for (let file of fileList)
+        await _lMsgDxSetFullFile(account, file["chatId"], file["fileData"]["fileId"], file["fileData"]);
 }
 
 
