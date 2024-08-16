@@ -83,6 +83,19 @@ async function trySendFile(file) {
     console.log(" > Done.")
 }
 
+async function fileAddClicked(event)
+{
+let fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.multiple = true;
+    fileInput.onchange = async () => {
+        for (let file of fileInput.files) {
+            console.log(`> Sending file: `, file);
+            await trySendFile(file);
+        }
+    };
+    fileInput.click();
+}
 
 async function fileDroppedInTextArea(event) {
     event.preventDefault();
