@@ -82,5 +82,6 @@ async function groupUpdateUI(groupId, groupInfo)
             docChatLastChannelId = NoId;
             await createChatList(docChatLastServerId, docChatLastChannelId, true);
         }
+        await refreshChatListArea(docChatLastServerId, docChatLastChannelId);
     }
 }
