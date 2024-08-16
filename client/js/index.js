@@ -20,6 +20,8 @@ async function init()
     catch (e)
     {
         await setStatus("Fatal Error");
+        alert("Fatal error: " + e);
+        alert("If this issue persists, consider contacting @marceldobehere or resetting your profile.")
         logFatalErrorAndCrash(e);
     }
 }
