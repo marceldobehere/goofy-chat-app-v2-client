@@ -65,7 +65,7 @@ async function createChannelList(serverId, selectedChatId, forceRefresh) {
             await createChannelEntry(userIds[i], username, serverId, selectedChatId == userIds[i]);
         }
         if (userIds.length == 0)
-            await createChannelEntry(NoId, "No Friends", serverId, false);
+            await createChannelEntry(NoId, "No Friends", serverId, true);
     }
     else
     {
@@ -79,6 +79,9 @@ async function createChannelList(serverId, selectedChatId, forceRefresh) {
         for (let channel of info["channels"])
             await createChannelEntry(channel["id"], channel["name"], serverId, selectedChatId == channel["id"]);
     }
+
+    if (docLastChannelId == NoId)
+        await refreshChatList();
 }
 
 function setChannelInfoVisibility(visible)

@@ -120,6 +120,9 @@ async function refreshChatListArea(serverId, channelId)
         chatNameElement.textContent = `${info["groupName"]} - ${channel["name"]}`;
     }
 }
+async function refreshChatList() {
+    await createChatList(docChatLastServerId, docChatLastChannelId, false);
+}
 async function createChatList(serverId, channelId, scrollDown) {
     docChatList.innerHTML = "";
     docChatHeaderDeleteBtn.style.display = "none";
@@ -129,9 +132,17 @@ async function createChatList(serverId, channelId, scrollDown) {
     let inputElement = document.getElementById('main-chat-content-input');
     if (serverId == NoId || channelId == NoId)
     {
-        docChatList.textContent = "[No chat open]";
+        if (serverId == DMsId && getAllUsers().length == 0)
+        {
+            docChatList.innerHTML = "<br> Seems like you have no one to talk to :(<br><br>Consider adding some friends to chat with! (The \"Add friend\" button)<br><br><br>(You can also add yourself to chat with yourself)";
+            chatNameElement.textContent = "No Friends";
+        }
+        else
+        {
+            docChatList.textContent = "[No chat open]";
+            chatNameElement.textContent = "";
+        }
         inputElement.style.display = "none";
-        chatNameElement.textContent = "";
         return;
     }
     inputElement.style.display = "";
@@ -283,6 +294,8 @@ async function deleteCurrDm()
         for (let file of files)
             await internalDeleteFile(currentUser['mainAccount'], dmUserId, file["fileId"]);
     }
+
+    docChatLastChannelId = NoId;
 
     await resetUiList();
 }
