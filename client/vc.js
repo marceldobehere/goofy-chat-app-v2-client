@@ -4,6 +4,7 @@ async function init()
     extFnVcInit = initVcTest;
     await initClientLib();
     console.log("> Done!");
+    setStatus("Ready");
 }
 
 init().then();
