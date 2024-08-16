@@ -7,7 +7,7 @@ It is essentially a secure end-to-end encrypted chat app that allows users to ch
 NOTE: It is still WIP right now, but its mostly in a usable state!
 
 
-![Screenshot](./imgs/img.png)
+![Screenshot](./imgs/file%20img.png)
 
 It is statically hosted [here](https://marceldobehere.github.io/goofy-chat-app-v2-client/client/)!
 
@@ -224,6 +224,13 @@ Currently the STUN servers are hardcoded and set to the Google STUN servers.
 (Implementation details yet to follow)
 
 
+## Screenshots
+
+![Showing File Support](./imgs/file%20img.png)
+
+![Markdown and Code Support](./imgs/code.png)
+
+![Early Version](./imgs/img.png)
 
 
 
