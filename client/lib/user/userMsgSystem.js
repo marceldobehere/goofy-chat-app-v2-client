@@ -22,6 +22,9 @@ async function getUserMySymmKey(account, userId)
 {
     if (userId == account["userId"])
         return privateSymmKey(account);
+    // if its a redirect account also use symmkey
+    if (currentUser["redirectAccounts"].includes(userId))
+        return privateSymmKey(account);
 
     let initialMsg = false;
 
@@ -137,7 +140,7 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
 {
     message["date"] = date;
     message["from"] = userIdFrom;
-    logInfo(`Adding message to user ${chatUserId}:`, message);
+    logInfo(`Adding message to user ${chatUserId} (${userIdFrom}):`, message);
     let type = message["type"];
     let messageId = message["messageId"];
     if (messageId == undefined)
@@ -155,7 +158,8 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
             let msg = {
                 messageId: getRandomIntInclusive(0, 99999999999),
                 data: message,
-                type: "redirect"
+                type: "redirect",
+                to: chatUserId
             };
 
 
@@ -163,7 +167,7 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
             {
                 let redirect = currentUser["redirectAccounts"][i];
 
-                logInfo(`Redirecting message to ${redirect}:`, message);
+                logInfo(`> AAA Redirecting message to ${redirect}:`, msg);
                 await _sendAesMessageToUser(account, redirect, msg, privateSymmKey(account));
             }
         }
@@ -177,8 +181,8 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
 
     if (type == "symm-key")
     {
-        logInfo("Setting symm key");
         let symmKey = message["symmKey"];
+        logInfo(`Setting symm-key of ${chatUserId} (${userIdFrom}) to `, symmKey);
         await setUserLastSymmKey(account, chatUserId, symmKey);
     }
     else if (type == "chat-info")
@@ -186,10 +190,10 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
         let info = message["data"];
         info = tryConformUserChatInfo(info);
 
-        let localInfo = getUserChatInfo(account, chatUserId);
+        let localInfo = getUserChatInfo(account, userIdFrom);
         //console.log(localInfo);
         localInfo = mergeUserChatInfo(localInfo, info);
-        setUserChatInfo(account, chatUserId, localInfo);
+        setUserChatInfo(account, userIdFrom, localInfo);
 
         //console.log(info);
     }
@@ -223,12 +227,12 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
     }
     else if (type == "redirect")
     {
-        logInfo("Redirect message", message);
+        logInfo("> BBB Redirect message to " + message["to"] + ": ", message);
 
         if (message["to"] == undefined)
-            await addMessageToUser(account, message["data"]["from"], message["data"]["from"], message["data"], message["data"]["date"]);
+            alert("HUHHHH MESSAGE TO IS UNDEFINED???");//await addMessageToUser(account, message["data"]["from"], message["data"]["from"], message["data"], message["data"]["date"]);
         else
-            await addMessageToUser(account, account['userId'], message["to"], message["data"], message["data"]["date"]);
+            await addMessageToUser(account, message["data"]["from"], message["to"], message["data"], message["data"]["date"]);
     }
     else if (type == "remote-symm-key")
     {
@@ -331,7 +335,7 @@ async function addSentMessage(account, userIdTo, message, dontActuallyAdd)
             {
                 let redirect = currentUser["redirectAccounts"][i];
 
-                logInfo(`Redirecting message to ${redirect}:`, msg);
+                logInfo(`> CCC Redirecting sent message to ${redirect}:`, msg);
                 await _sendAesMessageToUser(account, redirect, msg, privateSymmKey(account));
             }
         }

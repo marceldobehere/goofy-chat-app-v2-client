@@ -70,7 +70,7 @@ function createChatEntry(username, time, message)
         const clean = DOMPurify.sanitize(dirty, { ADD_ATTR: ['target'] });
         p.innerHTML = clean;
     } catch (e) {
-        logError("Error rendering content:", e);
+        console.warn("ERROR RENDERING: ", message)
         p.textContent = `ERROR RENDERING MESSAGE: ${e.message}`;
     }
 

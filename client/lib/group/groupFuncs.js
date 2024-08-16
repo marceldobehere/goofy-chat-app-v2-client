@@ -159,16 +159,17 @@ async function sendGroupChatMessageToAll(user, groupId, msg)
         if (userId != user['listenerAccount']["userId"])
             await sendGroupChatMessageToOne(user['mainAccount'], userId, msg);
 
-    // send the message to all redirects
-    let redirects = user["redirectAccounts"];
-    for (let userId of redirects)
-        await sendGroupChatMessageToOne(user['mainAccount'], userId, msg);
+    // NOT NEEDED LOL
+    // // send the message to all redirects
+    // let redirects = user["redirectAccounts"];
+    // for (let userId of redirects)
+    //     await sendGroupChatMessageToOne(user['mainAccount'], userId, msg);
 }
 
 async function sendGroupChatMessageToOne(account, userId, msg)
 {
     // send the new account info to one person
-    logInfo(`Sending message to ${userId}.`);
+    logInfo(`Sending message to ${userId}:`, msg);
 
     let type = msg["type"]
     let data = msg["data"];
