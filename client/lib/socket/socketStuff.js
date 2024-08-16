@@ -21,19 +21,20 @@ async function createSockets(serverList, user)
         serverSocketList.push(socket);
         serverStatusList.push(false);
 
+        let currListIndex = listIndex;
         let promiseArray = [];
         let promiseDone = false;
         let sockPromise = new Promise((resolve, reject) => {
             socket.on('connect', () => {
                 logInfo("Server connected.");
-                serverStatusList[listIndex] = true;
+                serverStatusList[currListIndex] = true;
 
                 let res = (async () => {
-                    setStatus(`Init Sock ${listIndex * 3 + 1}/${serverList.length * 3}`)
+                    setStatus(`Init Sock ${currListIndex * 3 + 1}/${serverList.length * 3}`)
                     await login(socket, user["mainAccount"]);
-                    setStatus(`Init Sock ${listIndex * 3 + 2}/${serverList.length * 3}`)
+                    setStatus(`Init Sock ${currListIndex * 3 + 2}/${serverList.length * 3}`)
                     await login(socket, user["listenerAccount"]);
-                    setStatus(`Init Sock ${listIndex * 3 + 3}/${serverList.length * 3}`)
+                    setStatus(`Init Sock ${currListIndex * 3 + 3}/${serverList.length * 3}`)
                     await sockReqMessages(socket);
                 })();
 
@@ -48,7 +49,7 @@ async function createSockets(serverList, user)
 
         socket.on('disconnect', () => {
             logInfo("Server disconnected.");
-            serverStatusList[listIndex] = false;
+            serverStatusList[currListIndex] = false;
         });
 
         socket.on('error', (error) => {
