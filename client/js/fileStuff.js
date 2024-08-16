@@ -21,11 +21,29 @@ function _arrayBufferToBase64(buffer) {
     return window.btoa(binary);
 }
 
-async function trySendFile(file) {
+async function trySendFile(file, statusCallBack) {
     if (!file)
         return;
     if (file.size == 0)
         return;
+
+    if (file.size > 50 * 1024 * 1024) {
+        if (!confirm("This file is VERY VERY large. Are you sure you want to send it? (This could take ages)"))
+            return;
+    }
+    else if (file.size > 25 * 1024 * 1024) {
+        if (!confirm("This file is very large. Are you sure you want to send it? (This could take a while)"))
+            return;
+    }
+    else if (file.size > 10 * 1024 * 1024) {
+        if (!confirm("This file is large. Are you sure you want to send it?"))
+            return;
+    }
+    else if (file.size > 6 * 1024 * 1024) {
+        if (!confirm("This file is a bit large. Are you sure you want to send it?"))
+            return;
+    }
+
 
     const chunkSize = 150 * 1024;
 
@@ -74,6 +92,14 @@ async function trySendFile(file) {
         //promiseArr.push(p2);
         await p2;
 
+        if (statusCallBack)
+            try {
+                // (fileId, bytesSent, totalBytes, chunkIndex, chunkCount)
+                statusCallBack(fileId, end, file.size, chunkIndex, chunkCount);
+            } catch (e) {
+                console.error(e);
+            }
+
         //await new Promise(r => setTimeout(r, 100));
         chunkIndex++;
     }
@@ -85,14 +111,16 @@ async function trySendFile(file) {
 
 async function fileAddClicked(event)
 {
-let fileInput = document.createElement("input");
+    let fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.multiple = true;
     fileInput.onchange = async () => {
-        for (let file of fileInput.files) {
-            console.log(`> Sending file: `, file);
-            await trySendFile(file);
-        }
+        let files = fileInput.files;
+        if (files.length > 0 && confirm(`Send ${files.length} file(s) to the chat?`))
+            for (let file of files) {
+                console.log(`> Sending file: `, file);
+                await trySendFile(file);
+            }
     };
     fileInput.click();
 }
@@ -102,10 +130,11 @@ async function fileDroppedInTextArea(event) {
     console.log(`File dropped in text area`, event);
 
     const files = event.dataTransfer.files;
-    for (let file of files) {
-        console.log(`> Sending file: `, file);
-        await trySendFile(file);
-    }
+    if (files.length > 0 && confirm(`Send ${files.length} file(s) to the chat?`))
+        for (let file of files) {
+            console.log(`> Sending file: `, file);
+            await trySendFile(file);
+        }
 }
 
 async function uploadFileFromString(str, filename)
@@ -119,10 +148,11 @@ async function filePastedInTextArea(event) {
     const files = dT.files;
 
     // Upload files
-    for (let file of files) {
-        console.log(`> Sending file: `, file);
-        await trySendFile(file);
-    }
+    if (files.length > 0 && confirm(`Send ${files.length} file(s) to the chat?`))
+        for (let file of files) {
+            console.log(`> Sending file: `, file);
+            await trySendFile(file);
+        }
 
     // Upload clipboard as a file if it's a long string
     let paste = (event.clipboardData || window.clipboardData).getData("text");
