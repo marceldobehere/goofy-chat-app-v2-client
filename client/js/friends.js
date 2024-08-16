@@ -1,7 +1,7 @@
 async function addFriendUser()
 {
     let userId = prompt("Enter user id:");
-    if (userId == null)
+    if (userId == null || userId == "")
         return;
     userId = parseInt(userId);
     if (isNaN(userId))

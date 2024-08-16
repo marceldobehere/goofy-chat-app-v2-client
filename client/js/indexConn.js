@@ -59,3 +59,9 @@ async function doConnInit() {
     showId();
     await resetUiList();
 }
+
+function copyUserId()
+{
+    let element = document.getElementById('main-chat-selector-settings-userid');
+    navigator.clipboard.writeText(element.textContent).then();
+}
