@@ -22,19 +22,21 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Fully Open Source
 * Markdown Support (With Syntax Highlighting)
 
-
-### Partially implemented / In Progress Features
-* Private/Group Voice/Video calls (using WebRTC)
+### Mostly working Features
 * Group Chats
 * Image/Video/File Sharing
 * Embedded Images/Videos/Audios
+
+### Partially implemented Features
+* Private/Group Voice/Video calls (using WebRTC)
 
 ### Planned Features
 * Friend System / DMs (?)
  * People sending friend/message requests before being able to chat with you
  * Blocking people
  * Having open/closed "DMs"
-* Notification
+* Notifications
+* Upload Status Bar
 * Improved mobile usability
 * Potentially PWA Features (?)
 * Preferred Server for decentralized communication

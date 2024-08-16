@@ -272,7 +272,17 @@ async function deleteCurrDm()
     if (!confirm("Do you really want to delete this chat?"))
         return;
 
-    await deleteDirectMessages(docChatLastChannelId);
+    let deleteFiles = confirm("Do you also want to delete all files?");
+    let dmUserId = docChatLastChannelId;
+
+    await deleteDirectMessages(dmUserId);
+
+    if (deleteFiles)
+    {
+        let files = await internalGetRawFiles(currentUser['mainAccount'], dmUserId);
+        for (let file of files)
+            await internalDeleteFile(currentUser['mainAccount'], dmUserId, file["fileId"]);
+    }
 
     await resetUiList();
 }

@@ -129,6 +129,15 @@ async function internalGetRawFiles(account, userId)
     );
 }
 
+async function internalGetAllRawFiles(account)
+{
+    return await _intLockMethod(
+        _lMsgDxGetAllRawFiles,
+        undefined,
+        [account]
+    );
+}
+
 async function internalHasFile(account, userId, fileId)
 {
     return await _intLockMethod(
