@@ -30,11 +30,11 @@ async function createSockets(serverList, user)
                 serverStatusList[currListIndex] = true;
 
                 let res = (async () => {
-                    setStatus(`Init Sock ${currListIndex * 3 + 1}/${serverList.length * 3}`)
+                    await setStatus(`Init Sock ${currListIndex * 3 + 1}/${serverList.length * 3}`)
                     await login(socket, user["mainAccount"]);
-                    setStatus(`Init Sock ${currListIndex * 3 + 2}/${serverList.length * 3}`)
+                    await setStatus(`Init Sock ${currListIndex * 3 + 2}/${serverList.length * 3}`)
                     await login(socket, user["listenerAccount"]);
-                    setStatus(`Init Sock ${currListIndex * 3 + 3}/${serverList.length * 3}`)
+                    await setStatus(`Init Sock ${currListIndex * 3 + 3}/${serverList.length * 3}`)
                     await sockReqMessages(socket);
                 })();
 
@@ -70,7 +70,7 @@ async function createSockets(serverList, user)
         listIndex++;
     }
 
-    setStatus("Connected");
+    await setStatus("Connected");
 }
 
 function createSocket(addr)

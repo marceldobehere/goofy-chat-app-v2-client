@@ -1,23 +1,25 @@
+const sleep = async (time) => await new Promise(r => setTimeout(r, time));
+
 async function init()
 {
     try {
-        setStatus("Init Lib")
+        await setStatus("Init Lib")
         console.log("> Initializing client lib...");
         await initClientLib();
 
-        setStatus("Init UI")
+        await setStatus("Init UI")
         await doConnInit();
 
-        setStatus("Init Acc")
+        await setStatus("Init Acc")
         if (!hasOwnUserChatInfo(currentUser))
             await askOwnChatInfo();
 
-        setStatus("Ready")
+        await setStatus("Ready")
         console.log("> Done!");
     }
     catch (e)
     {
-        setStatus("Fatal Error");
+        await setStatus("Fatal Error");
         logFatalErrorAndCrash(e);
     }
 }

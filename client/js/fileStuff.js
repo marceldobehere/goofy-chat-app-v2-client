@@ -100,7 +100,6 @@ async function trySendFile(file, statusCallBack) {
                 console.error(e);
             }
 
-        //await new Promise(r => setTimeout(r, 100));
         chunkIndex++;
     }
     // await Promise.all(promiseArr);
@@ -302,7 +301,7 @@ async function loadFileList(account) {
             fileListUl.appendChild(li);
             fileListDiv.scrollTop = fileListDiv.scrollHeight;
 
-            await new Promise(r => setTimeout(r, 10));
+            await sleep(10);
         }
     }
     catch (e) {

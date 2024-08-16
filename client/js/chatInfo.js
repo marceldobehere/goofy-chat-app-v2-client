@@ -166,7 +166,7 @@ function promptUntilText(text)
 
 async function askOwnChatInfo()
 {
-    setStatus("Request Info")
+    await setStatus("Request Info")
     let chatInfo = getOwnUserChatInfo(currentUser);
 
     alert('Initial Account Stuff');

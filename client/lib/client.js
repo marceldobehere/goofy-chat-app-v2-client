@@ -45,39 +45,45 @@ async function initClientLib()
 {
     await initLocalStorageStuff(
         () => {
-            setStatus("Request Password")
+            setStatus("Request Password");
             return prompt("Enter password:");
         },
         () => {
             alert("Invalid password");
         },
         () => {
-            setStatus("Password?")
+            setStatus("Password?");
             return confirm("Do you want to secure your data with a password?");
         });
 
-    setStatus("Init User")
+    docChatList.innerText = "Initialising User...";
+    await sleep(10);
+    await setStatus("Init User");
     initUserStuff();
-    setStatus("Init Chat")
+    await setStatus("Init Chat");
     initChatStuff();
-    setStatus("Init Servers")
+    await setStatus("Init Servers");
     initServerListStuff();
-    setStatus("Init Crypto")
+    await setStatus("Init Crypto");
     initUserPuKeyInterface();
 
-    setStatus("Init Msgs")
+    await setStatus("Init Msgs");
     await initLocalMsgInterface(currentUser["mainAccount"]);
     await initUserMsgSystem();
     await initMsgSystem();
 
-    setStatus("Init Sockets")
+
+    docChatList.innerText = "Connecting to server, this might take a moment with new accounts...";
+    await setStatus("Init Sockets");
     await createSockets(serverList, currentUser);
 
-    setStatus("Check User")
+    await setStatus("Check User");
     await checkUserStuff();
+    docChatList.innerText = "";
 
-    setStatus("Init VC?")
+    await setStatus("Init VC?");
     tryExtFn(extFnVcInit);
+    await setStatus("Init Done")
 
     //console.log(await accSendRawMessage(currentUser["mainAccount"], currentUser["mainAccount"]["userId"], {text: "yooo"}));
 }
