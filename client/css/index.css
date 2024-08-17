@@ -184,7 +184,7 @@ body {
 #main-chat-content {
     border: 1px solid orange;
     background-color: var(--main-chat-bg);
-    width: calc(var(--main-chat-size) * var(--main-chat-chat-shown));
+    width: 100%;
 
     margin: 0px;
     padding: 0px;
@@ -266,7 +266,13 @@ body {
     border: 1px solid yellow;
     background-color: var(--main-chat-info-bg);
     overflow: auto;
-    width: calc(100% * var(--main-chat-show-info));
+    width: 100%;
+}
+
+#main-chat-info-inner {
+    min-width: var(--main-chat-info-size);
+    width: 100%;
+    height: 100%;
 }
 
 /*Change the scrollbar*/
