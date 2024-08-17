@@ -37,28 +37,43 @@ async function addFileStatListEntry(file) {
 
 // Create a div that contains the file name and a cancel button
 async function displayNewFileStatListEntry(file) {
+    let fileData = await file.arrayBuffer();
+
+    let blob = new Blob([fileData]);//, {type: "image/png"});
+    let url = URL.createObjectURL(blob);
+
+    let newBlob = undefined;
+    if (await doesImageExist(url))
+        newBlob = new Blob([fileData], {type: "image/png"});
+    // else if (await doesVideoExist(url))
+    //     newBlob = new Blob([fileData], {type: "video/mp4"});
+    // else if (await doesAudioExist(url))
+    //     newBlob = new Blob([fileData], {type: "audio/mpeg"});
+
+
     let div = document.createElement("div");
     div.className = "file-stat-entry";
+
+    let prev = document.createElement("img");
+    prev.className = "file-stat-entry-preview";
+    if (newBlob)
+        prev.src = URL.createObjectURL(newBlob);
+    else
+        prev.src = "./assets/imgs/prev.png";
+    prev.onclick = async () => {
+        console.log(`Clicked on file: `, file)
+        if (newBlob) {
+            let newUrl = URL.createObjectURL(newBlob);
+            let newTab = window.open(newUrl, "_blank");
+            newTab.focus();
+        }
+    }
+    div.appendChild(prev);
 
     let text = document.createElement("p");
     text.textContent = `${file.name} (${dynamicSizeDisplay(file.size)})`;
     text.onclick = async () => {
         console.log(`Clicked on file: `, file)
-        if (!file)
-            return alert(`[Error: File not found]`);
-        let fileData = await file.arrayBuffer();
-
-        let blob = new Blob([fileData]);//, {type: "image/png"});
-        let url = URL.createObjectURL(blob);
-
-        let newBlob = undefined;
-        if (await doesImageExist(url))
-            newBlob = new Blob([fileData], {type: "image/png"});
-        // else if (await doesVideoExist(url))
-        //     newBlob = new Blob([fileData], {type: "video/mp4"});
-        // else if (await doesAudioExist(url))
-        //     newBlob = new Blob([fileData], {type: "audio/mpeg"});
-
         if (newBlob) {
             let newUrl = URL.createObjectURL(newBlob);
             let newTab = window.open(newUrl, "_blank");
@@ -115,7 +130,7 @@ async function trySendFiles()
 
         // remove the X buttons
         for (let div of fileDivList)
-            div.children[1].remove();
+            div.children[2].remove();
 
         // send all files
         let fileIndex = 0;
@@ -128,7 +143,7 @@ async function trySendFiles()
                 await trySendFile(file, (fileId, bytesSent, totalBytes, chunkIndex, chunkCount) => {
                     if (!div)
                         return;
-                    let text = div.children[0];
+                    let text = div.children[1];
                     if (bytesSent == totalBytes) {
                         try {div.remove();} catch (e) {}
                     }

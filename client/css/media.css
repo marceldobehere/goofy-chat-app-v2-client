@@ -53,7 +53,7 @@
     --main-chat-margin-vert: 15px;
     --main-chat-padding: 5px;
     --main-chat-input-height: calc(3.6em + 10px);
-    --main-chat-input-file-status-height: calc(calc(1.2em + 22px + var(--main-chat-selector-scroll-size)) * var(--main-chat-show-input-file-status));
+    --main-chat-input-file-status-height: calc(calc(1.4em + 30px + var(--main-chat-selector-scroll-size)) * var(--main-chat-show-input-file-status));
     --main-chat-header-height: calc(1.4em + 26px);
     --main-chat-input-upload-size: 60px;
     --main-chat-font-size: 1.05em;

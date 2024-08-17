@@ -225,21 +225,36 @@ body {
 }
 
 #main-chat-content-input-file-status * {
-    margin: 0px 8px 0px 8px;
-    padding: 4px;
     text-wrap: nowrap;
 }
 
-.file-stat-entry {
+#main-chat-content-input-file-status .file-stat-entry {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 2rem auto auto;
     border: 1px solid red;
-    margin: 0px;
-    padding: 2px;
+    margin: 0px 4px 0px 4px;
+    padding: 4px;
+    height: calc(1.4em + 10px);
+    grid-template-rows: auto;
 }
 
-.file-stat-entry-cancel {
+#main-chat-content-input-file-status .file-stat-entry * {
+    margin: auto;
+    padding: 0px 4px 0px 4px;
+}
+
+#main-chat-content-input-file-status .file-stat-entry-cancel {
     color: red;
+    height: 100%;
+}
+
+#main-chat-content-input-file-status .file-stat-entry-preview {
+    width: 80%;
+    max-height: 100%;
+    max-width: 100%;
+    margin: auto;
+    padding: 0px;
+
 }
 
 /*Change the scrollbar*/
