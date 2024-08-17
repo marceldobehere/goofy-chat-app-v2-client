@@ -81,3 +81,32 @@ async function importProfile()
 
     location.reload();
 }
+
+async function updateProfile()
+{
+    // 1. Change username
+    // 2. idk
+
+    let indexStr = prompt("Settings:\n1. Change Nickname");
+    if (indexStr == null || indexStr == "")
+        return;
+
+    let index = parseInt(indexStr);
+    if (isNaN(index))
+        return alert("Invalid index");
+
+    if (index < 1 || index > 1)
+        return alert("Invalid index");
+
+    if (index == 1)
+    {
+        let username = prompt("Enter new nickname:");
+        if (username == null || username == "")
+            return;
+
+        let chatInfo = getOwnUserChatInfo(currentUser);
+        chatInfo["baseNickname"] = username;
+
+        await setOwnUserChatInfo(currentUser, chatInfo, false);
+    }
+}
