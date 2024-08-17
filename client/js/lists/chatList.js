@@ -1,5 +1,7 @@
 const docChatList = document.getElementById("main-chat-content-list");
 const docChatUlDiv = document.getElementById("main-chat-content-uldiv");
+const inputElement = document.getElementById('main-chat-content-input');
+const inputStatusElement = document.getElementById('main-chat-content-input-file-status');
 let docChatLastServerId = NoId;
 let docChatLastChannelId = NoId;
 
@@ -84,6 +86,7 @@ function createChatEntry(username, time, message)
     docChatList.appendChild(li);
 }
 
+
 const docChatHeaderDeleteBtn = document.getElementById("main-chat-content-header-delete-chat");
 async function refreshChatListArea(serverId, channelId)
 {
@@ -91,14 +94,15 @@ async function refreshChatListArea(serverId, channelId)
 
     docChatHeaderDeleteBtn.style.display = "none";
     let chatNameElement = document.getElementById("main-chat-content-header-toggle-chat-name");
-    let inputElement = document.getElementById('main-chat-content-input');
     if (serverId == NoId || channelId == NoId)
     {
         inputElement.style.display = "none";
+        inputStatusElement.style.display = "none";
         chatNameElement.textContent = "";
         return;
     }
     inputElement.style.display = "";
+    inputStatusElement.style.display = "";
 
     if (serverId == DMsId)
     {
@@ -121,6 +125,7 @@ async function refreshChatListArea(serverId, channelId)
     }
 }
 async function refreshChatList() {
+    console.log("Refreshing chat list");
     await createChatList(docChatLastServerId, docChatLastChannelId, false);
 }
 async function createChatList(serverId, channelId, scrollDown) {
@@ -129,7 +134,6 @@ async function createChatList(serverId, channelId, scrollDown) {
     await updateChatInfo(serverId, channelId);
 
     let chatNameElement = document.getElementById("main-chat-content-header-toggle-chat-name");
-    let inputElement = document.getElementById('main-chat-content-input');
     if (serverId == NoId || channelId == NoId)
     {
         if (serverId == DMsId && getAllUsers().length == 0)
@@ -143,9 +147,13 @@ async function createChatList(serverId, channelId, scrollDown) {
             chatNameElement.textContent = "";
         }
         inputElement.style.display = "none";
+        inputStatusElement.style.display = "none";
         return;
     }
     inputElement.style.display = "";
+    inputStatusElement.style.display = "";
+
+    await clearAndHideFileStatList();
 
     if (serverId == DMsId)
     {
@@ -204,28 +212,35 @@ async function createChatList(serverId, channelId, scrollDown) {
 
 async function channelClicked(element, channelId, serverId) {
     console.log(`Channel ${channelId} clicked`);
+
+
     if (docLastChannelEntry)
         docLastChannelEntry.classList.remove("chat-selector-entry-active");
     element.classList.add("chat-selector-entry-active");
     docLastChannelEntry = element;
     docLastChannelId = channelId;
-    docChatLastServerId = serverId;
-    docChatLastChannelId = channelId;
 
-    await createChatList(docLastChannelServerId, channelId, true);
     if (settingsObj["chat"]["auto-hide-chat"])
         setChannelInfoVisibility(false);
 
-    if (serverId == DMsId)
+    if (docChatLastChannelId != channelId || docChatLastServerId != serverId)
     {
-        await userMarkMessagesAsRead(channelId);
-        await createChannelList(DMsId, channelId, true);
+        docChatLastServerId = serverId;
+        docChatLastChannelId = channelId;
+        await createChatList(docLastChannelServerId, channelId, true);
+
+        if (serverId == DMsId)
+        {
+            await userMarkMessagesAsRead(channelId);
+            await createChannelList(DMsId, channelId, true);
+        }
+        else if (serverId != NoId)
+        {
+            await userMarkGroupMessagesAsRead(serverId, channelId);
+            await createChannelList(serverId, channelId, true);
+        }
     }
-    else if (serverId != NoId)
-    {
-        await userMarkGroupMessagesAsRead(serverId, channelId);
-        await createChannelList(serverId, channelId, true);
-    }
+
 
     docChatInputElement.focus();
 }

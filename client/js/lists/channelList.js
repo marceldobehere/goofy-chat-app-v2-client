@@ -80,7 +80,7 @@ async function createChannelList(serverId, selectedChatId, forceRefresh) {
             await createChannelEntry(channel["id"], channel["name"], serverId, selectedChatId == channel["id"]);
     }
 
-    if (docLastChannelId == NoId)
+    if (docChatLastChannelId == NoId)
         await refreshChatList();
 }
 

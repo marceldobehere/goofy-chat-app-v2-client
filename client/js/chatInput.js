@@ -10,6 +10,12 @@ function mainChatInputKey(event)
         setTimeout(messageSend, 0);
         return event.preventDefault();
     }
+    if (event.key == "Escape")
+    {
+        clearAndHideFileStatList().then();
+        return event.preventDefault();
+
+    }
 }
 
 function getCurrentChatUserId()
@@ -48,29 +54,37 @@ async function messageSend() {
         messageSending++;
         if (messageSending > 20) {
             messageSending = 0;
-            console.log("SEND MAIL ANYWAY");
+            console.log("SEND MSG ANYWAY");
 
             resetMsgLocks();
         }
-        setTimeout(messageSend, 60);
+        setTimeout(messageSend, 500);
         return;
     }
     messageSending++;
 
-    let text = docChatInputElement.value;
-    docChatInputElement.value = "";
-    if (text == "")
+    if (!confirmSendFiles())
     {
         messageSending = 0;
         return;
     }
 
+    let text = docChatInputElement.value;
+    docChatInputElement.value = "";
+
     try
     {
-        await doMsgSendThingy("text", text);
+        if (text != "")
+            await doMsgSendThingy("text", text);
     }
     catch (e)
     {
+        console.error(e);
+    }
+
+    try {
+        trySendFiles().then();
+    } catch (e) {
         console.error(e);
     }
 

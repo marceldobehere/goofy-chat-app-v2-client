@@ -38,6 +38,11 @@ class AsyncLock {
         await bigPromise;
     }
 
+    isLocked()
+    {
+        return this.resolveArr.length > 0;
+    }
+
     reset()
     {
         this.promiseArr = [];
@@ -62,8 +67,9 @@ const lockOutgoingAes = new AsyncLock();
 const lockOutgoingRsa = new AsyncLock();
 const lockSymmKey = new AsyncLock();
 
-const locklocalMsg = new AsyncLock();
 
+const locklocalMsg = new AsyncLock();
+const lockFileAdd = new AsyncLock();
 
 function resetMsgLocks()
 {

@@ -189,9 +189,10 @@ body {
     margin: 0px;
     padding: 0px;
     display: grid;
-    grid-template-rows: var(--main-chat-header-height) auto var(--main-chat-input-height);
+    grid-template-rows: var(--main-chat-header-height) auto var(--main-chat-input-file-status-height) var(--main-chat-input-height);
     grid-template-columns: auto;
     overflow: hidden;
+    transition: 0.35s ease-in-out;
 }
 
 #main-chat-content-uldiv {
@@ -207,6 +208,54 @@ body {
     border: 1px solid chartreuse;
     display: grid;
     grid-template-columns: var(--main-chat-input-upload-size) auto;
+}
+
+/*Several divs will be horizontal with a scrollbar if needed*/
+#main-chat-content-input-file-status {
+    border: 1px solid orchid;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 2px;
+    margin: 0px;
+    background-color: var(--main-chat-upload-bg);
+}
+
+#main-chat-content-input-file-status * {
+    margin: 0px 8px 0px 8px;
+    padding: 4px;
+    text-wrap: nowrap;
+}
+
+.file-stat-entry {
+    display: grid;
+    grid-template-columns: auto auto;
+    border: 1px solid red;
+    margin: 0px;
+    padding: 2px;
+}
+
+.file-stat-entry-cancel {
+    color: red;
+}
+
+/*Change the scrollbar*/
+#main-chat-content-input-file-status::-webkit-scrollbar {
+    height: var(--main-chat-selector-scroll-size);
+}
+
+/*Change the scrollbar track*/
+#main-chat-content-input-file-status::-webkit-scrollbar-track {
+    background-color: var(--main-chat-selector-scroll-bg);
+}
+
+/*Change the scrollbar thumb*/
+#main-chat-content-input-file-status::-webkit-scrollbar-thumb {
+    background-color: var(--main-chat-selector-scroll-color);
+    border-radius: var(--main-chat-selector-scroll-size);
 }
 
 #main-chat-content-input-upload {
