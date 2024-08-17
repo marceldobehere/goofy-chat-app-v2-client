@@ -60,6 +60,31 @@ There are also minor things like the support for communication using decentraliz
 This is also an attempt to turn this into a slowly more usable project.
 
 
+## Feature Explanations / Guides
+
+### Reset Account
+If there is a fatal error, or you feel like resetting your account, you can do so by clicking the `Reset Profile` button in the settings.
+
+
+### Account Export/Import
+To export/import your account, you can open the settings and click the `Export Profile` or `Import Profile` button.
+
+If you have a lot of files, and especially if your profile is encrypted, it is recommended to export without files / export the files separately.
+Currently this is not implemented yet. The closest thing you can do is to delete the files before exporting.
+
+Exporting may take a long while with lots of data, especially if you have a lot of files. Please note that the browser could crash if its too much xd
+
+Note: When you import your profile you can either load it as a pure backup or you can add it as a synced device. More Information on that below.
+
+
+### Multi Device Sync
+To sync your account across devices you will need to do the following steps:
+* Export your account on the first device
+* Import your account on the second device, but instead of loading it as a backup, you will load it as a synced device.
+* Profit!
+
+
+
 ## The idea
 
 ### Background
