@@ -20,24 +20,28 @@ async function _lMsgDxCreateDb()
         logInfo("Encrypted DB ready");
     }
 
-    await db.version(3).stores({
+    await db.version(4).stores({
         messages: `
         [messageId+accountUserId+userId],
+        [accountUserId+userId],
         userId,
         accountUserId,
         messageId`,
         unread:`
         [messageId+accountUserId+userId],
+        [accountUserId+userId],
         messageId,
         accountUserId,
         userId`,
         msgIds: `
         [messageId+accountUserId+userId],
+        [accountUserId+userId],
         messageId,
         accountUserId,
         userId`,
         files: `
         [fileId+accountUserId+userId],
+        [accountUserId+userId],
         fileId,
         accountUserId,
         userId`,
