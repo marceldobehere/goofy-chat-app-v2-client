@@ -354,6 +354,16 @@ async function openChat(serverId, channelId) {
     await channelClicked(element, channelId, serverId);
 }
 
+function isAtBottom()
+{
+    return docChatUlDiv.scrollHeight - docChatUlDiv.scrollTop - docChatUlDiv.clientHeight < 140;
+}
+
+function scrollToBottom()
+{
+    docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
+}
+
 async function messageReceivedUI(account, chatUserId, message)
 {
     /*    console.log("MESSAGE RECEIVED")
@@ -361,7 +371,7 @@ async function messageReceivedUI(account, chatUserId, message)
         console.log(message);*/
 
 
-    let shouldScroll = docChatUlDiv.scrollHeight - docChatUlDiv.scrollTop - docChatUlDiv.clientHeight < 140;
+    let shouldScroll = isAtBottom();
     if (isStrChannelFromGroup(chatUserId))
     {
         let groupInfo = getGroupAndChannelFromChannelStr(chatUserId);
@@ -378,7 +388,7 @@ async function messageReceivedUI(account, chatUserId, message)
 
             createChatEntry(username, message);
             if (shouldScroll)
-                docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
+                scrollToBottom();
         }
 
         if (!windowVisible() ||
@@ -416,7 +426,7 @@ async function messageReceivedUI(account, chatUserId, message)
             await refreshChatListArea(DMsId, chatUserId);
             createChatEntry(username, message);
             if (shouldScroll)
-                docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
+                scrollToBottom();
         }
 
         if (!windowVisible() ||

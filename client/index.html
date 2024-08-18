@@ -13,10 +13,14 @@
     <meta name="description" content="Goofy Chat App v2">
     <script>
         const documentHeight = () => {
+            let atBottom;
+            try { atBottom = isAtBottom(); } catch (e) { atBottom = false; }
             const doc = document.documentElement;
             let height = window.visualViewport.height;
             doc.style.setProperty('--main-app-height', `${height - 2}px`);
             console.log(`New Document Height: ${height} (Other: ${window.innerHeight})`);
+            if (atBottom)
+                try { setTimeout(scrollToBottom, 100); } catch (e) {}
         }
         window.addEventListener('resize', documentHeight)
         documentHeight()
