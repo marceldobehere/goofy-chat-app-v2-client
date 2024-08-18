@@ -3,7 +3,7 @@ async function createGroup()
     alert("GROUP ADD");
 
     let groupName = prompt("Enter Group name");
-    if (groupName == null)
+    if (groupName == null || groupName == "")
         return;
     let groupId = getRandomIntInclusive(0, 99999999999);
 
