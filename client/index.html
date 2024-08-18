@@ -14,12 +14,13 @@
     <script>
         const documentHeight = () => {
             const doc = document.documentElement;
-            doc.style.setProperty('--main-app-height', `${window.innerHeight - 2}px`);
-            console.log('Document Height', window.innerHeight - 2);
+            let height = window.visualViewport.height;
+            doc.style.setProperty('--main-app-height', `${height - 2}px`);
+            console.log(`New Document Height: ${height} (Other: ${window.innerHeight})`);
         }
         window.addEventListener('resize', documentHeight)
         documentHeight()
-        setInterval(documentHeight, 1000);
+        //setInterval(documentHeight, 1000);
 
         document.addEventListener("DOMContentLoaded", (event) => {
             domLoaded();
