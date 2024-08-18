@@ -95,6 +95,7 @@ function createChatEntry(username, msgObj, onlyReturn)
             await doMsgSendThingy("delete-msg", {messageId: messageId}, true);
             await internalRemoveUserMessage(currentUser['mainAccount'], getCurrentChatUserId(), messageId);
             await messageDeletedUI(currentUser['mainAccount'], getCurrentChatUserId(), messageId);
+            docChatInputElement.focus();
         };
 
         let editButton = document.createElement("button");
@@ -113,6 +114,7 @@ function createChatEntry(username, msgObj, onlyReturn)
             await doMsgSendThingy("edit-msg", {messageId: messageId, message: edited}, true);
             let msg = await internalEditUserMessageText(currentUser['mainAccount'], getCurrentChatUserId(), messageId, edited);
             await messageEditedUI(currentUser['mainAccount'], getCurrentChatUserId(), messageId, msg["message"]);
+            docChatInputElement.focus();
         };
 
         let br = document.createElement("br");
