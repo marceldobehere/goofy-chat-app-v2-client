@@ -31,6 +31,9 @@ async function init()
         if (!hasOwnUserChatInfo(currentUser))
             await askOwnChatInfo();
 
+        await setStatus("Init Notif")
+        await checkNotifications();
+
         await setStatus("Ready")
         console.log("> Done!");
     }
