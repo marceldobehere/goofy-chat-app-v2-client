@@ -28,19 +28,19 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Image/Video/File Sharing
 * Upload Status Bar / Temporary File Upload List
 * Embedded Images/Videos/Audios
-
+* Notifications
+* 
 ### Partially implemented Features
 * Private/Group Voice/Video calls (using WebRTC)
 * Pings
+* Editing Messages
 
 ### Planned Features
-* Editing Messages
 * Friend System / DMs (?)
  * People sending friend/message requests before being able to chat with you
  * Blocking people
  * Having open/closed "DMs"
-* Notifications
-* Small Profile Pictures
+* Small Profile Picture
 * Improved mobile usability
 * Potentially PWA Features (?)
 * Preferred Server for decentralized communication
