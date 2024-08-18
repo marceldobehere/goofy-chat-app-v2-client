@@ -13,8 +13,15 @@ let consoleMsgs = [];
 
 function createFakeConsoleEntry(level, args, add) {
     let li = document.createElement("li");
+
+    let timeStr = (new Date()).toISOString().substring(11,19);
+    let spanTime = document.createElement("span");
+    spanTime.classList.add("goofy-console-time");
+    spanTime.textContent = timeStr + " ";
+
     let spanLevel = document.createElement("span");
     spanLevel.classList.add(`goofy-console-${level.toLowerCase()}`);
+
     let spanMsg = document.createElement("span");
     spanMsg.classList.add("goofy-console-msg");
 
@@ -35,6 +42,7 @@ function createFakeConsoleEntry(level, args, add) {
 
     spanMsg.textContent = msg;
 
+    li.appendChild(spanTime);
     li.appendChild(spanLevel);
     li.appendChild(spanMsg);
 
