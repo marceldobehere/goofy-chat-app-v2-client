@@ -370,6 +370,7 @@ async function messageReceivedUI(account, chatUserId, message)
         console.log(chatUserId);
         console.log(message);*/
 
+    let mine = message["from"] == currentUser['mainAccount']['userId'];
 
     let shouldScroll = isAtBottom();
     if (isStrChannelFromGroup(chatUserId))
@@ -391,22 +392,24 @@ async function messageReceivedUI(account, chatUserId, message)
                 scrollToBottom();
         }
 
-        if (!windowVisible() ||
-            !(docChatLastServerId == groupInfo["groupId"] && docChatLastChannelId == groupInfo["channelId"]))
-            playNotificationSound();
+        if (!mine) {
+            if (!windowVisible() ||
+                !(docChatLastServerId == groupInfo["groupId"] && docChatLastChannelId == groupInfo["channelId"]))
+                playNotificationSound();
 
-        {
-            if (hasGroupChatInfo(currentUser["mainAccount"], groupInfo["groupId"]))
             {
-                let info = getGroupChatInfo(currentUser['mainAccount'], groupInfo["groupId"]);
-                let channel = info["channels"].find(x => x["id"] ==  groupInfo["channelId"]);
+                if (hasGroupChatInfo(currentUser["mainAccount"], groupInfo["groupId"]))
+                {
+                    let info = getGroupChatInfo(currentUser['mainAccount'], groupInfo["groupId"]);
+                    let channel = info["channels"].find(x => x["id"] ==  groupInfo["channelId"]);
 
-                showNotification(`${username} in ${info["groupName"]} - ${channel["name"]}`, message["data"], () => {
-                    openChat(groupInfo["groupId"], groupInfo["channelId"]);
-                });
+                    showNotification(`${username} in ${info["groupName"]} - ${channel["name"]}`, message["data"], () => {
+                        openChat(groupInfo["groupId"], groupInfo["channelId"]);
+                    });
+                }
+                else
+                    logError("Group not found")
             }
-            else
-                logError("Group not found")
         }
 
 
@@ -429,13 +432,15 @@ async function messageReceivedUI(account, chatUserId, message)
                 scrollToBottom();
         }
 
-        if (!windowVisible() ||
-            !(chatUserId == docChatLastChannelId && docChatLastServerId == DMsId))
-            playNotificationSound();
+        if (!mine) {
+            if (!windowVisible() ||
+                !(chatUserId == docChatLastChannelId && docChatLastServerId == DMsId))
+                playNotificationSound();
 
-        showNotification(username, message["data"], () => {
-            openChat(DMsId, chatUserId);
-        });
+            showNotification(username, message["data"], () => {
+                openChat(DMsId, chatUserId);
+            });
+        }
 
 
         if (docLastServerId == DMsId)// && (await userGetMessages(chatUserId)).length == 1)
