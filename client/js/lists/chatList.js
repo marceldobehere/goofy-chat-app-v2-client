@@ -281,6 +281,8 @@ async function messageReceivedUI(account, chatUserId, message)
     /*    console.log("MESSAGE RECEIVED")
         console.log(chatUserId);
         console.log(message);*/
+
+    let shouldScroll = docChatUlDiv.scrollHeight - docChatUlDiv.scrollTop - docChatUlDiv.clientHeight < 140;
     if (isStrChannelFromGroup(chatUserId))
     {
         let groupInfo = getGroupAndChannelFromChannelStr(chatUserId);
@@ -293,8 +295,10 @@ async function messageReceivedUI(account, chatUserId, message)
 
             //await createChatList(groupInfo["groupId"], groupInfo["channelId"], true);
             await refreshChatListArea(groupInfo["groupId"], groupInfo["channelId"]);
+
             createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"], message["messageId"], message["from"]);
-            docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
+            if (shouldScroll)
+                docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
 
 
@@ -310,7 +314,8 @@ async function messageReceivedUI(account, chatUserId, message)
             //await createChatList(DMsId, chatUserId, true);
             await refreshChatListArea(DMsId, chatUserId);
             createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"], message["messageId"], message["from"]);
-            docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
+            if (shouldScroll)
+                docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
 
         if (docLastServerId == DMsId)// && (await userGetMessages(chatUserId)).length == 1)

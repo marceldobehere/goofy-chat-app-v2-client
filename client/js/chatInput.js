@@ -12,6 +12,8 @@ function mainChatInputKey(event)
     }
     if (event.key == "Escape")
     {
+        if (currSendFileList.length == 0)
+            docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         clearAndHideFileStatList().then();
         return event.preventDefault();
 
