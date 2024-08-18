@@ -21,22 +21,25 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Cross Device Sync
 * Fully Open Source
 * Markdown Support (With Syntax Highlighting)
+* Deleting Messages
 
 ### Mostly working Features
 * Group Chats
 * Image/Video/File Sharing
+* Upload Status Bar / Temporary File Upload List
 * Embedded Images/Videos/Audios
 
 ### Partially implemented Features
 * Private/Group Voice/Video calls (using WebRTC)
 
 ### Planned Features
+* Editing Messages
 * Friend System / DMs (?)
  * People sending friend/message requests before being able to chat with you
  * Blocking people
  * Having open/closed "DMs"
 * Notifications
-* Upload Status Bar
+* Small Profile Pictures
 * Improved mobile usability
 * Potentially PWA Features (?)
 * Preferred Server for decentralized communication
@@ -47,7 +50,7 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Stickers (?)
 * Portable Core Client Lib in NodeJS/Java (May be in progress)
 * Improved Voice Chats / Potential integration into the main app
-* Multiple fully seperated Accounts
+* Multiple fully separated Accounts
 * Customizable UI/Themes
 
 

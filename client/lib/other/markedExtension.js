@@ -139,7 +139,70 @@ const renderer = {
             return `<a id="${imgId}">[Loading]</a>`;
         }
         else
-            return `<a href="${url}" target="_blank">[Image ${text}]</a>`;
+        {
+            if (settingsObj["chat"]["allow-external-sources-global"])
+            {
+                let randomId = getRandomIntInclusive(100000, 9999999);
+                let element = document.createElement("a");
+                element.href = url;
+                element.target = "_blank";
+                element.textContent = `[Image ${text}]`;
+                element.id = `img-${randomId}`;
+
+                waitForElm(`#img-${randomId}`).then(async (element) => {
+                    if (await doesImageExist(url))
+                    {
+                        let imgNode = document.createElement("img");
+                        imgNode.src = url;
+                        imgNode.alt = text;
+                        imgNode.className = "chat-image";
+                        imgNode.onload = () => fixSizeScroll(imgNode);
+                        element.replaceWith(imgNode);
+
+                        imgNode.onclick = () => {
+                            // open image in new tab
+                            let newTab = window.open(url, "_blank");
+                            newTab.focus();
+                        };
+                    }
+                    else if (await doesVideoExist(url))
+                    {
+                        let videoNode = document.createElement("video");
+                        videoNode.src = url;
+                        videoNode.alt = text;
+                        videoNode.className = "chat-video";
+                        videoNode.controls = true;
+                        videoNode.onloadeddata = () => fixSizeScroll(videoNode);
+                        element.replaceWith(videoNode);
+                    }
+                    else if (await doesAudioExist(url))
+                    {
+                        let audioNode = document.createElement("audio");
+                        audioNode.src = url;
+                        audioNode.alt = text;
+                        audioNode.className = "chat-audio";
+                        audioNode.controls = true;
+                        audioNode.onloadeddata = () => fixSizeScroll(audioNode);
+                        element.replaceWith(audioNode);
+                    }
+                    else
+                    {
+                        element.textContent = `[Unknown ${text}]`;
+                    }
+                });
+                return `<a id="img-${randomId}">[Loading]</a>`;
+            }
+            else
+            {
+                text = text.replaceAll("<", "&lt;");
+                text = text.replaceAll(">", "&gt;");
+
+                url = url.replaceAll("<", "&lt;");
+                url = url.replaceAll(">", "&gt;");
+
+                return `<a href="${url}" target="_blank">[External: ${text} (${url})]</a>`;
+            }
+        }
     },
 
     link(token) {

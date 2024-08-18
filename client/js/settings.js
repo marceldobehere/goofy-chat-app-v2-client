@@ -3,6 +3,7 @@ const settingsElement = document.getElementById("main-app-container-settings");
 
 const settingsMainInputAutoHideChatElement = document.getElementById("settings-main-input-auto-hide-chat");
 const settingsMainInputAutoShowChatElement = document.getElementById("settings-main-input-auto-show-chat");
+const settingsMainInputAllowExternalSourcesGlobalElement = document.getElementById("settings-main-input-allow-external-sources-global");
 
 function hideSettings()
 {
@@ -13,6 +14,7 @@ async function showSettings()
 {
     settingsMainInputAutoHideChatElement.checked = getSetting(["chat", "auto-hide-chat"]);
     settingsMainInputAutoShowChatElement.checked = getSetting(["chat", "auto-show-chat"]);
+    settingsMainInputAllowExternalSourcesGlobalElement.checked = getSetting(["chat", "allow-external-sources-global"]);
 
     settingsBgElement.style.display = "block";
 }
