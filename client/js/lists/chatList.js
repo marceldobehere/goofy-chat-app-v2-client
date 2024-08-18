@@ -275,10 +275,14 @@ async function createChatList(serverId, channelId, scrollDown) {
 async function channelClicked(element, channelId, serverId) {
     console.log(`Channel ${channelId} clicked`);
 
+    try {
+        if (docLastChannelEntry)
+            docLastChannelEntry.classList.remove("chat-selector-entry-active");
+        element.classList.add("chat-selector-entry-active");
+    } catch (e) {
+        console.warn("ERROR ADDING CLASS: ", e);
+    }
 
-    if (docLastChannelEntry)
-        docLastChannelEntry.classList.remove("chat-selector-entry-active");
-    element.classList.add("chat-selector-entry-active");
     docLastChannelEntry = element;
     docLastChannelId = channelId;
     await updateChatInfo(serverId, channelId);
@@ -332,11 +336,28 @@ async function messageEditedUI(account, chatUserId, messageId, newMessage)
     }
 }
 
+async function openChat(serverId, channelId) {
+    logInfo(`> Opening chat ${serverId} - ${channelId}`);
+
+    docLastServerId = serverId;
+    docLastChannelId = channelId;
+    createServerList(docLastServerId);
+    await createChannelList(docLastServerId, docLastChannelId, true);
+    await createChatList(docLastServerId, docLastChannelId);
+
+    let channelIdStr = `chat-selector-entry-${serverId}-${channelId}`;
+    let element = document.getElementById(channelIdStr);
+    if (element)
+        element = element.getElementsByTagName("span")[0];
+    await channelClicked(element, channelId, serverId);
+}
+
 async function messageReceivedUI(account, chatUserId, message)
 {
     /*    console.log("MESSAGE RECEIVED")
         console.log(chatUserId);
         console.log(message);*/
+
 
     let shouldScroll = docChatUlDiv.scrollHeight - docChatUlDiv.scrollTop - docChatUlDiv.clientHeight < 140;
     if (isStrChannelFromGroup(chatUserId))
@@ -345,6 +366,7 @@ async function messageReceivedUI(account, chatUserId, message)
         if (groupInfo == null)
             return;
 
+        let username = userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]);
         if (docChatLastServerId == groupInfo["groupId"] && docChatLastChannelId == groupInfo["channelId"])
         {
             await userMarkGroupMessagesAsRead(groupInfo["groupId"], groupInfo["channelId"]);
@@ -352,10 +374,30 @@ async function messageReceivedUI(account, chatUserId, message)
             //await createChatList(groupInfo["groupId"], groupInfo["channelId"], true);
             await refreshChatListArea(groupInfo["groupId"], groupInfo["channelId"]);
 
-            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message);
+            createChatEntry(username, message);
             if (shouldScroll)
                 docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
+
+        if (!windowVisible() ||
+            !(docChatLastServerId == groupInfo["groupId"] && docChatLastChannelId == groupInfo["channelId"]))
+            playNotificationSound();
+
+        {
+            if (hasGroupChatInfo(currentUser["mainAccount"], groupInfo["groupId"]))
+            {
+                let info = getGroupChatInfo(currentUser['mainAccount'], groupInfo["groupId"]);
+                let channel = info["channels"].find(x => x["id"] ==  groupInfo["channelId"]);
+
+                showNotification(`${username} in ${info["groupName"]} - ${channel["name"]}`, message["data"], () => {
+                    openChat(groupInfo["groupId"], groupInfo["channelId"]);
+                });
+            }
+            else
+                logError("Group not found")
+        }
+
+
 
 
         if (docLastServerId == groupInfo["groupId"])
@@ -363,16 +405,26 @@ async function messageReceivedUI(account, chatUserId, message)
     }
     else
     {
+        let username = userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]);
         if (chatUserId == docChatLastChannelId && docChatLastServerId == DMsId)
         {
             await userMarkMessagesAsRead(chatUserId);
 
             //await createChatList(DMsId, chatUserId, true);
             await refreshChatListArea(DMsId, chatUserId);
-            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message);
+            createChatEntry(username, message);
             if (shouldScroll)
                 docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
+
+        if (!windowVisible() ||
+            !(chatUserId == docChatLastChannelId && docChatLastServerId == DMsId))
+            playNotificationSound();
+
+        showNotification(username, message["data"], () => {
+            openChat(DMsId, chatUserId);
+        });
+
 
         if (docLastServerId == DMsId)// && (await userGetMessages(chatUserId)).length == 1)
             await createChannelList(DMsId, docLastChannelId, true);

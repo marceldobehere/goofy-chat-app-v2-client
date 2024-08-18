@@ -5,6 +5,7 @@ let docLastChannelServerId = NoId;
 
 async function createChannelEntry(channelId, channelName, serverId, shouldHighlight) {
     let li = document.createElement("li");
+    li.id = `chat-selector-entry-${serverId}-${channelId}`;
     let span = document.createElement("span");
     span.className = "chat-selector-entry";
     if (channelId != NoId)

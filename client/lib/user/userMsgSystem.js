@@ -174,7 +174,7 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
     }
     else if (!dontRedirectTypes.includes(type))
     {
-        logWarn(`Message already in user:`, message);
+        logInfo(`Message already in user:`, message);
         return;
     }
 
