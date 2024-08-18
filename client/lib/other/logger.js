@@ -64,14 +64,19 @@ function logInfo(...arr)
 function logWarn(...arr)
 {
     if (logWarnEnabled)
-        _logExtra("WARN", arr);
+    {
+        //_logExtra("WARN", arr);
+        console.warn(...arr);
+        console.trace();
+    }
 }
 
 function logError(...arr)
 {
     if (logErrorEnabled)
     {
-        _logExtra("ERROR", arr);
+        //_logExtra("ERROR", arr);
+        console.error(...arr);
         console.trace(arr);
     }
 }
@@ -80,7 +85,9 @@ function logFatalErrorAndCrash(...arr)
 {
     if (logErrorEnabled)
     {
-        _logExtra("FATAL ERROR", arr);
+        //_logExtra("FATAL ERROR", arr);
+        console.error("FATAL ERROR");
+        console.error(...arr);
         console.trace(arr);
     }
 

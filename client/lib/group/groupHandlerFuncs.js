@@ -55,7 +55,7 @@ async function handleGroupMessage(account, msgObj, dontAdd)
     if (!dontAdd)
         await addMessageToUser(account, from, getChannelStrFromGroup(groupId, channelId), sendMsgObj, date);
 
-    logWarn("Group messages not fully implemented yet");
+    //logWarn("Group messages not fully implemented yet");
 }
 
 async function handleGroupInvite(account, msgObj)

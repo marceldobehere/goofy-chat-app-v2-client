@@ -37,9 +37,10 @@ function getReplyStr(message)
 }
 
 
-function createChatEntry(username, time, message)
+function createChatEntry(username, time, message, mine, messageId)
 {
     let li = document.createElement("li");
+    li.id = `chat-msg-${messageId}`;
     let div = document.createElement("div");
     div.className = "chat-entry";
     let span1 = document.createElement("span");
@@ -58,6 +59,26 @@ function createChatEntry(username, time, message)
     replyButton.onclick = () => {
         docChatInputElement.value = `${getReplyStr(message)}\n`;
         docChatInputElement.focus();
+    };
+
+    let deleteButton = document.createElement("button");
+    deleteButton.className = "chat-entry-delete";
+    deleteButton.textContent = "X";
+    deleteButton.onclick = async () => {
+        if (!confirm("Do you really want to delete this message?"))
+            return;
+
+        logInfo("DELETE MSG: " + messageId);
+        await doMsgSendThingy("delete-msg", {messageId: messageId}, true);
+        await internalRemoveUserMessage(currentUser['mainAccount'], getCurrentChatUserId(), messageId);
+        await messageDeletedUI(currentUser['mainAccount'], getCurrentChatUserId(), messageId);
+    };
+
+    let editButton = document.createElement("button");
+    editButton.className = "chat-entry-edit";
+    editButton.textContent = "E";
+    editButton.onclick = async () => {
+        alert("Editing messages not implemented yet!")
     };
 
     let br = document.createElement("br");
@@ -79,6 +100,10 @@ function createChatEntry(username, time, message)
     div.appendChild(span1);
     div.appendChild(document.createTextNode(" - "));
     div.appendChild(span2);
+    if (mine) {
+        div.appendChild(deleteButton);
+        div.appendChild(editButton);
+    }
     div.appendChild(replyButton);
     div.appendChild(br);
     div.appendChild(p);
@@ -169,7 +194,7 @@ async function createChatList(serverId, channelId, scrollDown) {
         {
             let msg = messages[i];
             let username = userGetInfoDisplayUsername(currentUser['mainAccount'], msg["from"]);
-            createChatEntry(username, msg["date"], msg["data"]);
+            createChatEntry(username, msg["date"], msg["data"], currentUser['mainAccount']['userId'] == msg["from"], msg["messageId"]);
         }
     }
     else
@@ -196,11 +221,8 @@ async function createChatList(serverId, channelId, scrollDown) {
         {
             let msg = messages[i];
             let username = userGetInfoDisplayUsername(currentUser['mainAccount'], msg["from"]);
-            createChatEntry(username, msg["date"], msg["data"]);
+            createChatEntry(username, msg["date"], msg["data"], currentUser['mainAccount']['userId'] == msg["from"], msg["messageId"]);
         }
-
-        // for (let i = 0; i < 30; i++)
-        //     createChatEntry(`User ${i}`, "2024-04-27T17:43:03.164Z", `Test Message ${i} for chat ${channelId}`);
     }
 
 
@@ -245,6 +267,13 @@ async function channelClicked(element, channelId, serverId) {
     docChatInputElement.focus();
 }
 
+async function messageDeletedUI(account, chatUserId, messageId)
+{
+    let li = document.getElementById(`chat-msg-${messageId}`);
+    if (li)
+        li.remove();
+}
+
 async function messageReceivedUI(account, chatUserId, message)
 {
     /*    console.log("MESSAGE RECEIVED")
@@ -262,7 +291,7 @@ async function messageReceivedUI(account, chatUserId, message)
 
             //await createChatList(groupInfo["groupId"], groupInfo["channelId"], true);
             await refreshChatListArea(groupInfo["groupId"], groupInfo["channelId"]);
-            await createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"]);
+            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"], currentUser['mainAccount']['userId'] == message["from"], message["messageId"]);
             docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
 
@@ -278,7 +307,7 @@ async function messageReceivedUI(account, chatUserId, message)
 
             //await createChatList(DMsId, chatUserId, true);
             await refreshChatListArea(DMsId, chatUserId);
-            await createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"]);
+            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"], currentUser['mainAccount']['userId'] == message["from"], message["messageId"]);
             docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
 

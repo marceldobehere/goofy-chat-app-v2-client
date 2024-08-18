@@ -82,6 +82,15 @@ async function internalGetUserMessages(account, userId)
     );
 }
 
+async function internalGetUserMessage(account, userId, messageId)
+{
+    return await _intLockMethod(
+        _lMsgDxGetUserMsg,
+        undefined,
+        [account, userId, messageId]
+    );
+}
+
 async function internalAddUserMessageSorted(account, userId, message)
 {
     return await _intLockMethod(

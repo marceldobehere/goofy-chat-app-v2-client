@@ -509,8 +509,17 @@ body {
     text-wrap: wrap;
 }
 
-.chat-entry-reply {
+.chat-entry-reply, .chat-entry-delete, .chat-entry-edit {
     float: right;
+}
+.chat-entry-reply {
+    color: #79c0ff;
+}
+.chat-entry-delete {
+    color: red;
+}
+.chat-entry-edit {
+    color: yellow;
 }
 
 .chat-entry img {

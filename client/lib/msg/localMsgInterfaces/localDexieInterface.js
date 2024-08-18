@@ -124,6 +124,14 @@ async function _lMsgDxGetUserMsgs(account, userId) // sorted
     return messages;
 }
 
+async function _lMsgDxGetUserMsg(account, userId, messageId)
+{
+    let temp = await db.messages.where({accountUserId: account["userId"], userId: userId, messageId: messageId}).toArray();
+    if (temp.length < 1)
+        return undefined;
+    return temp[0];
+}
+
 async function _lMsgDxAddMsg(account, userId, msg)
 {
     return await db.messages.add({accountUserId: account["userId"], userId: userId, messageId: msg["messageId"], message: msg});

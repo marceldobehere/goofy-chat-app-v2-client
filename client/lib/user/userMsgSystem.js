@@ -275,6 +275,21 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
 
         logInfo(`Adding User ${newUserId} to redirect list`);
     }
+    else if (type == "delete-msg")
+    {
+        let deleteMsgId = message["data"]["messageId"];
+        let msg = await internalGetUserMessage(account, chatUserId, deleteMsgId);
+        if (msg == undefined)
+            return logWarn("Message not found:", deleteMsgId);
+
+        logInfo(`Trying to delete message ${deleteMsgId}:`, msg);
+        if (msg["message"]["from"] == userIdFrom) {
+            await internalRemoveUserMessage(account, chatUserId, deleteMsgId);
+            await messageDeletedUI(account, chatUserId, deleteMsgId);
+        }
+        else
+            logWarn("User not allowed to delete message:", msg);
+    }
     else if (type == "call-start")
     {
         tryExtFn(extFnVcOnReceiveCallOffer, account, chatUserId, message["data"]);
@@ -360,7 +375,7 @@ async function addNormalMessageToUser(account, chatUserId, message)
 {
     logInfo(`New message from user ${chatUserId}:`, message);
     if (isStrChannelFromGroup(chatUserId))
-        logWarn("Group messages not implemented yet");
+        ;//logWarn("Group messages not implemented yet");
     else
         addUserIdIfNotExists(chatUserId);
 
