@@ -38,6 +38,7 @@
                     <label>Add Ping Reply</label><input type="checkbox" id="settings-main-input-add-ping-reply" onclick="setSetting(['chat', 'add-ping-reply'], this.checked)"><br>
                     <label>Allow Notifications</label><input type="checkbox" id="settings-allow-notifications" onclick="setSetting(['notification', 'allow-notifications'], this.checked);checkNotifications();"><br>
                     <label>Allow Notification Sound</label><input type="checkbox" id="settings-allow-notification-sounds" onclick="setSetting(['notification', 'allow-sound'], this.checked)"><br>
+                    <label>Goofy Console</label><input type="checkbox" id="settings-goofy-console-enabled" onclick="setSetting(['goofy-console', 'enabled'], this.checked);checkGoofyConsole();"><br>
 
 
                     <br>
@@ -62,6 +63,15 @@
                     </div>
                 </div>
 
+
+                <div id="settings-goofy-console">
+                    <hr>
+                    <h3>Goofy Console</h3>
+                    <div id="settings-goofy-console-list-div">
+                        <ul id="settings-goofy-console-list-ul">
+                        </ul>
+                    </div>
+                </div>
 
                 <div>
                     <hr>
@@ -162,6 +172,7 @@
 <script src="./lib/other/importExport.js" defer></script>
 <script src="./lib/chat/chatStuff.js" defer></script>
 <script src="./lib/user/settingsObj.js" defer></script>
+<script src="./js/goofyConsole.js" defer></script>
 <script src="./lib/user/userInfoStuff.js" defer></script>
 <script src="./lib/group/groupFuncs.js" defer></script>
 <script src="./lib/group/groupHandlerFuncs.js" defer></script>

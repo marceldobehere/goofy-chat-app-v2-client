@@ -7,7 +7,7 @@ const settingsMainInputAllowExternalSourcesGlobalElement = document.getElementBy
 const settingsMainInputAddPingReply = document.getElementById("settings-main-input-add-ping-reply");
 const settingsMainInputAllowNotifications = document.getElementById("settings-allow-notifications");
 const settingsMainInputAllowNotificationSounds = document.getElementById("settings-allow-notification-sounds");
-
+const settingsGoofyConsoleEnabled = document.getElementById("settings-goofy-console-enabled");
 
 function hideSettings() {
     settingsBgElement.style.display = "none";
@@ -20,6 +20,7 @@ async function showSettings() {
     settingsMainInputAddPingReply.checked = getSetting(["chat", "add-ping-reply"]);
     settingsMainInputAllowNotifications.checked = getSetting(["notification", "allow-notifications"]);
     settingsMainInputAllowNotificationSounds.checked = getSetting(["notification", "allow-sound"]);
+    settingsGoofyConsoleEnabled.checked = getSetting(["goofy-console", "enabled"]);
 
     checkNotifications().then();
 
