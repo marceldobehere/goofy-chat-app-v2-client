@@ -6,6 +6,7 @@ function tryConformSettings(obj)
     if (obj["chat"] == undefined) obj["chat"] = {};
     if (obj["chat"]["auto-show-chat"] == undefined) obj["chat"]["auto-show-chat"] = true;
     if (obj["chat"]["auto-hide-chat"] == undefined) obj["chat"]["auto-hide-chat"] = true;
+    if (obj["chat"]["add-ping-reply"] == undefined) obj["chat"]["add-ping-reply"] = true;
     if (obj["chat"]["allow-external-sources-global"] == undefined) obj["chat"]["allow-external-sources-global"] = false;
 
 

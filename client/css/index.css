@@ -515,12 +515,26 @@ body {
 .chat-entry-reply {
     color: #79c0ff;
 }
+
+.chat-ping {
+    cursor: pointer;
+}
+
 .chat-entry-delete {
     color: red;
 }
 .chat-entry-edit {
     color: yellow;
 }
+
+.chat-ping-self {
+    color: yellow;
+}
+
+.chat-ping-other {
+    color: red;
+}
+
 
 .chat-entry img {
     max-height: 15rem;

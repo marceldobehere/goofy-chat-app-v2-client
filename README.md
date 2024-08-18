@@ -31,6 +31,7 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 
 ### Partially implemented Features
 * Private/Group Voice/Video calls (using WebRTC)
+* Pings
 
 ### Planned Features
 * Editing Messages
@@ -44,7 +45,6 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Potentially PWA Features (?)
 * Preferred Server for decentralized communication
 * Dynamic Chat List for improved performance
-* Pings
 * Message Reactions
 * Optional Message Read Acknowledgements
 * Stickers (?)
@@ -261,7 +261,7 @@ Currently the STUN servers are hardcoded and set to the Google STUN servers.
 
 ![Early Version](./imgs/img.png)
 
-
+![Ping Example](./imgs/ping.png)
 
 ## External Libraries
 * [CryptoJS](https://github.com/brix/crypto-js/tree/develop)

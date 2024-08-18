@@ -25,20 +25,21 @@ function isoDateToReadable(isoDateStr, isToday)
     return `${dateStr} at ${timeStr}`;
 }
 
-function getReplyStr(message)
+function getReplyStr(message, userId)
 {
     // Add a > infront of every line
     let lines = message.split("\n");
     let newLines = [];
     for (let line of lines)
         newLines.push(`> ${line}`);
-    let tempUserStr = "";//`\n\n@${('USER')}`;
-    return newLines.join("\n")+`${tempUserStr}\n`;
+    let tempUserStr = (settingsObj["chat"]["add-ping-reply"]) ? `\n\n@${userId}` : "\n";
+    return newLines.join("\n")+`${tempUserStr}`;
 }
 
 
-function createChatEntry(username, time, message, mine, messageId)
+function createChatEntry(username, time, message, messageId, userId)
 {
+    let mine = currentUser['mainAccount']['userId'] == userId;
     let li = document.createElement("li");
     li.id = `chat-msg-${messageId}`;
     let div = document.createElement("div");
@@ -57,7 +58,7 @@ function createChatEntry(username, time, message, mine, messageId)
     replyButton.className = "chat-entry-reply";
     replyButton.textContent = "<-";
     replyButton.onclick = () => {
-        docChatInputElement.value = `${getReplyStr(message)}\n`;
+        docChatInputElement.value = `${getReplyStr(message, userId)}\n`;
         docChatInputElement.focus();
     };
 
@@ -194,7 +195,7 @@ async function createChatList(serverId, channelId, scrollDown) {
         {
             let msg = messages[i];
             let username = userGetInfoDisplayUsername(currentUser['mainAccount'], msg["from"]);
-            createChatEntry(username, msg["date"], msg["data"], currentUser['mainAccount']['userId'] == msg["from"], msg["messageId"]);
+            createChatEntry(username, msg["date"], msg["data"], msg["messageId"], msg["from"]);
         }
     }
     else
@@ -221,7 +222,7 @@ async function createChatList(serverId, channelId, scrollDown) {
         {
             let msg = messages[i];
             let username = userGetInfoDisplayUsername(currentUser['mainAccount'], msg["from"]);
-            createChatEntry(username, msg["date"], msg["data"], currentUser['mainAccount']['userId'] == msg["from"], msg["messageId"]);
+            createChatEntry(username, msg["date"], msg["data"], msg["messageId"], msg["from"]);
         }
     }
 
@@ -291,7 +292,7 @@ async function messageReceivedUI(account, chatUserId, message)
 
             //await createChatList(groupInfo["groupId"], groupInfo["channelId"], true);
             await refreshChatListArea(groupInfo["groupId"], groupInfo["channelId"]);
-            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"], currentUser['mainAccount']['userId'] == message["from"], message["messageId"]);
+            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"], message["messageId"], message["from"]);
             docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
 
@@ -307,7 +308,7 @@ async function messageReceivedUI(account, chatUserId, message)
 
             //await createChatList(DMsId, chatUserId, true);
             await refreshChatListArea(DMsId, chatUserId);
-            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"], currentUser['mainAccount']['userId'] == message["from"], message["messageId"]);
+            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"], message["messageId"], message["from"]);
             docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
 

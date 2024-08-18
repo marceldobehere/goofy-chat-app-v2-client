@@ -240,6 +240,44 @@ const renderer = {
         text = text.replaceAll(">", "&gt;");
         text = text.replaceAll("\n", "<br>");
         return text;
+    },
+
+    text(token) {
+        let parts = token.text.split(" ");
+        let partRes = [];
+        for (let part of parts)
+        {
+            if (part.startsWith("@") && part.length > 1)
+            {
+                let ping = part.substring(1);
+                let randomInt = getRandomIntInclusive(100000, 9999999);
+                let pingId = `chat-ping-${randomInt}-user-${ping}`;
+                waitForElm(`#${pingId}`).then(async (element) => {
+                    let userId = parseInt(ping);
+                    if (!userExists(userId))
+                    {
+                        element.className = "chat-ping chat-ping-other";
+                        return element.textContent = `@[Unknown User]`;
+                    }
+
+                    let username = userGetInfoDisplayUsernameShort(currentUser['mainAccount'], userId);
+                    console.log(username, element);
+                    element.textContent = `@${username}`;
+                    if (userId == currentUser['mainAccount']['userId'])
+                        element.className = "chat-ping chat-ping-self";
+                    else
+                        element.className = "chat-ping chat-ping-other";
+
+                    element.onclick = () => {
+                        //openChat(userId);
+                    };
+                });
+                partRes.push(`<span id="${pingId}">${part}</span>`);
+            }
+            else
+                partRes.push(part);
+        }
+        return partRes.join(" ");
     }
 };
 

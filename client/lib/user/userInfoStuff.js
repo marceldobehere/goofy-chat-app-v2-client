@@ -114,6 +114,18 @@ function userGetInfoDisplayUsername(account, userId)
     return username;
 }
 
+function userGetInfoDisplayUsernameShort(account, userId)
+{
+    let info = getUserChatInfo(account, userId);
+    let username = `${userId}`;
+    if (info["baseNickname"] != null)
+        username = `${info["baseNickname"]}`;
+    if (info["overlayNickname"] != null)
+        username = `${info["overlayNickname"]}`;
+
+    return username;
+}
+
 async function updateOwnBaseNickname(newNickname)
 {
     let info = getOwnUserChatInfo(currentUser);
