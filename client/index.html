@@ -18,6 +18,7 @@
         }
         window.addEventListener('resize', documentHeight)
         documentHeight()
+        setInterval(documentHeight, 1000);
 
         document.addEventListener("DOMContentLoaded", (event) => {
             domLoaded();
