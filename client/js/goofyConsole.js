@@ -31,12 +31,23 @@ function createFakeConsoleEntry(level, args, add) {
     for (let i = 0; i < args.length; i++) {
         if (i > 0)
             msg += " ";
+
         let argStr = JSON.stringify(args[i]);
+        if (argStr === undefined)
+            argStr = "undefined";
+        else if (argStr === null)
+            argStr = "null";
+
         if (argStr.startsWith("\"") && argStr.endsWith("\""))
             argStr = argStr.substring(1, argStr.length - 1);
 
-        if (argStr.length > 150) // get first 100, then ... then last 5
-            argStr = argStr.substring(0, 150) + " [...] " + argStr.substring(argStr.length - 5);
+        if (argStr.length > 100) // get first 100, then ... then last 5
+        {
+            argStr = argStr.substring(0, 100) + " [...] " + argStr.substring(argStr.length - 5);
+            spanMsg.onclick = function () {
+                alert(JSON.stringify(args[i], null, 2));
+            };
+        }
         msg += argStr;
     }
 
