@@ -122,7 +122,9 @@ function showNotification(title, msg, callback)
     serviceWorkerRegistration.showNotification(title, {
         body: msg,
         silent: true,
-        data: randomId
+        data: randomId,
+        icon: "./assets/imgs/icon.png",
+        badge: "./assets/imgs/icon.png"
 
     }).then();
 }
