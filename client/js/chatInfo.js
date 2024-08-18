@@ -116,7 +116,9 @@ async function updateChatInfo(serverId, channelId)
                 let info = getUserChatInfo(currentUser["mainAccount"], channelId);
                 info["overlayNickname"] = nick;
                 await setUserChatInfo(currentUser["mainAccount"], channelId, info);
-                await channelClicked(docLastChannelEntry, channelId, DMsId);
+                //await channelClicked(docLastChannelEntry, channelId, DMsId);
+                await createChannelList(docLastServerId, docLastChannelId, true);
+                await createChatList(docChatLastServerId, docChatLastChannelId, true);
             };
             div.appendChild(btn);
         }

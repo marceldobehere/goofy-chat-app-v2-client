@@ -242,6 +242,7 @@ async function channelClicked(element, channelId, serverId) {
     element.classList.add("chat-selector-entry-active");
     docLastChannelEntry = element;
     docLastChannelId = channelId;
+    await updateChatInfo(serverId, channelId);
 
     if (settingsObj["chat"]["auto-hide-chat"])
         setChannelInfoVisibility(false);
