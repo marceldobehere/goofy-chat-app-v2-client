@@ -101,10 +101,14 @@ let notificationMap = new Map();
 
 function showNotification(title, msg, callback)
 {
+    logInfo(`> Trying to show Notification: ${title} - ${msg}`)
     if (!canNotify())
-        return;
+        return logWarn("Cannot show notification!",
+            settingsObj["notification"]["allow-notifications"],
+            notificationsWork,
+            windowVisible());
 
-    logInfo(`> Showing notification: ${msg}`);
+    logInfo(`> Showing notification: ${title} - ${msg}`);
 
     let randomId = getRandomIntInclusive(1000000, 9999999);
     notificationMap.set(randomId, {
