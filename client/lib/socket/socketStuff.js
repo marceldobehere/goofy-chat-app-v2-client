@@ -58,6 +58,11 @@ async function createSockets(serverList, user)
 
         socket.on('connect_error', (error) => {
             logWarn(`Server connect error: ${error}`);
+
+            setTimeout(() => {
+                logInfo("Attempting to reconnect...");
+                socket.connect();
+            }, 5000);
         });
 
         msgHook(socket, 'message', (obj) => {
@@ -79,7 +84,8 @@ function createSocket(addr)
         "force new connection" : true,
         "reconnectionAttempts": "Infinity", //avoid having user reconnect manually in order to prevent dead clients after a server restart
         "timeout" : 10000, //before connect_error and connect_timeout are emitted.
-        "transports" : ["websocket", "polling"]
+        "transports" : ["websocket", "polling"],
+        "autoConnect": false
     };
 
     if (addr.startsWith("https://"))
