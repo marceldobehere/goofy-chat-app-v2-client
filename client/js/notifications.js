@@ -103,10 +103,12 @@ function showNotification(title, msg, callback)
 {
     logInfo(`> Trying to show Notification: ${title} - ${msg}`)
     if (!canNotify())
-        return logWarn("Cannot show notification!",
-            settingsObj["notification"]["allow-notifications"],
-            notificationsWork,
-            windowVisible());
+        return logInfo("Cannot show notification!",
+            "Allowed:", settingsObj["notification"]["allow-notifications"],
+            "Works:", notificationsWork,
+            "Window Hidden:", !windowVisible(),
+            "No Focus:", !windowHasFocus(),
+            "Visibility:", document.visibilityState);
 
     logInfo(`> Showing notification: ${title} - ${msg}`);
 
@@ -140,10 +142,15 @@ window.addEventListener('visibilitychange', () =>
 let msgSound = new Audio("./assets/audio/not.wav");
 function playNotificationSound()
 {
+    logInfo("Playing notification sound")
     if (!settingsObj["notification"]["allow-sound"])
         return;
 
-    msgSound.play().then();
+    msgSound.play().then(() => {
+        logInfo("Notification sound played")
+    }).catch((e) => {
+        logWarn("Notification sound error", e.message);
+    });
 }
 
 checkNotifications().then();
