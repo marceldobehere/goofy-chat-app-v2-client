@@ -124,7 +124,7 @@ function showNotification(title, msg, callback)
         silent: true,
         data: randomId,
         icon: "./assets/imgs/icon.png",
-        badge: "./assets/imgs/icon.png"
+        badge: "./assets/imgs/badge.png"
 
     }).then();
 }
