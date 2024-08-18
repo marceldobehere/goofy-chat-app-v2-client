@@ -26,6 +26,14 @@ function getCurrentChatUserId()
         return getChannelStrFromGroup(docChatLastServerId, docChatLastChannelId);
 }
 
+function getChatUserIdSpecific(serverId, channelId)
+{
+    if (serverId == DMsId)
+        return channelId;
+    else
+        return getChannelStrFromGroup(serverId, channelId);
+}
+
 async function doMsgSendThingy(type, data, dontAdd)
 {
     console.log(`Sending message: ${JSON.stringify(data)} (Type: ${type})`);
@@ -40,6 +48,24 @@ async function doMsgSendThingy(type, data, dontAdd)
     {
         //alert('Group chats not implemented yet');
         let res = await userSendGroupMessageSpecial(docChatLastServerId, docChatLastChannelId, data, type, !!dontAdd);
+        console.log(res);
+    }
+}
+
+async function doMsgSendThingySpecific(type, data, serverId, channelId, dontAdd)
+{
+    console.log(`Sending message: ${JSON.stringify(data)} (Type: ${type})`);
+
+    if (serverId == DMsId)
+    {
+        let userId = channelId;
+        let res = await userSendDirectMessageSpecial(userId, data, type, !!dontAdd);
+        console.log(res);
+    }
+    else
+    {
+        //alert('Group chats not implemented yet');
+        let res = await userSendGroupMessageSpecial(serverId, channelId, data, type, !!dontAdd);
         console.log(res);
     }
 }

@@ -18,8 +18,15 @@ async function hideFileStatListIfEmpty() {
 }
 
 async function clearAndHideFileStatList() {
-    await clearFileStatList();
-    await setFileStatListVisibility(false);
+    await lockFileListOpen.enable();
+    try {
+        await setFileStatListVisibility(false);
+        await sleep(50);
+        await clearFileStatList();
+    } catch (e) {
+        console.error(e);
+    }
+    await lockFileListOpen.disable();
 }
 
 async function addFileStatListEntry(file) {
@@ -123,7 +130,11 @@ async function trySendFiles()
         return;
 
     await lockFileAdd.enable();
+    await lockFileListOpen.enable();
     try {
+        let serverId = docChatLastServerId;
+        let channelId = docChatLastChannelId;
+
         let fileList = currSendFileList;
         let fileDivList = Array.from(fileStatList.children);
         currSendFileList = [];
@@ -140,7 +151,7 @@ async function trySendFiles()
                 console.log(`> Sending file: `, file);
                 let tempIndex = fileIndex;
                 let div = fileDivList[tempIndex];
-                await trySendFile(file, (fileId, bytesSent, totalBytes, chunkIndex, chunkCount) => {
+                await trySendFile(file, serverId, channelId, (fileId, bytesSent, totalBytes, chunkIndex, chunkCount) => {
                     if (!div)
                         return;
                     let text = div.children[1];
@@ -157,9 +168,12 @@ async function trySendFiles()
             fileIndex++;
         }
 
+        await lockFileListOpen.disable();
         await clearAndHideFileStatList();
     } catch (e) {
         console.error(e);
     }
     await lockFileAdd.disable();
+    if (lockFileListOpen.isLocked())
+        await lockFileListOpen.disable();
 }

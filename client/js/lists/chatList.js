@@ -178,7 +178,7 @@ async function createChatList(serverId, channelId, scrollDown) {
     inputElement.style.display = "";
     inputStatusElement.style.display = "";
 
-    await clearAndHideFileStatList();
+    clearAndHideFileStatList();
 
     if (serverId == DMsId)
     {

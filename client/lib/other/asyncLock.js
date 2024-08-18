@@ -70,6 +70,7 @@ const lockSymmKey = new AsyncLock();
 
 const locklocalMsg = new AsyncLock();
 const lockFileAdd = new AsyncLock();
+const lockFileListOpen = new AsyncLock();
 
 function resetMsgLocks()
 {

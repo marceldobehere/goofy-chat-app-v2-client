@@ -16,7 +16,7 @@ function _arrayBufferToBase64(buffer) {
     return window.btoa(binary);
 }
 
-async function trySendFile(file, statusCallBack) {
+async function trySendFile(file, serverId, channelId, statusCallBack) {
     if (!file)
         return;
     if (file.size == 0)
@@ -79,11 +79,11 @@ async function trySendFile(file, statusCallBack) {
         let sendMsg = {file: fileObj, chunkIndex: chunkIndex, data: chunkStr};
 
 
-        let p1 = doMsgSendThingy("file-msg", sendMsg, true);
+        let p1 = doMsgSendThingySpecific("file-msg", sendMsg, serverId, channelId, true);
         //promiseArr.push(p1);
         await p1;
 
-        let p2 = handleFilePartMsg(currentUser['mainAccount'], getCurrentChatUserId(), {data: sendMsg});
+        let p2 = handleFilePartMsg(currentUser['mainAccount'], getChatUserIdSpecific(serverId, channelId), {data: sendMsg});
         //promiseArr.push(p2);
         await p2;
 
@@ -99,7 +99,7 @@ async function trySendFile(file, statusCallBack) {
     }
     // await Promise.all(promiseArr);
 
-    await doMsgSendThingy("text", `![${file.name}](${filePathStart + fileId})`);
+    await doMsgSendThingySpecific("text", `![${file.name}](${filePathStart + fileId})`, serverId, channelId);
     console.log(" > Done.")
 }
 
@@ -112,8 +112,6 @@ async function fileAddClicked(event)
         let files = fileInput.files;
         if (files.length > 0)// && confirm(`Send ${files.length} file(s) to the chat?`))
             for (let file of files) {
-                // console.log(`> Sending file: `, file);
-                // await trySendFile(file);
                 await addFileStatListEntry(file);
             }
     };
@@ -127,8 +125,6 @@ async function fileDroppedInTextArea(event) {
     const files = event.dataTransfer.files;
     if (files.length > 0)// && confirm(`Send ${files.length} file(s) to the chat?`))
         for (let file of files) {
-            // console.log(`> Sending file: `, file);
-            // await trySendFile(file);
             await addFileStatListEntry(file);
         }
 }
@@ -136,7 +132,6 @@ async function fileDroppedInTextArea(event) {
 async function uploadFileFromString(str, filename)
 {
     let file = new File([str], filename);
-    //await trySendFile(file);
     await addFileStatListEntry(file);
 }
 
@@ -147,8 +142,6 @@ async function filePastedInTextArea(event) {
     // Upload files
     if (files.length > 0)// && confirm(`Send ${files.length} file(s) to the chat?`))
         for (let file of files) {
-            // console.log(`> Sending file: `, file);
-            // await trySendFile(file);
             await addFileStatListEntry(file);
         }
 
