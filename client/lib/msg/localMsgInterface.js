@@ -196,12 +196,12 @@ async function internalResetAll()
     );
 }
 
-async function internalMsgExportAll(account)
+async function internalMsgExportAll(account, includeFiles)
 {
     let res = await _intLockMethod(
         _lMsgDxExportAllMsgs,
         _lMsgLSExportAllMsgs,
-        [account]
+        [account, includeFiles]
     );
 
     try {

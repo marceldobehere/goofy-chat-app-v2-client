@@ -362,7 +362,7 @@ async function _lMsgDxUploadFileAllChunks(account, userId, fileId, chunks)
 
 
 
-async function _lMsgDxExportAllMsgs(account)
+async function _lMsgDxExportAllMsgs(account, includeFiles)
 {
     let userList = getAllUsers().concat(getAllGroupChannelIds(account));
     let msgList = [];
@@ -387,9 +387,11 @@ async function _lMsgDxExportAllMsgs(account)
         for (let msgId of msgIds)
             msgIdList.push({chatId:user, messageId:msgId});
 
-        let files = await _lMsgDxGetFiles(account, user);
-        for (let file of files)
-            fileList.push({chatId:user, fileData:file});
+        if (includeFiles) {
+            let files = await _lMsgDxGetFiles(account, user);
+            for (let file of files)
+                fileList.push({chatId:user, fileData:file});
+        }
     }
 
 

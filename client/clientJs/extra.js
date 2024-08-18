@@ -60,6 +60,12 @@ function openFilePrompt()
                 }
             }
         };
+        fileSelector.onclose = () => {
+            resolve();
+        };
+        fileSelector.oncancel = () => {
+            resolve();
+        };
 
         fileSelector.click();
     });
@@ -97,6 +103,12 @@ function openBinaryFilePrompt()
                     reject();
                 }
             }
+        };
+        fileSelector.onclose = () => {
+            reject();
+        };
+        fileSelector.oncancel = () => {
+            reject();
         };
 
         fileSelector.click();
