@@ -53,6 +53,27 @@ body {
     overflow: auto;
 }
 
+/*Change the scrollbar*/
+#main-app-container-settings::-webkit-scrollbar {
+    width: var(--main-chat-selector-scroll-size);
+}
+
+/*Change the scrollbar track*/
+#main-app-container-settings::-webkit-scrollbar-track {
+    background-color: var(--main-chat-selector-scroll-bg);
+}
+
+/*Change the scrollbar thumb*/
+#main-app-container-settings::-webkit-scrollbar-thumb {
+    background-color: var(--main-chat-selector-scroll-color);
+    border-radius: var(--main-chat-selector-scroll-size);
+}
+
+/*Change the scrollbar thumb on hover*/
+#main-app-container-settings::-webkit-scrollbar-thumb:hover {
+    background-color: var(--main-chat-selector-scroll-color-hover);
+}
+
 #main-app-container-settings li {
     margin-bottom: 0.3rem;
 }
@@ -88,7 +109,6 @@ body {
     border: 1px solid red;
     padding: 0px;
     margin-top: 0px;
-
 }
 
 /*Change the scrollbar*/
@@ -111,6 +131,15 @@ body {
     list-style-type: none;
     padding: 0px;
     margin: 0px;
+}
+
+#settings-goofy-console-input {
+    width: calc(100% - 4px);
+    height: 2rem;
+    background-color: #202030;
+    border: 1px solid orange;
+    margin: 0px;
+    padding: 0px;
 }
 
 .goofy-console-msg {

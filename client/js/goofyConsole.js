@@ -5,7 +5,7 @@ let goofyConsoleAutoScroll = true;
 const goofyConsoleDiv = document.getElementById("settings-goofy-console");
 const goofyConsoleUlDiv = document.getElementById("settings-goofy-console-list-div");
 const goofyConsoleListUl = document.getElementById("settings-goofy-console-list-ul");
-
+const goofyConsoleInput = document.getElementById("settings-goofy-console-input");
 
 let ogConsole = window.console;
 let fakeConsole = undefined;
@@ -25,6 +25,9 @@ function createFakeConsoleEntry(level, args, add) {
         if (i > 0)
             msg += " ";
         let argStr = JSON.stringify(args[i]);
+        if (argStr.startsWith("\"") && argStr.endsWith("\""))
+            argStr = argStr.substring(1, argStr.length - 1);
+
         if (argStr.length > 150) // get first 100, then ... then last 5
             argStr = argStr.substring(0, 150) + " [...] " + argStr.substring(argStr.length - 5);
         msg += argStr;
@@ -96,3 +99,20 @@ function initGoofyConsole() {
 }
 
 initGoofyConsole();
+
+
+function goofyConsoleInputKey(event) {
+    if (event.key === "Enter") {
+        let input = goofyConsoleInput.value;
+        if (input === "clear") {
+            fakeConsole.clear();
+        } else {
+            try {
+                fakeConsole.info(`${input} -> `, eval(input));
+            } catch (e) {
+                fakeConsole.error(`${input} -> `, e.message);
+            }
+        }
+        goofyConsoleInput.value = "";
+    }
+}
