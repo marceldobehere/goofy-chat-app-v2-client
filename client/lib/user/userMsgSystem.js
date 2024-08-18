@@ -290,6 +290,26 @@ async function addMessageToUser(account, userIdFrom, chatUserId, message, date)
         else
             logWarn("User not allowed to delete message:", msg);
     }
+    else if (type == "edit-msg")
+    {
+        let editMsgId = message["data"]["messageId"];
+        let editMsgText = message["data"]["message"];
+        if (editMsgText == undefined || editMsgId == undefined)
+            return logWarn("Invalid edit-msg message:", message);
+
+        let msg = await internalGetUserMessage(account, chatUserId, editMsgId);
+        if (msg == undefined)
+            return logWarn("Message not found:", editMsgId);
+
+        logInfo(`Trying to edit message ${editMsgId}:`, msg);
+        if (msg["message"]["from"] == userIdFrom)
+        {
+            let msg = await internalEditUserMessageText(account, chatUserId, editMsgId, editMsgText);
+            await messageEditedUI(account, chatUserId, editMsgId, msg["message"]);
+        }
+        else
+            logWarn("User not allowed to edit message:", msg);
+    }
     else if (type == "call-start")
     {
         tryExtFn(extFnVcOnReceiveCallOffer, account, chatUserId, message["data"]);

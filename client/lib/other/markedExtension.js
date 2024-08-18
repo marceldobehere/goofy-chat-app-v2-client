@@ -80,7 +80,7 @@ const renderer = {
             let imgId = `img-${fileId}-${randomInt}`;
             waitForElm(`#${imgId}`).then(async (element) => {
                 let file = await internalGetFile(currentUser['mainAccount'], getCurrentChatUserId(), parseInt(fileId));
-                console.log(file);
+                //console.log(file);
                 if (!file)
                     return element.textContent = `[Error: File not found]`;
                 let fileData = file["data"]; // is a uint8array
@@ -254,14 +254,13 @@ const renderer = {
                 let pingId = `chat-ping-${randomInt}-user-${ping}`;
                 waitForElm(`#${pingId}`).then(async (element) => {
                     let userId = parseInt(ping);
-                    if (!userExists(userId))
+                    if (!userExists(userId) && userId != currentUser['mainAccount']['userId'])
                     {
                         element.className = "chat-ping chat-ping-other";
                         return element.textContent = `@[Unknown User]`;
                     }
 
                     let username = userGetInfoDisplayUsernameShort(currentUser['mainAccount'], userId);
-                    console.log(username, element);
                     element.textContent = `@${username}`;
                     if (userId == currentUser['mainAccount']['userId'])
                         element.className = "chat-ping chat-ping-self";

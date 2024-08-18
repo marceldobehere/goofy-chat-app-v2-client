@@ -142,6 +142,16 @@ async function _lMsgDxRemoveMsg(account, userId, msgId)
     return await db.messages.where({accountUserId: account["userId"], userId: userId, messageId: msgId}).delete();
 }
 
+async function _lMsgDxEditMsg(account, userId, msgId, newMsg)
+{
+    let oldMsg = await _lMsgDxGetUserMsg(account, userId, msgId);
+    if (!oldMsg)
+        return;
+    newMsg["previousMessage"] = oldMsg["message"];
+
+    return await db.messages.update({accountUserId: account["userId"], userId: userId, messageId: msgId}, {message: newMsg});
+}
+
 
 async function _lMsgDxRemoveMsgs(account, userId)
 {

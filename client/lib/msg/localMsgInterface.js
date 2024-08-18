@@ -120,6 +120,28 @@ async function internalRemoveUserMessages(account, userId)
     removeUserIfExists(userId);
 }
 
+async function internalEditUserMessage(account, userId, messageId, message)
+{
+    return await _intLockMethod(
+        _lMsgDxEditMsg,
+        undefined,
+        [account, userId, messageId, message]
+    );
+}
+
+async function internalEditUserMessageText(account, userId, messageId, newText) {
+    let msg = await internalGetUserMessage(account, userId, messageId);
+    if (msg == null)
+    {
+        logError("Message not found");
+        return;
+    }
+    msg["message"]["data"] = newText;
+    msg["message"]["editDate"] = new Date();
+    await internalEditUserMessage(account, userId, messageId, msg["message"]);
+    return msg;
+}
+
 async function internalGetFile(account, userId, fileId)
 {
     return await _intLockMethod(

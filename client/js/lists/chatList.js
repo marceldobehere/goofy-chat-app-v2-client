@@ -37,80 +37,119 @@ function getReplyStr(message, userId)
 }
 
 
-function createChatEntry(username, time, message, messageId, userId)
+function createChatEntry(username, msgObj, onlyReturn)
 {
-    let mine = currentUser['mainAccount']['userId'] == userId;
-    let li = document.createElement("li");
-    li.id = `chat-msg-${messageId}`;
-    let div = document.createElement("div");
-    div.className = "chat-entry";
-    let span1 = document.createElement("span");
-    span1.className = "chat-entry-username";
-    span1.textContent = username;
-    let span2 = document.createElement("span");
-
-    let utcDate = new Date(time);
-    let localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
-    time = isoDateToReadable(localDate.toISOString(), utcDate.toDateString() == new Date().toDateString());
-    span2.textContent = time;
-
-    let replyButton = document.createElement("button");
-    replyButton.className = "chat-entry-reply";
-    replyButton.textContent = "<-";
-    replyButton.onclick = () => {
-        docChatInputElement.value = `${getReplyStr(message, userId)}\n`;
-        docChatInputElement.focus();
-    };
-
-    let deleteButton = document.createElement("button");
-    deleteButton.className = "chat-entry-delete";
-    deleteButton.textContent = "X";
-    deleteButton.onclick = async () => {
-        if (!confirm("Do you really want to delete this message?"))
-            return;
-
-        logInfo("DELETE MSG: " + messageId);
-        await doMsgSendThingy("delete-msg", {messageId: messageId}, true);
-        await internalRemoveUserMessage(currentUser['mainAccount'], getCurrentChatUserId(), messageId);
-        await messageDeletedUI(currentUser['mainAccount'], getCurrentChatUserId(), messageId);
-    };
-
-    let editButton = document.createElement("button");
-    editButton.className = "chat-entry-edit";
-    editButton.textContent = "E";
-    editButton.onclick = async () => {
-        alert("Editing messages not implemented yet!")
-    };
-
-    let br = document.createElement("br");
-    let p = document.createElement("p");
-    p.className = "chat-entry-message";
-
-    //message = message.replaceAll("\n", "\n\n");
-    //message = message.replaceAll("\n\n>", "\n>");
+    let time = msgObj["date"];
+    let message = msgObj["data"];
+    let messageId = msgObj["messageId"]
+    let userId = msgObj["from"];
 
     try {
-        const dirty = marked.parse(message);
-        const clean = DOMPurify.sanitize(dirty, { ADD_ATTR: ['target'] });
-        p.innerHTML = clean;
-    } catch (e) {
-        console.warn("ERROR RENDERING: ", message)
-        p.textContent = `ERROR RENDERING MESSAGE: ${e.message}`;
-    }
+        let mine = currentUser['mainAccount']['userId'] == userId;
+        let li = document.createElement("li");
+        li.id = `chat-msg-${messageId}`;
+        let div = document.createElement("div");
+        div.className = "chat-entry";
+        let span1 = document.createElement("span");
+        span1.className = "chat-entry-username";
+        span1.textContent = username;
+        let span2 = document.createElement("span");
 
-    div.appendChild(span1);
-    div.appendChild(document.createTextNode(" - "));
-    div.appendChild(span2);
-    if (mine) {
-        div.appendChild(deleteButton);
-        div.appendChild(editButton);
+        try {
+            let utcDate = new Date(time);
+            let localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
+            time = isoDateToReadable(localDate.toISOString(), utcDate.toDateString() == new Date().toDateString());
+
+            let editedTimeAddStr = "";
+            let editedTime = msgObj["editDate"];
+            if (editedTime != null) {
+                let utcDate = new Date(editedTime);
+                let localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
+                let editedTimeStr = isoDateToReadable(localDate.toISOString(), utcDate.toDateString() == new Date().toDateString());
+                editedTimeAddStr = ` - (edited ${editedTimeStr})`;
+            }
+
+
+            span2.textContent = time + editedTimeAddStr;
+        } catch (e) {
+            span2.textContent = "[Invalid Date]";
+            console.warn("ERROR PARSING DATE: ", e);
+        }
+
+        let replyButton = document.createElement("button");
+        replyButton.className = "chat-entry-reply";
+        replyButton.textContent = "<-";
+        replyButton.onclick = () => {
+            docChatInputElement.value = `${getReplyStr(message, userId)}\n`;
+            docChatInputElement.focus();
+        };
+
+        let deleteButton = document.createElement("button");
+        deleteButton.className = "chat-entry-delete";
+        deleteButton.textContent = "X";
+        deleteButton.onclick = async () => {
+            if (!confirm("Do you really want to delete this message?"))
+                return;
+
+            logInfo("DELETE MSG: " + messageId);
+            await doMsgSendThingy("delete-msg", {messageId: messageId}, true);
+            await internalRemoveUserMessage(currentUser['mainAccount'], getCurrentChatUserId(), messageId);
+            await messageDeletedUI(currentUser['mainAccount'], getCurrentChatUserId(), messageId);
+        };
+
+        let editButton = document.createElement("button");
+        editButton.className = "chat-entry-edit";
+        editButton.textContent = "E";
+        editButton.onclick = async () => {
+            let edited = prompt("Edit message:", message);
+            if (edited == null)
+                return;
+            if (edited == message)
+                return;
+            if (edited == "")
+                return; // TODO: Maybe delete?
+            logInfo("EDIT MSG: " + messageId);
+
+            await doMsgSendThingy("edit-msg", {messageId: messageId, message: edited}, true);
+            let msg = await internalEditUserMessageText(currentUser['mainAccount'], getCurrentChatUserId(), messageId, edited);
+            await messageEditedUI(currentUser['mainAccount'], getCurrentChatUserId(), messageId, msg["message"]);
+        };
+
+        let br = document.createElement("br");
+        let p = document.createElement("p");
+        p.className = "chat-entry-message";
+
+        //message = message.replaceAll("\n", "\n\n");
+        //message = message.replaceAll("\n\n>", "\n>");
+
+        try {
+            const dirty = marked.parse(message);
+            const clean = DOMPurify.sanitize(dirty, { ADD_ATTR: ['target'] });
+            p.innerHTML = clean;
+        } catch (e) {
+            console.warn("ERROR RENDERING: ", message)
+            p.textContent = `ERROR RENDERING MESSAGE: ${e.message}`;
+        }
+
+        div.appendChild(span1);
+        div.appendChild(document.createTextNode(" - "));
+        div.appendChild(span2);
+        if (mine) {
+            div.appendChild(deleteButton);
+            div.appendChild(editButton);
+        }
+        div.appendChild(replyButton);
+        div.appendChild(br);
+        div.appendChild(p);
+        li.appendChild(div);
+        if (onlyReturn)
+            return li;
+        else
+            docChatList.appendChild(li);
+    } catch (e) {
+        console.warn("ERROR CREATING CHAT ENTRY: ", e);
     }
-    div.appendChild(replyButton);
-    div.appendChild(br);
-    div.appendChild(p);
-    li.appendChild(div);
-    docChatList.appendChild(li);
-}
+ }
 
 
 const docChatHeaderDeleteBtn = document.getElementById("main-chat-content-header-delete-chat");
@@ -195,7 +234,7 @@ async function createChatList(serverId, channelId, scrollDown) {
         {
             let msg = messages[i];
             let username = userGetInfoDisplayUsername(currentUser['mainAccount'], msg["from"]);
-            createChatEntry(username, msg["date"], msg["data"], msg["messageId"], msg["from"]);
+            createChatEntry(username, msg);
         }
     }
     else
@@ -222,7 +261,7 @@ async function createChatList(serverId, channelId, scrollDown) {
         {
             let msg = messages[i];
             let username = userGetInfoDisplayUsername(currentUser['mainAccount'], msg["from"]);
-            createChatEntry(username, msg["date"], msg["data"], msg["messageId"], msg["from"]);
+            createChatEntry(username, msg);
         }
     }
 
@@ -271,9 +310,26 @@ async function channelClicked(element, channelId, serverId) {
 
 async function messageDeletedUI(account, chatUserId, messageId)
 {
+    if (chatUserId != getCurrentChatUserId())
+        return;
+
     let li = document.getElementById(`chat-msg-${messageId}`);
     if (li)
         li.remove();
+}
+
+async function messageEditedUI(account, chatUserId, messageId, newMessage)
+{
+    if (chatUserId != getCurrentChatUserId())
+        return;
+
+    let li = document.getElementById(`chat-msg-${messageId}`);
+    if (li)
+    {
+        let newLi = createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], newMessage["from"]), newMessage, true);
+
+        li.replaceWith(newLi);
+    }
 }
 
 async function messageReceivedUI(account, chatUserId, message)
@@ -296,7 +352,7 @@ async function messageReceivedUI(account, chatUserId, message)
             //await createChatList(groupInfo["groupId"], groupInfo["channelId"], true);
             await refreshChatListArea(groupInfo["groupId"], groupInfo["channelId"]);
 
-            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"], message["messageId"], message["from"]);
+            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message);
             if (shouldScroll)
                 docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
@@ -313,7 +369,7 @@ async function messageReceivedUI(account, chatUserId, message)
 
             //await createChatList(DMsId, chatUserId, true);
             await refreshChatListArea(DMsId, chatUserId);
-            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message["date"], message["data"], message["messageId"], message["from"]);
+            createChatEntry(userGetInfoDisplayUsername(currentUser['mainAccount'], message["from"]), message);
             if (shouldScroll)
                 docChatUlDiv.scrollTop = docChatUlDiv.scrollHeight;
         }
