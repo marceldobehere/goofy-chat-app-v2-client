@@ -112,6 +112,6 @@ async function updateProfile()
         let chatInfo = getOwnUserChatInfo(currentUser);
         chatInfo["baseNickname"] = username;
 
-        await setOwnUserChatInfo(currentUser, chatInfo, false);
+        await setOwnUserChatInfo(currentUser, chatInfo, true);
     }
 }
