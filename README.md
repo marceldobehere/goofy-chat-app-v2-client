@@ -69,8 +69,9 @@ If there is a fatal error, or you feel like resetting your account, you can do s
 ### Account Export/Import
 To export/import your account, you can open the settings and click the `Export Profile` or `Import Profile` button.
 
-If you have a lot of files, and especially if your profile is encrypted, it is recommended to export without files / export the files separately.
-Currently this is not implemented yet. The closest thing you can do is to delete the files before exporting.
+If you have a lot of files, and especially if your profile is encrypted, it is recommended to export without files and export the files separately.
+For that you can just Export the Profile and choose to not include files. Then you can export the files separately.
+When importing you can import the profile and then import the files separately afterwards.
 
 Exporting may take a long while with lots of data, especially if you have a lot of files. Please note that the browser could crash if its too much xd
 
@@ -267,4 +268,5 @@ Currently the STUN servers are hardcoded and set to the Google STUN servers.
 * [Dexie Easy Encrypt](https://github.com/jaetask/dexie-easy-encrypt/)
 * [Marked](https://github.com/markedjs/marked)
 * [DOMPurify](https://github.com/cure53/DOMPurify)
-* [Highlight.js](github.com/highlightjs/highlight.js)
+* [Highlight.js](https://github.com/highlightjs/highlight.js)
+* [JSZip](https://stuk.github.io/jszip/)

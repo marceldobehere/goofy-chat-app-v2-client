@@ -175,6 +175,14 @@ async function internalUploadFile(account, userId, fileId, obj)
 }
 
 
+async function internalUploadFileAllChunks(account, userId, fileId, chunks)
+{
+    return await _intLockMethod(
+        _lMsgDxUploadFileAllChunks,
+        undefined,
+        [account, userId, fileId, chunks]
+    );
+}
 
 
 

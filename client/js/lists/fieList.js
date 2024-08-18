@@ -134,6 +134,7 @@ async function loadFileList(account) {
         console.error(e);
     }
 
+    await sleep(500);
     fileLoadBtn.textContent = "Load";
     fileLoadBtn.disabled = false;
 }

@@ -336,7 +336,24 @@ async function _lMsgDxUploadFile(account, userId, fileId, data)
     return await db.files.update({accountUserId: account["userId"], userId: userId, fileId: fileId}, {chunks: chunks});
 }
 
+async function _lMsgDxUploadFileAllChunks(account, userId, fileId, chunks)
+{
+    if (!chunks)
+        return logError("Invalid file upload data");
 
+    let res = await db.files.where({accountUserId: account["userId"], userId: userId, fileId: fileId}).toArray();
+    if (res.length < 1)
+        return logError("File not found");
+    res = res[0];
+
+    let info = res["info"];
+
+    let chunkCount = info["chunkCount"];
+    if (chunks.length > chunkCount)
+        return logError("Chunk count too large");
+
+    return await db.files.update({accountUserId: account["userId"], userId: userId, fileId: fileId}, {chunks: chunks});
+}
 
 
 

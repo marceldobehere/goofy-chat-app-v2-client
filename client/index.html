@@ -39,7 +39,9 @@
                     <button onclick="importProfile()">Import Profile</button>
                     <button onclick="resetProfile()">Reset Profile</button>&nbsp;
                     <button onclick="updateProfile()">Update Profile</button><br>
-
+                    <button id="settings-export-all-files-btn" onclick="exportAllFiles()">Export Files</button>
+                    <button id="settings-import-all-files-btn" onclick="importAllFiles()">Import Files</button>
+                    <button id="settings-delete-all-files-btn" onclick="clearAllFiles()">Delete All Files</button><br>
                     <br>
                 </div>
 
@@ -127,6 +129,7 @@
 <script src="./ext/dexie-enc.js" defer></script>
 <script src="./ext/marked.js" defer></script>
 <script src="./ext/purify.min.js" defer></script>
+<script src="./ext/jszip.min.js" defer></script>
 <script src="./ext/highlight/highlight.min.js" defer></script>
 <script src="./lib/other/markedExtension.js" defer></script>
 <script src="./lib/other/logger.js" defer></script>

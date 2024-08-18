@@ -20,6 +20,12 @@ function downloadTextFile(str, fileName)
     downloadBase64File("data:text/plain;charset=utf-8," + encodeURIComponent(str), fileName);
 }
 
+function downloadBlob(blob, fileName)
+{
+    const url = URL.createObjectURL(blob);
+    downloadBase64File(url, fileName);
+}
+
 function openFilePrompt()
 {
     return new Promise((resolve, reject) =>
@@ -40,6 +46,44 @@ function openFilePrompt()
                         let data = evt.target.result;
                         let dataObj = JSON.parse(data);
                         resolve(dataObj);
+                    }
+                    catch (e)
+                    {
+                        alert("Error parsing file");
+                        reject();
+                        return;
+                    }
+                }
+                reader.onerror = (evt) => {
+                    alert("Error reading file");
+                    reject();
+                }
+            }
+        };
+
+        fileSelector.click();
+    });
+}
+
+function openBinaryFilePrompt()
+{
+    return new Promise((resolve, reject) =>
+    {
+        let fileSelector = document.createElement('input');
+        fileSelector.setAttribute('type', 'file');
+        fileSelector.oninput = (data) =>
+        {
+            console.log(data);
+            if (fileSelector.files[0])
+            {
+                let file = fileSelector.files[0];
+                let reader = new FileReader();
+                reader.readAsArrayBuffer(file);
+                reader.onload = (evt) => {
+                    try
+                    {
+                        let data = evt.target.result;
+                        resolve(data);
                     }
                     catch (e)
                     {
