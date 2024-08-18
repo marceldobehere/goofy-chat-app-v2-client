@@ -1,4 +1,3 @@
-let notifications = [];
 let notificationsWork = false;
 async function checkNotifications()
 {
@@ -18,6 +17,7 @@ async function checkNotifications()
     if (Notification.permission === "granted")
     {
         notificationsWork = true;
+        await initNotifications();
         return;
     }
 
@@ -25,7 +25,38 @@ async function checkNotifications()
     {
         if (await Notification.requestPermission())
             notificationsWork = true;
+        await initNotifications();
     }
+}
+
+async function initNotifications()
+{
+    if (!(await initServiceWorker()))
+        return;
+
+    logInfo('Init the Notification Handlers');
+
+    navigator.serviceWorker.addEventListener("message", (event) => {
+        console.log('[Notifications.js] Service Worker Message: ', event);
+        let evData = event.data;
+        let type = evData.type;
+        let data = evData.data;
+
+        if (type == "notification-click")
+        {
+            let id = data;
+            logInfo(`Notification click Received. ${id}`);
+
+            let not = notificationMap.get(id);
+            if (not != undefined)
+            {
+                logInfo(`Notification click Received. ${id} - Found`);
+                if (typeof not.callback == "function")
+                    not.callback(event);
+                notificationMap.delete(id);
+            }
+        }
+    });
 }
 
 const windowHasFocus = function () {
@@ -44,14 +75,9 @@ function clearNotifications()
 {
     if (!notificationsWork)
         return;
+    logInfo("Clearing notifications")
 
-    //console.log(notifications)
-    for (let not of notifications) {
-        //console.log(`> Closing notification: ${not.body}`);
-        not.close();
-    }
-
-    notifications = [];
+    serviceWorkerRegistration.active.postMessage({type: "clear-notifications"});
 }
 
 function windowVisible()
@@ -70,24 +96,29 @@ function canNotify()
     return true;
 }
 
+let notificationMap = new Map();
+
+
 function showNotification(title, msg, callback)
 {
     if (!canNotify())
         return;
 
-    //console.log(`> Showing notification: ${msg}`);
+    logInfo(`> Showing notification: ${msg}`);
 
-    const notification = new Notification(title, {body: msg, silent: true});
-    notifications.push(notification);
+    let randomId = getRandomIntInclusive(1000000, 9999999);
+    notificationMap.set(randomId, {
+        callback: callback
+    });
 
-    notification.onclick = (ev) =>
-    {
-        clearNotifications();
+    // TODO: AAAAAAAAAA
+    //const notification = new Notification(title, {body: msg, silent: true});
+    serviceWorkerRegistration.showNotification(title, {
+        body: msg,
+        silent: true,
+        data: randomId
 
-        if (typeof callback == "function")
-            callback(ev);
-        window.focus();
-    };
+    }).then();
 }
 
 window.addEventListener('focus', () =>
