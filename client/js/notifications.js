@@ -2,6 +2,7 @@ let notifications = [];
 let notificationsWork = false;
 async function checkNotifications()
 {
+    logInfo("Checking notifications")
     notificationsWork = false;
     //console.log(window.location.protocol);
     if (window.location.protocol != "https:" && window.location.protocol != "http:"

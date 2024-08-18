@@ -36,7 +36,7 @@
                     <label>Auto Toggle Chat</label><input type="checkbox" id="settings-main-input-auto-show-chat" onclick="setSetting(['chat', 'auto-show-chat'], this.checked)"><br>
                     <label>Allow Embedding External Sources</label><input type="checkbox" id="settings-main-input-allow-external-sources-global" onclick="setSetting(['chat', 'allow-external-sources-global'], this.checked)"><br>
                     <label>Add Ping Reply</label><input type="checkbox" id="settings-main-input-add-ping-reply" onclick="setSetting(['chat', 'add-ping-reply'], this.checked)"><br>
-                    <label>Allow Notifications</label><input type="checkbox" id="settings-allow-notifications" onclick="setSetting(['notification', 'allow-notifications'], this.checked)"><br>
+                    <label>Allow Notifications</label><input type="checkbox" id="settings-allow-notifications" onclick="setSetting(['notification', 'allow-notifications'], this.checked);checkNotifications();"><br>
                     <label>Allow Notification Sound</label><input type="checkbox" id="settings-allow-notification-sounds" onclick="setSetting(['notification', 'allow-sound'], this.checked)"><br>
 
 
