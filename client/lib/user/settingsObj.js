@@ -11,8 +11,8 @@ function tryConformSettings(obj) {
     if (obj["chat"]["allow-external-sources-global"] == undefined) obj["chat"]["allow-external-sources-global"] = false;
 
     if (obj["notification"] == undefined) obj["notification"] = {};
-    if (obj["notification"]["allow-notifications"] == undefined) obj["notification"]["allow-notifications"] = true;
-    if (obj["notification"]["allow-push-notifications"] == undefined) obj["notification"]["allow-push-notifications"] = true;
+    if (obj["notification"]["allow-notifications"] == undefined) obj["notification"]["allow-notifications"] = false;
+    if (obj["notification"]["allow-push-notifications"] == undefined) obj["notification"]["allow-push-notifications"] = false;
     if (obj["notification"]["allow-sound"] == undefined) obj["notification"]["allow-sound"] = false;
 
     if (obj["goofy-console"] == undefined) obj["goofy-console"] = {};

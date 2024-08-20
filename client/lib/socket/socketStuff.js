@@ -36,6 +36,9 @@ async function createSockets(serverList, user)
                     await login(socket, user["listenerAccount"]);
                     await setStatus(`Init Sock ${currListIndex * 3 + 3}/${serverList.length * 3}`)
                     await sockReqMessages(socket);
+
+                    if (currListIndex == serverList.length - 1)
+                        await setStatus("Connected");
                 })();
 
                 if (!promiseDone)
