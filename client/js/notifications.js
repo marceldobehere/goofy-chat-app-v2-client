@@ -117,8 +117,6 @@ function showNotification(title, msg, callback)
         callback: callback
     });
 
-    // TODO: AAAAAAAAAA
-    //const notification = new Notification(title, {body: msg, silent: true});
     serviceWorkerRegistration.showNotification(title, {
         body: msg,
         silent: true,

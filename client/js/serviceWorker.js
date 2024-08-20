@@ -48,3 +48,31 @@ self.addEventListener('message', async function (event) {
         }
     }
 });
+
+
+self.addEventListener('push', function(event) {
+    event.waitUntil(
+        // Retrieve a list of the clients of this service worker.
+        self.clients.matchAll().then(function(clientList) {
+            // Check if there's at least one focused client.
+            let focused = clientList.some(function(client) {
+                return client.focused;
+            });
+
+            if (focused) {
+                return;
+            }
+
+            console.log("> PUSH EVENT: ", event, payload);
+            let title = "New messages available";
+            let body = "You have new messages";
+            return self.registration.showNotification(title, {
+                body: body,
+                silent: true,
+                data: 12345,
+                icon: "./assets/imgs/icon.png",
+                badge: "./assets/imgs/badge.png"
+            });
+        })
+    );
+});

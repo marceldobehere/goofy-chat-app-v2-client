@@ -99,6 +99,13 @@ function createFakeConsole() {
         consoleMsgs = [];
         goofyConsoleListUl.innerHTML = "";
     }
+    fakeConsole.trace = function () {
+        let args = Array.from(arguments);
+        consoleMsgs.push(args);
+        createFakeConsoleEntry("TRACE", args, true);
+        if (goofyConsoleLog)
+            ogConsole.trace(...args);
+    }
 }
 
 function checkGoofyConsole() {
