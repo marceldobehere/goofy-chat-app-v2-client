@@ -7,8 +7,6 @@ self.addEventListener("activate", (event) => {
     event.waitUntil(self.clients.claim());
 });
 
-console.log("[SW.JS] Service Worker Loaded");
-
 self.addEventListener('notificationclick', async function (event) {
     console.log('[SW.JS] Notification click Received.', event.notification.data);
     event.notification.close();
@@ -19,12 +17,21 @@ self.addEventListener('notificationclick', async function (event) {
 
     let clients = await self.clients.matchAll({includeUncontrolled: true, type: 'window'});
 
+    let found = false;
     for (const client of clients) {
         if ("focus" in client) {
             console.log("[SW.JS] Focusing client");
             client.postMessage({type: "notification-click", data: event.notification.data});
             await client.focus();
+            found = true;
         }
+    }
+
+    if (!found) {
+        console.log("[SW.JS] Opening new window");
+        await self.clients.openWindow("/client/");
+        let client = await self.clients.matchAll({includeUncontrolled: true, type: 'window'});
+        client.postMessage({type: "notification-click", data: event.notification.data});
     }
 
     resolve();
@@ -49,9 +56,9 @@ self.addEventListener('message', async function (event) {
     }
 });
 
-
 self.addEventListener('push', function(event) {
-    event.waitUntil(
+    console.log("[SW.JS] PUSH EVENT: ", event);
+    return event.waitUntil(
         // Retrieve a list of the clients of this service worker.
         self.clients.matchAll().then(function(clientList) {
             // Check if there's at least one focused client.
@@ -63,7 +70,7 @@ self.addEventListener('push', function(event) {
                 return;
             }
 
-            console.log("> PUSH EVENT: ", event, payload);
+            console.log("> PUSH EVENT: ", event);
             let title = "New messages available";
             let body = "You have new messages";
             return self.registration.showNotification(title, {
@@ -76,3 +83,5 @@ self.addEventListener('push', function(event) {
         })
     );
 });
+
+console.log("[SW.JS] Service Worker Loaded");

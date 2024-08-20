@@ -34,6 +34,7 @@ async function initServiceWorker()
 
             logInfo('> Service Worker Registered');
             serviceWorkerRegistration = registration;
+            await navigator.serviceWorker.ready;
             return serviceWorkerRegistration != undefined;
         } catch (e) {
             logError('Service Worker Registration Failed');
