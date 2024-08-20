@@ -29,7 +29,7 @@ self.addEventListener('notificationclick', async function (event) {
 
     if (!found) {
         console.log("[SW.JS] Opening new window");
-        await self.clients.openWindow("/client/");
+        await self.clients.openWindow("/goofy-chat-app-v2-client/client/");
         let client = await self.clients.matchAll({includeUncontrolled: true, type: 'window'});
         client.postMessage({type: "notification-click", data: event.notification.data});
     }
