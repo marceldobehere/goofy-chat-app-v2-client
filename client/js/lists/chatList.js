@@ -473,5 +473,8 @@ async function deleteCurrDm()
 
     docChatLastChannelId = NoId;
 
+    // TODO: Delete Symm keys
+
+
     await resetUiList();
 }

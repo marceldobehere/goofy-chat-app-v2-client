@@ -28,7 +28,7 @@ Also NOTE: This is only the statically hosted client. The server can be found [h
 * Image/Video/File Sharing
 * Upload Status Bar / Temporary File Upload List
 * Embedded Images/Videos/Audios
-* Notifications (Wont work on Firefox mobile)
+* Notifications (Sound, Normal and Push Notifications)
 
 
 ### Partially implemented Features
