@@ -71,8 +71,8 @@ self.addEventListener('push', function(event) {
             }
 
             console.log("> PUSH EVENT: ", event);
-            let title = "New messages available";
-            let body = "You have new messages";
+            let title = "Goofy Chat 2";
+            let body = "You have received new messages!";
             return self.registration.showNotification(title, {
                 body: body,
                 silent: true,
