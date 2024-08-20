@@ -29,6 +29,26 @@ async function checkNotifications()
     }
 }
 
+async function checkPushNotifications()
+{
+    if (!notificationsWork)
+        return;
+
+    if (!settingsObj["notification"]["allow-push-notifications"])
+        return;
+
+    if (!("serviceWorker" in navigator))
+        return;
+
+    if (!("PushManager" in window))
+        return;
+
+    if (!serviceWorkerRegistration)
+        return;
+
+    await tryInitSubscription();
+}
+
 async function initNotifications()
 {
     if (!(await initServiceWorker()))

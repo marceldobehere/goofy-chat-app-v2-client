@@ -83,7 +83,17 @@ async function initClientLib()
 
     await setStatus("Init VC?");
     tryExtFn(extFnVcInit);
+
+    await setStatus("Init Push?")
+    try {
+        checkPushNotifications();
+    } catch (e) {
+        logError(e);
+    }
+
     await setStatus("Init Done")
+
+
 
     //console.log(await accSendRawMessage(currentUser["mainAccount"], currentUser["mainAccount"]["userId"], {text: "yooo"}));
 }

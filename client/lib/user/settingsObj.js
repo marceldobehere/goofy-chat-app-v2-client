@@ -12,6 +12,7 @@ function tryConformSettings(obj) {
 
     if (obj["notification"] == undefined) obj["notification"] = {};
     if (obj["notification"]["allow-notifications"] == undefined) obj["notification"]["allow-notifications"] = true;
+    if (obj["notification"]["allow-push-notifications"] == undefined) obj["notification"]["allow-push-notifications"] = true;
     if (obj["notification"]["allow-sound"] == undefined) obj["notification"]["allow-sound"] = false;
 
     if (obj["goofy-console"] == undefined) obj["goofy-console"] = {};
