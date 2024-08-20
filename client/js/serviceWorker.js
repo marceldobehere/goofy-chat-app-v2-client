@@ -66,9 +66,9 @@ self.addEventListener('push', function(event) {
                 return client.focused;
             });
 
-            if (focused) {
-                return;
-            }
+            // if (focused) {
+            //     return;
+            // }
 
             console.log("> PUSH EVENT: ", event);
             let title = "Goofy Chat 2";
