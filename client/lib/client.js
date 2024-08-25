@@ -1,6 +1,18 @@
 let serverList;
 let currentUser;
 
+const sleep = async (time) => await new Promise(r => setTimeout(r, time));
+
+function setText(txt)
+{
+    let docChatList = document.getElementById("main-chat-content-list");
+    if (docChatList == null)
+        return;
+
+    docChatList.innerText = txt;
+}
+
+
 function initUserStuff()
 {
     currentUser = loadObject("currentUser");
@@ -56,7 +68,8 @@ async function initClientLib()
             return confirm("Do you want to secure your data with a password?");
         });
 
-    docChatList.innerText = "Initialising User...";
+
+    setText("Initialising User...");
     await sleep(10);
     await setStatus("Init User");
     initUserStuff();
@@ -73,20 +86,21 @@ async function initClientLib()
     await initMsgSystem();
 
 
-    docChatList.innerText = "Connecting to server, this might take a moment with new accounts...";
+    setText("Connecting to server, this might take a moment with new accounts...");
     await setStatus("Init Sockets");
     await createSockets(serverList, currentUser);
 
     await setStatus("Check User");
     await checkUserStuff();
-    docChatList.innerText = "";
+    setText("");
 
     await setStatus("Init VC?");
     tryExtFn(extFnVcInit);
 
     await setStatus("Init Push?")
     try {
-        checkPushNotifications();
+        if ("checkPushNotifications" in self)
+            checkPushNotifications().then();
     } catch (e) {
         logError(e);
     }

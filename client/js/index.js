@@ -1,5 +1,3 @@
-const sleep = async (time) => await new Promise(r => setTimeout(r, time));
-
 async function persist() {
     return await navigator.storage && navigator.storage.persist &&
         navigator.storage.persist();

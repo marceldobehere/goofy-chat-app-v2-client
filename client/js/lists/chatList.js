@@ -1,4 +1,4 @@
-const docChatList = document.getElementById("main-chat-content-list");
+let docChatList = document.getElementById("main-chat-content-list");
 const docChatUlDiv = document.getElementById("main-chat-content-uldiv");
 const inputElement = document.getElementById('main-chat-content-input');
 const inputStatusElement = document.getElementById('main-chat-content-input-file-status');
