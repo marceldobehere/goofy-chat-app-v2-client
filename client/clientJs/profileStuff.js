@@ -12,7 +12,7 @@ async function exportProfile()
         includeFiles = !!includeFiles;
 
         let exportObj = {
-            localStorage: localStorage,
+            localStorage: LsGetObj(),
             msgData: await internalMsgExportAll(currentUser['mainAccount'], includeFiles)
         }
 
@@ -38,7 +38,7 @@ async function resetProfile()
     await lockOutgoing.enable();
 
     await internalResetAll();
-    localStorage.clear();
+    LsReset();
     location.reload();
 }
 
@@ -69,10 +69,10 @@ async function importProfile()
         await lockOutgoing.enable();
     }
 
-    localStorage.clear();
+    LsReset();
     let ls = data["localStorage"];
     for (let key in ls)
-        localStorage.setItem(key, ls[key]);
+        LsSet(key, ls[key]);
 
     await internalResetAll();
 

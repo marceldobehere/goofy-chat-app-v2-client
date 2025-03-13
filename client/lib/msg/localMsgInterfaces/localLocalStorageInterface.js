@@ -129,13 +129,13 @@ async function _lMsgLSRemoveMsgs(account, userId)
 async function _lMsgLSResetAll()
 {
     // search through all keys and delete the ones that contain USER_MSGS, USER_UNREAD_MSG_IDS, USER_MSG_IDS
-    let keys = Object.keys(localStorage);
-    for (let key of keys)
+    let keys = LsGetAll();
+    for (let {key, value} of keys)
     {
         if (key.includes("_USER_MSGS_") ||
             key.includes("_USER_UNREAD_MSG_IDS_") ||
             key.includes("_USER_MSG_IDS_"))
-            localStorage.removeItem(key);
+            LsDel(key);
     }
 }
 

@@ -1,6 +1,44 @@
+const ENV_LS_OFFSET = "__GOOFY_CHAT_v2__";
+
+function LsGet(key) {
+    return localStorage.getItem(ENV_LS_OFFSET + key);
+}
+
+function LsSet(key, value) {
+    localStorage.setItem(ENV_LS_OFFSET + key, value);
+}
+
+function LsDel(key) {
+    localStorage.removeItem(ENV_LS_OFFSET + key);
+}
+
+function LsReset() {
+    let keys = LsGetAll();
+    for (let i = 0; i < keys.length; i++)
+        LsDel(keys[i].key);
+}
+
+function LsGetAll() {
+    let keys = [];
+    for (let i = 0; i < localStorage.length; i++)
+        if (localStorage.key(i).startsWith(ENV_LS_OFFSET)) {
+            const key = localStorage.key(i).substring(ENV_LS_OFFSET.length);
+            keys.push({ key: key, value: localStorage.getItem(localStorage.key(i)) });
+        }
+    return keys;
+}
+
+function LsGetObj() {
+    let keys = LsGetAll();
+    let obj = {};
+    for (let i = 0; i < keys.length; i++)
+        obj[keys[i].key] = keys[i].value;
+    return obj;
+}
+
 function clearAllLocalStorage()
 {
-    localStorage.clear();
+    LsReset();
 }
 
 function resetWithPassword(password)
@@ -66,7 +104,7 @@ async function initLocalStorageStuff(askPasswordCallback, passwordInvalidCallbac
 
 function _loadObject(key)
 {
-    let temp = localStorage.getItem(key);
+    let temp = LsGet(key);
     if (temp == null)
         return null;
 
@@ -75,7 +113,7 @@ function _loadObject(key)
 
 function _saveObject(key, obj)
 {
-    localStorage.setItem(key, JSON.stringify(obj));
+    LsSet(key, JSON.stringify(obj));
 }
 
 function _loadObjectOrCreateDefault(key, defaultObj)
@@ -132,7 +170,7 @@ function loadObjectOrCreateDefault(key, defaultObj)
 
 function deleteObject(key)
 {
-    localStorage.removeItem(key);
+    LsDel(key);
 }
 
 function loadAccountObjectOrCreateDefault(account, key, defaultObj)
